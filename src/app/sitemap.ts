@@ -1,0 +1,31 @@
+import type { MetadataRoute } from "next";
+import { absoluteUrl } from "@/lib/site";
+import { getFragranceSlugs } from "@/server/data/catalog";
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const now = new Date();
+
+  const primary = ["/", "/discovery-set"];
+  const secondary = ["/the-idea", "/faq", "/contact"];
+  const legal = ["/shipping", "/returns", "/privacy", "/terms"];
+  const pdp = (await getFragranceSlugs()).map((slug) => `/fragrances/${slug}`);
+
+  const entry = (
+    path: string,
+    priority: number,
+    changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"],
+  ): MetadataRoute.Sitemap[number] => ({
+    url: absoluteUrl(path),
+    lastModified: now,
+    changeFrequency,
+    priority,
+  });
+
+  return [
+    entry("/", 1, "weekly"),
+    ...pdp.map((p) => entry(p, 0.9, "weekly")),
+    ...primary.filter((p) => p !== "/").map((p) => entry(p, 0.8, "monthly")),
+    ...secondary.map((p) => entry(p, 0.5, "monthly")),
+    ...legal.map((p) => entry(p, 0.3, "yearly")),
+  ];
+}

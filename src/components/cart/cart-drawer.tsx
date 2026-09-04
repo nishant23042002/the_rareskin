@@ -1,0 +1,555 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useLenis } from "lenis/react";
+
+import { gsap } from "@/lib/gsap";
+import { useCart } from "@/components/providers/cart-provider";
+import { useRouteTransition } from "@/components/providers/route-transition";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { Button } from "@/components/ui/button";
+import { Mark } from "@/components/ui/mark";
+import { Icon } from "@/components/ui/icon";
+import { Logo } from "@/components/ui/logo";
+import { formatINR } from "@/lib/catalog";
+import { lockScroll, unlockScroll } from "@/lib/scroll-lock";
+import { CartLineRow } from "./cart-line";
+import { BagSuggestions } from "./bag-suggestions";
+import { CartMarquee } from "./cart-marquee";
+import { CheckoutPanel } from "./checkout-panel";
+
+const VIEW_INDEX = { bag: 0, checkout: 1, done: 2 } as const;
+const STEPS = ["Bag", "Details", "Placed"] as const;
+const TRI_JUICE =
+  "linear-gradient(90deg, #e0d7bf 0%, #c5872f 52%, #3d2712 100%)";
+
+/**
+ * "The Counter" — one right-anchored panel that slides between three views:
+ * the bag, the checkout, and the confirmation. A perfumer's counter where the
+ * order is assembled, wrapped, and handed over without you ever leaving the
+ * page. Native <dialog> + showModal() for the focus trap / ESC; the panel and
+ * scrim are parked off-screen by CSS from first paint (no flash); GSAP only
+ * paints, with setTimeout safety nets so a throttled rAF degrades to "no
+ * animation" rather than "stuck".
+ */
+export function CartDrawer() {
+  const {
+    isOpen,
+    view,
+    closeCart,
+    backToBag,
+    goToCheckout,
+    lines,
+    count,
+    subtotal,
+    savings,
+    listTotal,
+    hydrated,
+    placedOrder,
+    modalSuspended,
+  } = useCart();
+  const reduced = useReducedMotion();
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  /** true while we flip the dialog's modal level ourselves — the resulting
+   *  `close` event must not be read as the user closing the drawer. */
+  const suppressCloseRef = useRef(false);
+  const panelRef = useRef<HTMLElement>(null);
+  const scrimRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const lenis = useLenis();
+
+  const index = VIEW_INDEX[view];
+
+  useEffect(() => {
+    if (isOpen) lenis?.stop();
+    else lenis?.start();
+  }, [isOpen, lenis]);
+
+  // open / close
+  useEffect(() => {
+    const dlg = dialogRef.current;
+    const panel = panelRef.current;
+    const scrim = scrimRef.current;
+    if (!dlg || !panel || !scrim) return;
+
+    if (isOpen) {
+      if (!dlg.open) dlg.showModal();
+      lockScroll("cart");
+
+      gsap.set(panel, { xPercent: 101, x: 0 });
+      gsap.set(scrim, { autoAlpha: 0 });
+
+      if (reduced) {
+        gsap.set(panel, { xPercent: 0 });
+        gsap.set(scrim, { autoAlpha: 1 });
+        return;
+      }
+
+      gsap.to(scrim, { autoAlpha: 1, duration: 0.5, ease: "power1.out" });
+      gsap.to(panel, {
+        xPercent: 0,
+        duration: 0.62,
+        ease: "power4.out",
+        overwrite: "auto",
+      });
+      // safety net: if the ticker is throttled (background tab / hidden pane)
+      // force the resting visible state so the panel is never stuck off-canvas
+      const openSafety = window.setTimeout(() => {
+        gsap.set(panel, { xPercent: 0, x: 0 });
+        gsap.set(scrim, { autoAlpha: 1 });
+      }, 900);
+
+      const rows = panel.querySelectorAll<HTMLElement>("[data-cart-line]");
+      if (rows.length) {
+        gsap.fromTo(
+          rows,
+          { autoAlpha: 0, y: 16 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.5,
+            stagger: 0.06,
+            ease: "power2.out",
+            delay: 0.22,
+          },
+        );
+      }
+      return () => window.clearTimeout(openSafety);
+    }
+
+    if (!dlg.open) return;
+
+    const finish = () => {
+      dlg.close();
+      unlockScroll("cart");
+    };
+
+    if (reduced) {
+      gsap.set(panel, { xPercent: 101, x: 0 });
+      gsap.set(scrim, { autoAlpha: 0 });
+      finish();
+      return;
+    }
+
+    gsap.to(scrim, { autoAlpha: 0, duration: 0.32, ease: "power1.in" });
+    gsap.to(panel, {
+      xPercent: 101,
+      x: 0,
+      duration: 0.42,
+      ease: "power3.in",
+      overwrite: "auto",
+      onComplete: finish,
+    });
+    const safety = window.setTimeout(finish, 700);
+    return () => window.clearTimeout(safety);
+  }, [isOpen, reduced]);
+
+  // A top-layer modal paints above every z-indexed element on the page, so a
+  // third-party payment overlay (Razorpay Checkout) would open *behind* the
+  // drawer. While `modalSuspended` is set, drop to a non-modal `show()` so the
+  // overlay sits in front; re-enter `showModal()` once it closes. The `close`
+  // event this triggers is masked so it doesn't collapse the drawer.
+  useEffect(() => {
+    const dlg = dialogRef.current;
+    if (!dlg || !dlg.open) return;
+
+    let isModal = true;
+    try {
+      isModal = dlg.matches(":modal");
+    } catch {
+      /* :modal unsupported — assume modal, the toggle below still corrects it */
+    }
+    if (modalSuspended !== isModal) return; // already in the right mode
+
+    suppressCloseRef.current = true;
+    dlg.close();
+    if (modalSuspended) {
+      dlg.show();
+    } else {
+      dlg.showModal();
+    }
+    const clear = window.setTimeout(() => {
+      suppressCloseRef.current = false;
+    }, 0);
+    return () => window.clearTimeout(clear);
+  }, [modalSuspended]);
+
+  // slide between views
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const to = -index * (100 / 3);
+    if (reduced) {
+      gsap.set(track, { xPercent: to });
+      return;
+    }
+    gsap.to(track, {
+      xPercent: to,
+      duration: 0.5,
+      ease: "power4.out",
+      overwrite: "auto",
+    });
+    const safety = window.setTimeout(() => {
+      gsap.set(track, { xPercent: to });
+    }, 620);
+    return () => window.clearTimeout(safety);
+  }, [index, reduced]);
+
+  // ESC → animated close; also re-sync state if the dialog was closed from
+  // outside (e.g. the route transition force-closes open dialogs).
+  useEffect(() => {
+    const dlg = dialogRef.current;
+    if (!dlg) return;
+    const onCancel = (e: Event) => {
+      e.preventDefault();
+      closeCart();
+    };
+    const onClose = () => {
+      // our own modal-level flip, not a real close — ignore it
+      if (suppressCloseRef.current) {
+        suppressCloseRef.current = false;
+        return;
+      }
+      unlockScroll("cart");
+      if (isOpen) closeCart();
+    };
+    dlg.addEventListener("cancel", onCancel);
+    dlg.addEventListener("close", onClose);
+    return () => {
+      dlg.removeEventListener("cancel", onCancel);
+      dlg.removeEventListener("close", onClose);
+    };
+  }, [closeCart, isOpen]);
+
+  const filled = hydrated && lines.length > 0;
+
+  return (
+    <dialog
+      ref={dialogRef}
+      aria-label="Your bag and checkout"
+      className="fixed inset-0 m-0 h-dvh max-h-none w-[calc(100vw+var(--sbw,0px))] max-w-none overflow-hidden border-0 bg-transparent p-0 backdrop:bg-transparent"
+    >
+      <div
+        ref={scrimRef}
+        onClick={closeCart}
+        aria-hidden
+        className="drawer-scrim absolute inset-0 bg-ink/35"
+      />
+      <aside
+        ref={panelRef}
+        className="drawer-panel ui-surface absolute inset-y-0 right-0 flex w-[min(468px,94vw)] flex-col border-l border-line bg-surface text-ink will-change-transform"
+      >
+        {view !== "done" && <CartMarquee />}
+
+        {/* ── header ─────────────────────────────────────────────── */}
+        <header className="shrink-0 border-b border-line px-6 pt-5 pb-3.5">
+          <div className="flex items-center justify-between">
+            {view === "checkout" ? (
+              <button
+                type="button"
+                onClick={backToBag}
+                className="-ml-1 inline-flex items-center gap-1.5 px-1 py-0.5 text-[10px] tracking-[0.14em] text-ink-2 uppercase transition-colors hover:text-ink"
+              >
+                <Icon name="chevron" className="size-3 rotate-180" />
+                Bag
+              </button>
+            ) : (
+              <span className="inline-flex items-center gap-2.5">
+                <Mark className="w-3 text-ink" />
+                <span className="text-[10.5px] tracking-[0.2em] uppercase">
+                  {view === "done"
+                    ? placedOrder?.orderNumber ?? "Order placed"
+                    : "The Bag"}
+                </span>
+                {view === "bag" && count > 0 && (
+                  <span className="text-[10.5px] tabular-nums text-ink-3">
+                    &middot; {count}
+                  </span>
+                )}
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={closeCart}
+              aria-label="Close"
+              className="-mr-1 p-1.5 text-ink-3 transition-colors hover:text-ink"
+            >
+              <Icon name="close" className="size-[13px]" />
+            </button>
+          </div>
+
+          {/* progress rail */}
+          <div className="mt-3.5">
+            <div className="relative h-px bg-line-2">
+              <span
+                className="absolute inset-y-0 left-0 transition-[width] duration-500 ease-[var(--ease-out-strong)]"
+                style={{
+                  width: `${(index / (STEPS.length - 1)) * 100}%`,
+                  backgroundImage: TRI_JUICE,
+                }}
+              />
+              {STEPS.map((_, i) => (
+                <span
+                  key={i}
+                  className="absolute top-1/2 size-[5px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                  style={{
+                    left: `${(i / (STEPS.length - 1)) * 100}%`,
+                    background:
+                      i <= index ? "var(--color-ink)" : "var(--color-line-2)",
+                  }}
+                />
+              ))}
+            </div>
+            <div className="mt-2 flex justify-between text-[8.5px] tracking-[0.14em] uppercase">
+              {STEPS.map((s, i) => (
+                <span
+                  key={s}
+                  className={
+                    i === index
+                      ? "text-ink"
+                      : i < index
+                        ? "text-ink-3"
+                        : "text-ink-3/55"
+                  }
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+        </header>
+
+        {/* ── filmstrip ──────────────────────────────────────────── */}
+        <div className="relative flex-1 overflow-hidden">
+          <div ref={trackRef} className="flex h-full w-[300%]">
+            {/* slide: bag */}
+            <div className="flex h-full w-1/3 flex-col">
+              <div
+                data-lenis-prevent
+                className="flex flex-1 flex-col overflow-y-auto overscroll-contain"
+              >
+                {!hydrated ? null : filled ? (
+                  <>
+                    <ul>
+                      {lines.map((line) => (
+                        <CartLineRow key={line.sku} line={line} />
+                      ))}
+                    </ul>
+                    <BagSuggestions className="border-t border-line/70 pt-5 pb-7" />
+                  </>
+                ) : (
+                  <div className="flex flex-1 flex-col">
+                    <div className="flex flex-col items-center px-8 pt-16 pb-10 text-center">
+                      <Mark className="mb-5 w-6 text-ink-3" />
+                      <p className="serif-italic text-[1.4rem] leading-snug text-ink-2">
+                        Nothing chosen yet.
+                      </p>
+                      <p className="mt-3 max-w-[26ch] text-[11px] leading-relaxed text-ink-3">
+                        Three extraits and the Discovery Set — add one to begin.
+                      </p>
+                    </div>
+                    <BagSuggestions
+                      heading="The range"
+                      className="mt-auto border-t border-line/70 pt-5 pb-8"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {filled && (
+                <footer className="shrink-0 border-t border-line px-6 pt-4 pb-[calc(20px+env(safe-area-inset-bottom))]">
+                  {savings > 0 && (
+                    <>
+                      <div className="flex items-baseline justify-between text-[11px] text-ink-2">
+                        <span>Bag value</span>
+                        <span className="tabular-nums text-ink-3 line-through">
+                          {formatINR(listTotal)}
+                        </span>
+                      </div>
+                      <div className="mt-1 flex items-baseline justify-between text-[11px] font-medium text-ok">
+                        <span>You save</span>
+                        <span className="tabular-nums">− {formatINR(savings)}</span>
+                      </div>
+                    </>
+                  )}
+                  <div className="mt-2.5 flex items-baseline justify-between border-t border-line pt-2.5">
+                    <span className="text-[9.5px] tracking-[0.16em] text-ink-3 uppercase">
+                      Subtotal
+                    </span>
+                    <span className="serif text-[1.5rem] tabular-nums text-ink">
+                      {formatINR(subtotal)}
+                    </span>
+                  </div>
+
+                  <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-[9.5px] tracking-[0.06em] text-ink-3 uppercase">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Icon name="check" className="size-[11px] text-ok" /> Free
+                      shipping
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Icon name="check" className="size-[11px] text-ok" />{" "}
+                      All-inclusive price
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Icon name="check" className="size-[11px] text-ok" /> Easy
+                      returns
+                    </span>
+                  </div>
+
+                  <Button onClick={goToCheckout} className="mt-3.5 w-full">
+                    Proceed to checkout
+                  </Button>
+                </footer>
+              )}
+            </div>
+
+            {/* slide: checkout */}
+            <div className="flex h-full w-1/3 flex-col">
+              {(isOpen || view === "checkout") && <CheckoutPanel />}
+            </div>
+
+            {/* slide: confirmation */}
+            <div className="flex h-full w-1/3 flex-col">
+              <Confirmation
+                key={placedOrder?.orderNumber ?? "none"}
+                order={placedOrder}
+                onClose={closeCart}
+              />
+            </div>
+          </div>
+        </div>
+      </aside>
+    </dialog>
+  );
+}
+
+/** Seconds the confirmation lingers before it carries a paid shopper to their
+ *  order. Long enough to read the confirmation, short enough not to nag. */
+const REDIRECT_SECS = 5;
+
+function Confirmation({
+  order,
+  onClose,
+}: {
+  order: { orderNumber: string; method: "razorpay" | "cod"; paid: boolean } | null;
+  onClose: () => void;
+}) {
+  const { navigate } = useRouteTransition();
+  const reduced = useReducedMotion();
+  const [secondsLeft, setSecondsLeft] = useState(REDIRECT_SECS);
+  const [autoRedirect, setAutoRedirect] = useState(true);
+  const firedRef = useRef(false);
+
+  const orderNumber = order?.orderNumber ?? null;
+  const paid = order?.paid ?? false;
+  const orderHref = orderNumber ? `/account/orders/${orderNumber}` : "/account/orders";
+
+  const goToOrder = () => {
+    if (firedRef.current) return;
+    firedRef.current = true;
+    onClose(); // slide the drawer out
+    window.setTimeout(() => navigate(orderHref), reduced ? 0 : 260);
+  };
+
+  // Paid orders auto-advance to the order page after a short, visible countdown.
+  // A `key` on this component (the order number) gives every order a fresh mount,
+  // so `secondsLeft` starts at REDIRECT_SECS without a reset inside the effect.
+  useEffect(() => {
+    if (!paid || !orderNumber || !autoRedirect) return;
+    firedRef.current = false;
+    const startedAt = Date.now();
+    const id = window.setInterval(() => {
+      const remaining = Math.max(
+        0,
+        REDIRECT_SECS - Math.floor((Date.now() - startedAt) / 1000),
+      );
+      setSecondsLeft(remaining);
+      if (remaining === 0) {
+        window.clearInterval(id);
+        goToOrder();
+      }
+    }, 250);
+    return () => window.clearInterval(id);
+    // goToOrder is stable enough for this lifecycle; deps kept minimal on purpose
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paid, orderNumber, autoRedirect]);
+
+  if (!order) return <div className="flex-1" />;
+
+  const progress =
+    ((REDIRECT_SECS - secondsLeft) / REDIRECT_SECS) * 100;
+
+  return (
+    <>
+      <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
+        <span className="relative mb-6 inline-flex size-14 items-center justify-center rounded-full border border-line-2">
+          <span
+            aria-hidden
+            className="absolute inset-x-4 -bottom-px h-[2px]"
+            style={{ backgroundImage: TRI_JUICE }}
+          />
+          <svg viewBox="0 0 20 20" className="w-6 text-ink" fill="none" aria-hidden>
+            <path
+              d="M4 10.5 L8.5 15 L16 5.5"
+              stroke="currentColor"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
+        <p className="eyebrow mb-2 text-ok">
+          {paid ? "Payment received" : "Order placed"}
+        </p>
+        <h3 className="serif text-[1.7rem] leading-tight tracking-[-0.01em] text-ink">
+          {order.orderNumber}
+        </h3>
+        <p className="mx-auto mt-3 max-w-[32ch] text-[13px] leading-relaxed text-ink-2">
+          {order.method === "cod"
+            ? "You’ll pay the courier in cash on arrival. We’ll confirm dispatch by SMS."
+            : paid
+              ? "Thank you — your payment is confirmed. A receipt is on its way to your email and we’ll text you when it ships."
+              : "Your order is held for 30 minutes. Reopen it from your account to complete payment."}
+        </p>
+
+        {paid && autoRedirect && (
+          <div className="mt-7 w-full max-w-[240px]">
+            <div className="relative h-px overflow-hidden bg-line-2">
+              <span
+                className="absolute inset-y-0 left-0 transition-[width] duration-[250ms] ease-linear"
+                style={{ width: `${progress}%`, backgroundImage: TRI_JUICE }}
+              />
+            </div>
+            <p className="mt-2.5 text-[10.5px] tracking-[0.1em] text-ink-3 uppercase">
+              Opening your order in{" "}
+              <span className="tabular-nums text-ink">{secondsLeft}s</span>
+            </p>
+          </div>
+        )}
+
+        <Logo
+          className="mt-8 text-ink-3"
+          style={{ width: "96px", opacity: 0.5 }}
+        />
+      </div>
+      <footer className="shrink-0 space-y-2.5 border-t border-line px-6 pt-4 pb-[calc(22px+env(safe-area-inset-bottom))]">
+        <Button onClick={goToOrder} className="w-full">
+          {paid && autoRedirect ? "View order now" : "View order"}
+        </Button>
+        <button
+          type="button"
+          onClick={() => {
+            if (paid && autoRedirect) {
+              setAutoRedirect(false);
+            } else {
+              onClose();
+            }
+          }}
+          className="w-full py-2 text-[10px] tracking-[0.16em] text-ink-3 uppercase transition-colors hover:text-ink"
+        >
+          {paid && autoRedirect ? "Stay here" : "Keep shopping"}
+        </button>
+      </footer>
+    </>
+  );
+}

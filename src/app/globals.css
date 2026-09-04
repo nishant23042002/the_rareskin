@@ -1,0 +1,536 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   THE RARESKIN — design tokens
+   Warm greyscale monochrome; chroma appears only where a fragrance does.
+   Ported 1:1 from the "Campaign" prototype. Single, deliberate light theme.
+   ========================================================================== */
+
+@theme {
+  /* greyscale ramp */
+  --color-w0: #fafaf7;
+  --color-w1: #efeeea;
+  --color-w2: #cfcdc6;
+  --color-w3: #7c7a74;
+  --color-w4: #2c2a26;
+
+  /* surfaces + ink */
+  --color-bg: #f2f1ed;
+  --color-surface: #fafaf7;
+  --color-surface-2: #eceae4;
+  --color-ink: #232120;
+  --color-ink-2: #6b6963;
+  /* was #9a988f — darkened so quiet labels clear WCAG AA (4.5:1) on --color-bg */
+  --color-ink-3: #6c6960;
+  --color-line: #dedcd5;
+  --color-line-2: #cfcdc6;
+  --color-cta: #17140f;
+  --color-cta-hover: #000000;
+
+  /* per-fragrance accents (index dots, focus rings, spec bars) */
+  --color-aurevan: #a89a7c;
+  --color-orvelis: #bc862f;
+  --color-vayren: #6a4630;
+
+  /* warm gilt — the only flat accent, used on dark grounds (announcement, marquee) */
+  --color-gilt: #d89a4d;
+
+  /* status — muted so they sit inside the warm palette, still WCAG AA on --color-bg */
+  --color-error: #b23a2b;
+  --color-ok: #4a7355;
+  /* amber "attention" — replaces the hard-coded #8f6118 in the admin */
+  --color-warn: #8f6118;
+
+  /* type */
+  --font-sans: var(--font-jost), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-newsreader), Georgia, "Times New Roman", serif;
+
+  /* motion */
+  --ease-brand: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  /* long, quint-out settle for the header state change (Polène-style) */
+  --ease-nav: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  :root {
+    --header-h: 66px;
+    --announce-h: 34px;
+    --index-h: 38px;
+    /* classic-scrollbar width, published by <ScrollbarVar>; 0 until it mounts */
+    --sbw: 0px;
+    color-scheme: light;
+  }
+
+  * {
+    min-width: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* Always reserve the scrollbar's space so locking scroll (drawer / menu /
+       Lenis stop) can't reflow the page sideways. */
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-weight: 300;
+    font-size: 1rem;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 300;
+    line-height: 1.04;
+    letter-spacing: -0.016em;
+    text-wrap: balance;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Tailwind v4 preflight no longer sets this; every interactive control gets it */
+  button:not(:disabled),
+  [role="button"],
+  [role="tab"],
+  summary,
+  label[for] {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: var(--color-ink);
+    color: var(--color-w0);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+    border-radius: 1px;
+  }
+
+  body.is-locked,
+  body.route-locked {
+    overflow: hidden;
+  }
+
+  /* ---------------------------------------------------------------------
+     Admin ("Studio") theme — scoped to the admin shell so the storefront
+     stays on its single deliberate light theme. `data-admin-theme` is set
+     server-side from a cookie (no flash); the toggle flips it live.
+     The greyscale ramp's ends are swapped so `bg-ink text-w0`-style
+     inversions keep working without touching component markup.
+     --------------------------------------------------------------------- */
+  [data-admin-theme="light"] {
+    color-scheme: light;
+    /* explicit so a light scope nested in a dark one (e.g. the product
+       preview, which mocks the always-light storefront) restores the base
+       palette rather than inheriting the dark tokens */
+    --color-w0: #fafaf7;
+    --color-w1: #efeeea;
+    --color-w2: #cfcdc6;
+    --color-w3: #7c7a74;
+    --color-w4: #2c2a26;
+    --color-bg: #f2f1ed;
+    --color-surface: #fafaf7;
+    --color-surface-2: #eceae4;
+    --color-ink: #232120;
+    --color-ink-2: #6b6963;
+    --color-ink-3: #6c6960;
+    --color-line: #dedcd5;
+    --color-line-2: #cfcdc6;
+    --color-cta: #17140f;
+    --color-cta-hover: #000000;
+    --color-error: #b23a2b;
+    --color-ok: #4a7355;
+    --color-warn: #8f6118;
+  }
+  [data-admin-theme="dark"] {
+    color-scheme: dark;
+
+    --color-w0: #1c1b19;
+    --color-w1: #26241f;
+    --color-w2: #4c4941;
+    --color-w3: #948f86;
+    --color-w4: #ede9e2;
+
+    --color-bg: #161512;
+    --color-surface: #211f1c;
+    --color-surface-2: #2c2925;
+    --color-ink: #ede9e2;
+    --color-ink-2: #aba69c;
+    --color-ink-3: #948f86; /* WCAG AA on --color-bg (>4.5:1) */
+    --color-line: #3a3730;
+    --color-line-2: #4e4a41;
+    --color-cta: #ede9e2;
+    --color-cta-hover: #ffffff;
+
+    --color-error: #e58573;
+    --color-ok: #7fb08f;
+    --color-warn: #dba64e;
+  }
+}
+
+@layer components {
+  /* small uppercase kicker used across the site */
+  .eyebrow {
+    font-size: 0.656rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
+    font-weight: 400;
+  }
+
+  /* ---- functional UI surfaces: checkout, account, forms ----
+     The editorial body runs light (300). Dense, information-carrying UI needs
+     more weight to stay legible at small sizes, so these surfaces set a 400
+     floor. `.serif` display type inside them still resolves to its own weight.
+     Applied on the drawer panel and the /account main. */
+  .ui-surface,
+  .ui-surface input,
+  .ui-surface select,
+  .ui-surface textarea,
+  .ui-surface button {
+    font-weight: 400;
+  }
+  .ui-surface .serif {
+    font-weight: 300;
+  }
+
+  .serif {
+    font-family: var(--font-serif);
+    font-weight: 300;
+  }
+
+  .serif-italic {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  /* ---- header: transparent over the hero, frosted once scrolled ----
+     Everything that moves on scroll is GPU-friendly: the frost is an opacity
+     crossfade of a pre-composited layer (backdrop-filter set once, never
+     transitioned), the wordmark scales via transform, only `color` tweens on
+     the main thread (cheap). */
+  .site-header {
+    position: relative;
+    isolation: isolate;
+    color: var(--color-ink);
+    transition: color 0.35s ease;
+  }
+  .site-header > * {
+    position: relative;
+    z-index: 1;
+  }
+  .site-header[data-tone="light"] {
+    color: var(--color-w0);
+  }
+  .site-header[data-scrolled="true"] {
+    color: var(--color-ink);
+  }
+
+  .site-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-color: color-mix(in srgb, var(--color-w0) 74%, transparent);
+    -webkit-backdrop-filter: blur(12px) saturate(1.35);
+    backdrop-filter: blur(12px) saturate(1.35);
+    border-bottom: 1px solid var(--color-line);
+    opacity: 0;
+    transition: opacity 0.6s var(--ease-nav);
+    pointer-events: none;
+  }
+  .site-header[data-scrolled="true"]::before {
+    opacity: 1;
+  }
+
+  .site-header__row {
+    height: var(--header-h);
+  }
+
+  .site-header__wordmark {
+    transform-origin: center;
+    transition: transform 0.6s var(--ease-nav);
+    will-change: transform;
+  }
+  .site-header[data-scrolled="true"] .site-header__wordmark {
+    transform: scale(0.84);
+  }
+
+  .site-header__index {
+    height: var(--index-h);
+    overflow: hidden;
+    border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+    transition:
+      height 0.6s var(--ease-nav),
+      opacity 0.35s ease,
+      border-color 0.5s var(--ease-nav);
+  }
+  .site-header[data-scrolled="true"] .site-header__index {
+    height: 0;
+    opacity: 0;
+    border-top-color: transparent;
+  }
+
+  /* ---- overlays: parked off-screen from first paint so they can never flash
+     at rest before JS runs. GSAP overrides these via inline style. ---- */
+  .drawer-scrim {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .drawer-panel {
+    transform: translateX(101%);
+    box-shadow: -28px 0 70px -20px rgba(20, 16, 12, 0.22);
+  }
+  .menu-panel {
+    transform: translateY(-101%);
+  }
+  .menu-panel [data-stagger] {
+    opacity: 0;
+  }
+
+  /* ---- sign-in modal: centred card ≥ 640px, bottom sheet below. The dialog +
+     panel are parked from first paint; GSAP drives the entrance/exit via inline
+     style, with a safety net that forces the resting state if it can't tick.
+     Form content is never opacity-parked — it rides the panel in, and new
+     fields on the code step must not be trapped invisible. ---- */
+  .signin-dialog {
+    opacity: 0;
+  }
+  .signin-panel {
+    opacity: 0;
+  }
+  .signin-juice {
+    background-image: linear-gradient(
+      90deg,
+      #e0d7bf 0%,
+      #c5872f 52%,
+      #3d2712 100%
+    );
+  }
+
+  /* route transition — parked from first paint; GSAP drives it via inline style */
+  .route-curtain {
+    opacity: 0;
+    visibility: hidden;
+  }
+  /* gentle fade-up on the phone → code step change. Failure-safe: no fill mode,
+     so the element always rests at its natural (visible) state — the keyframe
+     only adds movement while it plays. */
+  .signin-step {
+    animation: signin-step-in 0.4s var(--ease-out-strong);
+  }
+  @keyframes signin-step-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  /* admin notification bell — a one-shot wobble when the unread count rises.
+     No fill mode: rests at 0deg, the keyframe only plays on the trigger. */
+  .bell-ring {
+    animation: bell-ring 0.7s var(--ease-out-strong);
+    transform-origin: 50% 12%;
+  }
+  @keyframes bell-ring {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    12% {
+      transform: rotate(14deg);
+    }
+    28% {
+      transform: rotate(-11deg);
+    }
+    44% {
+      transform: rotate(7deg);
+    }
+    60% {
+      transform: rotate(-4deg);
+    }
+    76% {
+      transform: rotate(2deg);
+    }
+  }
+
+  /* toast enters from the right; resting state is fully visible so
+     prefers-reduced-motion (which kills the animation) still shows it. */
+  .toast-in {
+    animation: toast-in 0.32s var(--ease-out-strong);
+  }
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateX(16px);
+    }
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* campaign corner card — the pill catches a slow gilt sweep every few
+     seconds so it stays noticed without moving; the detail card rises once. */
+  .campaign-pill {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s var(--ease-out-strong);
+  }
+  .campaign-pill:hover {
+    transform: translateY(-1px);
+  }
+  .campaign-pill::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      transparent 40%,
+      rgba(216, 154, 77, 0.28) 50%,
+      transparent 60%
+    );
+    transform: translateX(-120%);
+    animation: campaign-sweep 7s ease-in-out 2s infinite;
+    pointer-events: none;
+  }
+  @keyframes campaign-sweep {
+    0%,
+    82%,
+    100% {
+      transform: translateX(-120%);
+    }
+    92% {
+      transform: translateX(120%);
+    }
+  }
+  .campaign-rise {
+    animation: campaign-rise 0.34s var(--ease-out-strong);
+  }
+  @keyframes campaign-rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .campaign-pill::after {
+      animation: none;
+      opacity: 0;
+    }
+    .campaign-rise {
+      animation: none;
+    }
+  }
+
+  /* ---- quiz: one stage, panels cross-fade + slide, height animates to the
+     active panel so the card never jumps ---- */
+  .quiz-stage {
+    position: relative;
+    overflow: hidden;
+    transition: height 0.42s var(--ease-out-strong);
+  }
+  .quiz-panel {
+    position: absolute;
+    inset: 0 0 auto 0;
+    opacity: 0;
+    transform: translateX(26px);
+    pointer-events: none;
+    transition:
+      opacity 0.32s ease,
+      transform 0.42s var(--ease-out-strong);
+  }
+  .quiz-panel[data-result="true"] {
+    transform: scale(0.965);
+  }
+  .quiz-panel[data-active="true"] {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  .quiz-opt::before {
+    content: "";
+    inline-size: 9px;
+    block-size: 9px;
+    border-radius: 9999px;
+    border: 1px solid var(--color-ink-3);
+    flex: none;
+    transition: background-color 0.18s ease;
+  }
+  .quiz-opt:hover::before {
+    background-color: var(--color-ink-3);
+  }
+
+  /* underline-draw on nav links (Polène-style) */
+  .nav-underline {
+    position: relative;
+  }
+  .nav-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    height: 1px;
+    background: var(--underline-color, currentColor);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.45s var(--ease-nav);
+  }
+  .nav-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+/* Lenis owns smooth scrolling; keep native behaviour instant so the two
+   never fight. Under reduced-motion Lenis is disabled and this still holds. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* `hidden` (not `clip`) so `scrollbar-gutter: stable` keeps reserving the
+   gutter while Lenis is stopped — otherwise the page shifts as the bar goes. */
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
