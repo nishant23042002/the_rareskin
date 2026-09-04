@@ -1,0 +1,68 @@
+{
+  "name": "rareskin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "db:check": "tsx scripts/db-check.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "catalog": "tsx scripts/catalog.ts",
+    "coupon": "tsx scripts/coupon.ts",
+  "reset:commerce": "tsx scripts/reset-commerce.ts",
+    "reset:stock": "tsx scripts/reset-stock.ts",
+    "seed:reviews": "tsx scripts/seed-reviews.ts",
+    "revalidate": "tsx scripts/catalog.ts revalidate",
+    "db:migrate": "migrate-mongo up",
+    "db:migrate:down": "migrate-mongo down",
+    "db:migrate:status": "migrate-mongo status",
+    "db:migrate:create": "migrate-mongo create",
+    "email:preview": "email dev --dir src/server/email/templates --port 3030",
+    "email:drain": "tsx scripts/email.ts drain",
+    "email:test": "tsx scripts/email.ts test"
+  },
+  "dependencies": {
+    "@gsap/react": "^2.1.2",
+    "@react-pdf/renderer": "^4.9.0",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.3",
+    "cloudinary": "^2.11.0",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.26",
+    "mongoose": "^9.9.4",
+    "next": "16.3.3",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-email": "^6.9.3",
+    "resend": "^6.25.0",
+    "server-only": "^0.0.1",
+    "twilio": "^6.1.0",
+    "zod": "^4.5.1"
+  },
+  "devDependencies": {
+    "@fontsource/jost": "^5.3.0",
+    "@fontsource/newsreader": "^5.3.0",
+    "@next/env": "^16.3.3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.3",
+    "migrate-mongo": "^14.0.7",
+    "prettier": "^3.9.6",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.12",
+    "typescript": "^5"
+  },
+  "packageManager": "pnpm@10.34.5",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}
