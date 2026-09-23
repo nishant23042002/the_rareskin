@@ -322,9 +322,13 @@ before going live:
   "Bottled in Roha, Maharashtra". Confirm each with the perfumer / QA before
   launch and adjust the copy in that file. The animal-testing line is
   deliberately omitted until the position is set (see FAQ item above).
-- **Founder portrait** — a placeholder panel until a photo is uploaded in
-  **Admin → Settings → Founder**. Once set it fills the homepage "first letter"
-  card (left column) and the `/the-idea` card. Portrait, ~4:5.
+- **Founder portrait** — set in **Admin → Settings → Founder** (or scripted:
+  `pnpm founder:portrait <image>` uploads to Cloudinary
+  `rareskin/content/founder-portrait`, records the `MediaAsset`, sets
+  `SiteSettings.founderPortrait` and busts the cache). It fills the homepage
+  "first letter" card (left column) and the `/the-idea` card. The live DB
+  already has the real photo; a fresh DB shows a placeholder panel until it's
+  set. Portrait, ~4:5.
 - **Homepage hero banners** — each fragrance's homepage-carousel slide shows the
   vector placeholder scene until a banner is uploaded in
   **Admin → Catalogue → \<fragrance\> → Homepage hero banner** (a 16:9 desktop
