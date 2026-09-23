@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
-import { Mark } from "@/components/ui/mark";
+import { FounderPhoto } from "@/components/ui/founder-photo";
 import { PageIntro } from "@/components/layout/page-intro";
 import { pageMeta } from "@/lib/seo";
-import { cloudinaryVariant } from "@/lib/catalog";
 import { getSiteSettings } from "@/server/data/settings";
 
 export const metadata = pageMeta({
@@ -36,27 +35,19 @@ function FounderCard({ src }: { src?: string }) {
   return (
     <figure className="overflow-hidden rounded-[4px] border border-line">
       <div
-        className="relative flex aspect-[4/5] items-center justify-center overflow-hidden"
+        className="relative aspect-[4/5] overflow-hidden sm:aspect-[4/3] lg:aspect-[4/5]"
         style={{
           background:
             "linear-gradient(160deg, var(--color-w0), var(--color-w1) 55%, var(--color-w2))",
         }}
       >
-        {src ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={cloudinaryVariant(src, { w: 760, h: 950, fill: true }) ?? src}
-            alt="Vijay More, founder of THE RARESKIN"
-            className="absolute inset-0 size-full object-cover"
-          />
-        ) : (
-          <>
-            <Mark className="w-16 text-ink/15" />
-            <span className="absolute bottom-3 left-3 text-[9px] tracking-[0.14em] text-ink-3 uppercase">
-              [Founder portrait]
-            </span>
-          </>
-        )}
+        <FounderPhoto
+          src={src}
+          alt="Vijay More, founder of THE RARESKIN"
+          // full container width below lg, the 340px column from lg
+          sizes="(min-width: 1024px) 340px, 100vw"
+          priority
+        />
       </div>
       <figcaption className="flex items-baseline justify-between gap-3 border-t border-line px-4 py-3">
         <span className="text-[13px] tracking-[0.08em]">Vijay More</span>

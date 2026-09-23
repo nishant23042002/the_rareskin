@@ -20,21 +20,25 @@ import { getCloudinaryEnv, getEnv } from "@/server/env";
  * `SiteSettings.founderPortrait` at it and bumps the storefront cache. Safe to
  * re-run: the same public id is overwritten and the MediaAsset row is reused.
  *
- *   pnpm founder:portrait <path-to-image> [--alt="…"] [--target=<url>]
+ *   pnpm founder:portrait <path-to-image> [--id=<public-id>] [--alt="…"] [--target=<url>]
+ *
+ * --id picks the Cloudinary public id (default "founder-portrait"). Use a new id
+ * to swap the photo while keeping the previous asset in Cloudinary.
  *
  * Cache bump target: --target or REVALIDATE_TARGET (default
  * http://localhost:3000). Needs REVALIDATE_SECRET; without it the storefront
  * picks the change up when the settings cache expires (24h).
  */
 
-const PUBLIC_ID = "founder-portrait";
+const DEFAULT_PUBLIC_ID = "founder-portrait";
 const FOLDER = "rareskin/content";
 const DEFAULT_ALT = "Vijay More, founder of THE RARESKIN";
 
 function parseArgs(argv: string[]) {
-  const out: { file?: string; alt?: string; target?: string } = {};
+  const out: { file?: string; id?: string; alt?: string; target?: string } = {};
   for (const a of argv) {
-    if (a.startsWith("--alt=")) out.alt = a.slice("--alt=".length);
+    if (a.startsWith("--id=")) out.id = a.slice("--id=".length);
+    else if (a.startsWith("--alt=")) out.alt = a.slice("--alt=".length);
     else if (a.startsWith("--target=")) out.target = a.slice("--target=".length);
     else if (!a.startsWith("--")) out.file = a;
   }
@@ -71,6 +75,10 @@ async function main() {
   const file = resolve(args.file);
   statSync(file); // throws a clear ENOENT if the path is wrong
   const alt = args.alt ?? DEFAULT_ALT;
+  const publicId = args.id ?? DEFAULT_PUBLIC_ID;
+  if (!/^[a-zA-Z0-9_-]{1,120}$/.test(publicId)) {
+    throw new Error(`invalid --id "${publicId}" (letters, digits, - and _ only)`);
+  }
 
   const { cloudName, apiKey, apiSecret } = getCloudinaryEnv();
   cloudinary.config({
@@ -80,10 +88,10 @@ async function main() {
     secure: true,
   });
 
-  console.log(`  uploading ${file} → ${FOLDER}/${PUBLIC_ID}`);
+  console.log(`  uploading ${file} → ${FOLDER}/${publicId}`);
   const up = await cloudinary.uploader.upload(file, {
     folder: FOLDER,
-    public_id: PUBLIC_ID,
+    public_id: publicId,
     overwrite: true,
     invalidate: true,
     resource_type: "image",
@@ -129,6 +137,14 @@ async function main() {
     { key: "singleton" },
     { $set: { founderPortrait: ref } },
   );
+  // the photo being replaced is no longer in use (its Cloudinary file is kept)
+  const prevId = before.founderPortrait?.assetId;
+  if (prevId && String(prevId) !== String(asset._id)) {
+    await MediaAsset.updateOne(
+      { _id: prevId },
+      { $pull: { usedIn: "settings:founderPortrait" } },
+    );
+  }
   console.log(`  ✓ SiteSettings.founderPortrait → asset ${asset._id}`);
 
   await recordAudit({

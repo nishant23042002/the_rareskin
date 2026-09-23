@@ -326,9 +326,12 @@ before going live:
   `pnpm founder:portrait <image>` uploads to Cloudinary
   `rareskin/content/founder-portrait`, records the `MediaAsset`, sets
   `SiteSettings.founderPortrait` and busts the cache). It fills the homepage
-  "first letter" card (left column) and the `/the-idea` card. The live DB
-  already has the real photo; a fresh DB shows a placeholder panel until it's
-  set. Portrait, ~4:5.
+  "first letter" card (left column) and the `/the-idea` card via the shared
+  `FounderPhoto` (responsive `srcset`, face-anchored crop). If no portrait is
+  set — e.g. a fresh DB — or it fails to load, it shows the bundled
+  `public/founder/founder-fallback.webp` instead. Any portrait works; tall
+  ~2:3 looks best. `--id=<new-id>` on the script keeps the previous Cloudinary
+  asset.
 - **Homepage hero banners** — each fragrance's homepage-carousel slide shows the
   vector placeholder scene until a banner is uploaded in
   **Admin → Catalogue → \<fragrance\> → Homepage hero banner** (a 16:9 desktop

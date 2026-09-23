@@ -5,9 +5,8 @@ import { useRef } from "react";
 
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/ui/logo";
-import { Mark } from "@/components/ui/mark";
+import { FounderPhoto } from "@/components/ui/founder-photo";
 import { gsap, useGSAP } from "@/lib/gsap";
-import { cloudinaryVariant } from "@/lib/catalog";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 /**
@@ -19,7 +18,7 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion";
  * one of the first to wear it.
  *
  * The portrait comes from Site Settings → Founder (`founderPortrait`); until one
- * is uploaded it's a placeholder panel.
+ * is uploaded (or if it fails to load) `FounderPhoto` shows the bundled fallback.
  *
  * Motion: the portrait + wordmark settle in, then the lines rise one after
  * another, like a letter being read. Static under reduced motion.
@@ -34,24 +33,14 @@ function FounderPortrait({ src }: { src?: string }) {
   return (
     <div
       data-rise
-      className="relative flex aspect-[4/3] items-center justify-center overflow-hidden border-b border-line bg-[linear-gradient(155deg,var(--color-w0),var(--color-w1)_55%,var(--color-w2))] md:aspect-auto md:h-full md:min-h-[280px] md:border-b-0 md:border-r"
+      className="relative aspect-[4/5] overflow-hidden border-b border-line bg-[linear-gradient(155deg,var(--color-w0),var(--color-w1)_55%,var(--color-w2))] sm:aspect-[4/3] md:aspect-auto md:h-full md:min-h-[340px] md:border-b-0 md:border-r"
     >
-      {src ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={cloudinaryVariant(src, { w: 760, h: 950, fill: true }) ?? src}
-          alt="Vijay More, founder of THE RARESKIN"
-          decoding="async"
-          className="absolute inset-0 size-full object-cover"
-        />
-      ) : (
-        <>
-          <Mark className="w-14 text-ink/12" strokeWidth={1.4} />
-          <span className="absolute bottom-3 left-3 text-[8.5px] tracking-[0.16em] text-ink-3/80 uppercase">
-            Founder portrait
-          </span>
-        </>
-      )}
+      <FounderPhoto
+        src={src}
+        alt="Vijay More, founder of THE RARESKIN"
+        // full card width on a phone/tablet, the ~32% column (≤318px) from md
+        sizes="(min-width: 768px) 318px, 100vw"
+      />
       {/* a faint highlight on the inner edge — the crease of the fold */}
       <span
         aria-hidden
