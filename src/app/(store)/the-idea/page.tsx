@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
-import { FounderPhoto } from "@/components/ui/founder-photo";
+import {
+  FounderPhoto,
+  type FounderPhotoSource,
+} from "@/components/ui/founder-photo";
 import { PageIntro } from "@/components/layout/page-intro";
 import { pageMeta } from "@/lib/seo";
 import { getSiteSettings } from "@/server/data/settings";
@@ -31,21 +34,23 @@ const PROMISE = [
   "Exceptional customer experience",
 ];
 
-function FounderCard({ src }: { src?: string }) {
+function FounderCard({ photo }: { photo?: FounderPhotoSource | null }) {
   return (
-    <figure className="overflow-hidden rounded-[4px] border border-line">
+    // never cropped — the card takes the photo's own height; below lg it's a
+    // size-capped, centred portrait rather than a full-width one
+    <figure className="mx-auto w-full max-w-[420px] overflow-hidden rounded-[4px] border border-line lg:mx-0 lg:max-w-none">
       <div
-        className="relative aspect-[4/5] overflow-hidden sm:aspect-[4/3] lg:aspect-[4/5]"
+        className="relative"
         style={{
           background:
             "linear-gradient(160deg, var(--color-w0), var(--color-w1) 55%, var(--color-w2))",
         }}
       >
         <FounderPhoto
-          src={src}
+          photo={photo}
           alt="Vijay More, founder of THE RARESKIN"
-          // full container width below lg, the 340px column from lg
-          sizes="(min-width: 1024px) 340px, 100vw"
+          // ≤420px below lg, the 340px column from lg
+          sizes="(min-width: 1024px) 340px, min(100vw, 420px)"
           priority
         />
       </div>
@@ -74,7 +79,7 @@ export default async function OurStoryPage() {
       <section className="border-t border-line">
         <Container className="grid gap-[clamp(28px,6vw,56px)] py-[clamp(52px,9vw,110px)] lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:gap-[clamp(44px,7vw,92px)]">
           <div className="lg:sticky lg:top-[calc(var(--announce-h)+var(--header-h)+40px)] lg:self-start">
-            <FounderCard src={settings.founderPortrait?.url} />
+            <FounderCard photo={settings.founderPortrait} />
           </div>
 
           <div>

@@ -5,7 +5,10 @@ import { useRef } from "react";
 
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/ui/logo";
-import { FounderPhoto } from "@/components/ui/founder-photo";
+import {
+  FounderPhoto,
+  type FounderPhotoSource,
+} from "@/components/ui/founder-photo";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
@@ -29,28 +32,38 @@ const LINES = [
   "This is only the beginning, and I’m grateful you’re here for it.",
 ];
 
-function FounderPortrait({ src }: { src?: string }) {
+function FounderPortrait({ photo }: { photo?: FounderPhotoSource | null }) {
   return (
+    // The photo is never cropped: it keeps its own proportions and the panel
+    // takes its height. Below lg it's a centred, size-capped portrait on the
+    // card's paper; from lg it fills the left column and the letter column
+    // stretches to match.
     <div
       data-rise
-      className="relative aspect-[4/5] overflow-hidden border-b border-line bg-[linear-gradient(155deg,var(--color-w0),var(--color-w1)_55%,var(--color-w2))] sm:aspect-[4/3] md:aspect-auto md:h-full md:min-h-[340px] md:border-b-0 md:border-r"
+      className="relative flex items-center justify-center overflow-hidden border-b border-line bg-[linear-gradient(155deg,var(--color-w0),var(--color-w1)_55%,var(--color-w2))] lg:border-b-0 lg:border-r"
     >
-      <FounderPhoto
-        src={src}
-        alt="Vijay More, founder of THE RARESKIN"
-        // full card width on a phone/tablet, the ~32% column (≤318px) from md
-        sizes="(min-width: 768px) 318px, 100vw"
-      />
+      <div className="w-full max-w-[440px] lg:max-w-none">
+        <FounderPhoto
+          photo={photo}
+          alt="Vijay More, founder of THE RARESKIN"
+          // ≤440px below lg, the 42% column (≤392px) from lg
+          sizes="(min-width: 1024px) 392px, min(100vw, 440px)"
+        />
+      </div>
       {/* a faint highlight on the inner edge — the crease of the fold */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-white/50 md:inset-y-0 md:right-0 md:left-auto md:h-auto md:w-px"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-white/50 lg:inset-y-0 lg:right-0 lg:left-auto lg:h-auto lg:w-px"
       />
     </div>
   );
 }
 
-export function FounderNote({ portraitUrl }: { portraitUrl?: string }) {
+export function FounderNote({
+  portrait,
+}: {
+  portrait?: FounderPhotoSource | null;
+}) {
   const rootRef = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
 
@@ -86,10 +99,10 @@ export function FounderNote({ portraitUrl }: { portraitUrl?: string }) {
     >
       <Container className="flex justify-center">
         <figure className="w-full max-w-[900px] overflow-hidden rounded-[4px] border border-line bg-surface shadow-[0_1px_0_rgba(255,255,255,0.7),0_28px_60px_-38px_rgba(35,33,32,0.3)] lg:-rotate-[0.5deg]">
-          <div className="grid md:grid-cols-[minmax(0,clamp(220px,32%,318px))_1fr]">
-            <FounderPortrait src={portraitUrl} />
+          <div className="grid lg:grid-cols-[minmax(0,clamp(300px,42%,392px))_1fr]">
+            <FounderPortrait photo={portrait} />
 
-            <div className="relative px-[clamp(24px,5vw,60px)] py-[clamp(32px,5vw,64px)]">
+            <div className="relative flex flex-col px-[clamp(24px,4.4vw,48px)] py-[clamp(32px,4.4vw,52px)]">
               <div className="flex items-start justify-between gap-4">
                 <p className="eyebrow" data-rise>
                   The first letter
@@ -110,7 +123,7 @@ export function FounderNote({ portraitUrl }: { portraitUrl?: string }) {
                 />
               </span>
 
-              <blockquote className="mt-[clamp(20px,3vw,30px)] space-y-[clamp(13px,1.8vw,18px)]">
+              <blockquote className="mt-[clamp(20px,3vw,30px)] mb-[clamp(22px,3.4vw,36px)] space-y-[clamp(13px,1.8vw,18px)]">
                 {LINES.map((line) => (
                   <p
                     key={line.slice(0, 18)}
@@ -123,7 +136,7 @@ export function FounderNote({ portraitUrl }: { portraitUrl?: string }) {
               </blockquote>
 
               <figcaption
-                className="mt-[clamp(22px,3.4vw,36px)] flex flex-col gap-y-5 border-t border-line pt-[clamp(18px,2.6vw,24px)] sm:flex-row sm:items-end sm:justify-between sm:gap-x-8"
+                className="mt-auto flex flex-col gap-y-5 border-t border-line pt-[clamp(18px,2.6vw,24px)] sm:flex-row sm:items-end sm:justify-between sm:gap-x-8"
                 data-rise
               >
                 <span>

@@ -327,8 +327,9 @@ before going live:
   `rareskin/content/founder-portrait`, records the `MediaAsset`, sets
   `SiteSettings.founderPortrait` and busts the cache). It fills the homepage
   "first letter" card (left column) and the `/the-idea` card via the shared
-  `FounderPhoto` (responsive `srcset`, face-anchored crop). If no portrait is
-  set — e.g. a fresh DB — or it fails to load, it shows the bundled
+  `FounderPhoto` — never cropped (the frame takes the photo's own proportions),
+  responsive `srcset` at `q_auto:best`, capped at the file's native width. If
+  no portrait is set — e.g. a fresh DB — or it fails to load, it shows the bundled
   `public/founder/founder-fallback.webp` instead. Any portrait works; tall
   ~2:3 looks best. `--id=<new-id>` on the script keeps the previous Cloudinary
   asset.

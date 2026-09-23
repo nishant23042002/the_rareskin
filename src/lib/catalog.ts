@@ -60,11 +60,12 @@ export function hasPhotography(images: FragranceImages): boolean {
  */
 export function cloudinaryVariant(
   url: string | null | undefined,
-  opts: { w?: number; h?: number; fill?: boolean } = {},
+  opts: { w?: number; h?: number; fill?: boolean; q?: string } = {},
 ): string | null {
   if (!url) return null;
   if (!url.includes("res.cloudinary.com") || !url.includes("/upload/")) return url;
-  const parts = ["f_auto", "q_auto"];
+  // `q` overrides the quality preset, e.g. "auto:best" for hero photography
+  const parts = ["f_auto", `q_${opts.q ?? "auto"}`];
   if (opts.fill) {
     // square/rect crop to the given box, subject-aware — used for avatars
     if (opts.w) parts.push(`w_${opts.w}`);
