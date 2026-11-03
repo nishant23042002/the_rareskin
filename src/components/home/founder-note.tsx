@@ -1,169 +1,66 @@
-"use client";
-
 import Link from "next/link";
-import { useRef } from "react";
 
-import { Container } from "@/components/ui/container";
-import { Logo } from "@/components/ui/logo";
 import {
   FounderPhoto,
   type FounderPhotoSource,
 } from "@/components/ui/founder-photo";
-import { gsap, useGSAP } from "@/lib/gsap";
-import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { RhIcon } from "@/components/ui/rh-icon";
 
 /**
- * "The first letter" — the founder's note, on the homepage, staged as the
- * keepsake card that comes tucked in the box rather than a web section. A
- * lighter paper laid on the ground, the founder's portrait on the left (on top,
- * on a phone), the RARESKIN wordmark as a letterhead, a condensed excerpt in his
- * own words, and the visitor cast — truthfully, the store hasn't launched — as
- * one of the first to wear it.
+ * "The first letter" — the founder's note as a dark band: his portrait (never
+ * cropped), the letter in his own words, and the visitor cast — truthfully, the
+ * store hasn't launched — as one of the first to wear it.
  *
  * The portrait comes from Site Settings → Founder (`founderPortrait`); until one
  * is uploaded (or if it fails to load) `FounderPhoto` shows the bundled fallback.
- *
- * Motion: the portrait + wordmark settle in, then the lines rise one after
- * another, like a letter being read. Static under reduced motion.
  */
 
-const LINES = [
-  "I didn’t set out to make another perfume. I wanted to make an experience — a scent that keeps telling your story long after you’ve left the room.",
-  "This is only the beginning, and I’m grateful you’re here for it.",
-];
-
-function FounderPortrait({ photo }: { photo?: FounderPhotoSource | null }) {
-  return (
-    // The photo is never cropped: it keeps its own proportions and the panel
-    // takes its height. Below lg it's a centred, size-capped portrait on the
-    // card's paper; from lg it fills the left column and the letter column
-    // stretches to match.
-    <div
-      data-rise
-      className="relative flex items-center justify-center overflow-hidden border-b border-line bg-[linear-gradient(155deg,var(--color-w0),var(--color-w1)_55%,var(--color-w2))] lg:border-b-0 lg:border-r"
-    >
-      <div className="w-full max-w-[440px] lg:max-w-none">
-        <FounderPhoto
-          photo={photo}
-          alt="Vijay More, founder of THE RARESKIN"
-          // ≤440px below lg, the 42% column (≤392px) from lg
-          sizes="(min-width: 1024px) 392px, min(100vw, 440px)"
-        />
-      </div>
-      {/* a faint highlight on the inner edge — the crease of the fold */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-white/50 lg:inset-y-0 lg:right-0 lg:left-auto lg:h-auto lg:w-px"
-      />
-    </div>
-  );
-}
+const QUOTE =
+  "I didn’t set out to make another perfume. I wanted to make an experience — a scent that keeps telling your story long after you’ve left the room.";
+const CLOSING = "This is only the beginning, and I’m grateful you’re here for it.";
 
 export function FounderNote({
   portrait,
 }: {
   portrait?: FounderPhotoSource | null;
 }) {
-  const rootRef = useRef<HTMLElement>(null);
-  const reduced = useReducedMotion();
-
-  useGSAP(
-    () => {
-      const root = rootRef.current;
-      if (!root) return;
-      const rise = gsap.utils.toArray<HTMLElement>("[data-rise]", root);
-
-      if (reduced) {
-        gsap.set(rise, { clearProps: "all" });
-        return;
-      }
-
-      gsap.set(rise, { autoAlpha: 0, y: 16 });
-      gsap.to(rise, {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.7,
-        stagger: 0.1,
-        ease: "power3.out",
-        scrollTrigger: { trigger: root, start: "top 74%", once: true },
-      });
-    },
-    { scope: rootRef, dependencies: [reduced] },
-  );
-
   return (
     <section
-      ref={rootRef}
+      className="rh-founder rh-dark"
       id="founder"
-      className="scroll-mt-[calc(var(--announce-h)+var(--header-h)+16px)] border-t border-line bg-bg py-[clamp(60px,10vw,120px)]"
+      aria-labelledby="founder-h"
     >
-      <Container className="flex justify-center">
-        <figure className="w-full max-w-[900px] overflow-hidden rounded-[4px] border border-line bg-surface shadow-[0_1px_0_rgba(255,255,255,0.7),0_28px_60px_-38px_rgba(35,33,32,0.3)] lg:-rotate-[0.5deg]">
-          <div className="grid lg:grid-cols-[minmax(0,clamp(300px,42%,392px))_1fr]">
-            <FounderPortrait photo={portrait} />
-
-            <div className="relative flex flex-col px-[clamp(24px,4.4vw,48px)] py-[clamp(32px,4.4vw,52px)]">
-              <div className="flex items-start justify-between gap-4">
-                <p className="eyebrow" data-rise>
-                  The first letter
-                </p>
-                <p
-                  className="text-[9.5px] tracking-[0.14em] text-ink-3 uppercase"
-                  data-rise
-                >
-                  Roha, Maharashtra
-                </p>
-              </div>
-
-              {/* the wordmark, like a letterhead */}
-              <span data-rise className="mt-[clamp(20px,3vw,32px)] block">
-                <Logo
-                  className="text-ink"
-                  style={{ width: "clamp(146px, 22vw, 196px)" }}
-                />
-              </span>
-
-              <blockquote className="mt-[clamp(20px,3vw,30px)] mb-[clamp(22px,3.4vw,36px)] space-y-[clamp(13px,1.8vw,18px)]">
-                {LINES.map((line) => (
-                  <p
-                    key={line.slice(0, 18)}
-                    data-rise
-                    className="serif text-[clamp(1.1rem,1.9vw,1.5rem)] leading-[1.5] text-ink"
-                  >
-                    {line}
-                  </p>
-                ))}
-              </blockquote>
-
-              <figcaption
-                className="mt-auto flex flex-col gap-y-5 border-t border-line pt-[clamp(18px,2.6vw,24px)] sm:flex-row sm:items-end sm:justify-between sm:gap-x-8"
-                data-rise
-              >
-                <span>
-                  <span className="serif-italic block text-[clamp(1.4rem,2.6vw,1.9rem)] leading-none text-ink">
-                    Vijay More
-                  </span>
-                  <span className="mt-2 block text-[9.5px] tracking-[0.16em] text-ink-3 uppercase">
-                    Founder &middot; THE RARESKIN
-                  </span>
-                </span>
-
-                <span className="sm:text-right">
-                  <span className="block text-[10px] tracking-[0.14em] text-ink-3 uppercase">
-                    You&rsquo;re among the first to wear it
-                  </span>
-                  <Link
-                    href="/the-idea"
-                    className="nav-underline mt-2 inline-flex items-center gap-2 text-[11px] tracking-[0.14em] text-ink uppercase"
-                  >
-                    Read the whole letter <span aria-hidden>&rarr;</span>
-                  </Link>
-                </span>
-              </figcaption>
-            </div>
-          </div>
+      <div className="rh-founder__tex" aria-hidden="true" />
+      <div className="rh-wrap rh-founder__grid">
+        <figure className="rh-founder__photo">
+          <FounderPhoto
+            photo={portrait}
+            alt="Vijay More, founder of THE RARESKIN"
+            // ≤260px on a phone, up to the 400px column from 900px
+            sizes="(min-width: 900px) 400px, min(72vw, 260px)"
+          />
         </figure>
-      </Container>
+        <div className="rh-founder__copy">
+          <div className="rh-founder__meta">
+            <p className="rh-eyebrow">The first letter</p>
+            <p className="rh-eyebrow">Roha, Maharashtra</p>
+          </div>
+          <h2 className="rh-founder__quote" id="founder-h">
+            {QUOTE}
+          </h2>
+          <p className="rh-lede">{CLOSING}</p>
+          <div className="rh-founder__sign">
+            <b>Vijay More</b>
+            <small>Founder &middot; THE RARESKIN</small>
+          </div>
+          <p className="rh-founder__first">
+            You&rsquo;re among the first to wear it
+          </p>
+          <Link className="rh-btn rh-btn--light" href="/the-idea">
+            Read the whole letter <RhIcon name="arrow" />
+          </Link>
+        </div>
+      </div>
     </section>
   );
 }

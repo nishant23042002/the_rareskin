@@ -99,6 +99,7 @@ export function SettingsForm({ settings }: { settings: S }) {
       announcementRotateSeconds: s.announcementRotateSeconds,
       campaign: s.campaign,
       founderPortrait: s.founderPortrait,
+      heroImage: s.heroImage,
       shipping: s.shipping,
       cod: s.cod,
       gst: s.gst,
@@ -240,7 +241,7 @@ export function SettingsForm({ settings }: { settings: S }) {
         {/* ── Announcement bar ────────────────────────────────────── */}
         <FormSection
           title="Announcement bar"
-          description="The rotating line above the header. Clear every row to fall back to the built-in messages."
+          description="The rotating line above the header, one message at a time. Write a message as “Lead | detail” (e.g. “Free shipping | Across India”) for the bold-then-quiet look; each row can link somewhere. Clear every row to fall back to the built-in messages."
         >
           <div className="grid gap-2">
             {s.announcements.map((a, i) => (
@@ -250,7 +251,7 @@ export function SettingsForm({ settings }: { settings: S }) {
               >
                 <TextInput
                   value={a.text}
-                  placeholder="Free shipping across India"
+                  placeholder="Free shipping | Across India"
                   onChange={(e) => {
                     const next = [...s.announcements];
                     next[i] = { ...a, text: e.target.value };
@@ -305,7 +306,7 @@ export function SettingsForm({ settings }: { settings: S }) {
               </button>
             )}
           </div>
-          <Field label="Marquee speed (seconds / message)" hint="3–12 · higher = slower">
+          <Field label="Seconds each message stays up" hint="3–12 · higher = slower">
             <TextInput
               inputMode="numeric"
               value={String(s.announcementRotateSeconds)}
@@ -388,6 +389,20 @@ export function SettingsForm({ settings }: { settings: S }) {
               />
             </Field>
           </Row>
+        </FormSection>
+
+        {/* ── Homepage hero ───────────────────────────────────────── */}
+        <FormSection
+          title="Homepage hero"
+          description="The photograph beside “Three Extraits” at the top of the homepage — the three flacons together, about 4:5 portrait on a phone and near-square on a desktop (e.g. 1600×1800+). Leave empty to show the illustrated trio."
+        >
+          <UploadField
+            label="Hero photograph"
+            folder="content"
+            value={(s.heroImage ?? null) as MediaRefDTO | null}
+            onChange={(v) => patch("heroImage", v)}
+            className="max-w-[260px]"
+          />
         </FormSection>
 
         {/* ── Founder ─────────────────────────────────────────────── */}

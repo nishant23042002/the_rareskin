@@ -153,6 +153,15 @@ export interface CatalogNavItem {
   slug: FragranceSlug;
   name: string;
   accent: string;
+  /** "The Quiet Confidence" */
+  title: string;
+  mood: string[];
+  /** card ground gradient + the readable text colour on it (sidebar hover wash) */
+  ground: string;
+  onGround: string;
+  /** launch price + MRP, rupees (drives the announcement bar's first message) */
+  price: number;
+  mrp: number;
 }
 
 /**

@@ -61,6 +61,7 @@ const siteSettingsSchema = new Schema<SiteSettingsDoc>(
     },
 
     founderPortrait: { type: mediaRefSchema, default: null },
+    heroImage: { type: mediaRefSchema, default: null },
 
     shipping: {
       freeAbovePaise: { type: Number, default: 0 },

@@ -1,87 +1,163 @@
-import { Container } from "@/components/ui/container";
-import { Reveal } from "@/components/ui/reveal";
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+
+import { RhIcon } from "@/components/ui/rh-icon";
 
 const POINTS = [
   {
-    n: "01",
     h: "Higher concentration",
     p: "Extrait carries more perfume oil than eau de parfum. A little does the work of a lot.",
   },
   {
-    n: "02",
     h: "Closer, for longer",
     p: "It sits near the skin and releases slowly through the day, into a long dry-down.",
   },
   {
-    n: "03",
     h: "50 ml is plenty",
-    p: "Two or three sprays. One bottle lasts — part of why the price works.",
+    p: "Two or three sprays. One bottle lasts, part of why the price works.",
   },
 ];
 
-/** Relative concentration, no invented numbers — extrait simply carries more. */
-function ConcentrationBar() {
+/**
+ * Relative concentration, no invented numbers — extrait simply carries more.
+ * The two bars draw in once, the first time the block scrolls into view.
+ */
+function ConcentrationBars() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [filled, setFilled] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced || !("IntersectionObserver" in window)) {
+      const id = requestAnimationFrame(() => setFilled(true));
+      return () => cancelAnimationFrame(id);
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setFilled(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(el);
+    // never leave the bars empty if the observer is slow to fire
+    const safety = window.setTimeout(() => setFilled(true), 4000);
+    return () => {
+      io.disconnect();
+      window.clearTimeout(safety);
+    };
+  }, []);
+
   return (
-    <div className="mt-9 space-y-3.5" aria-hidden>
-      <div>
-        <p className="mb-1.5 text-[10px] tracking-[0.16em] text-ink-3 uppercase">
-          Eau de Parfum
-        </p>
-        <div className="h-[3px] w-full bg-line-2">
-          <div className="h-full w-[44%] bg-ink-3" />
-        </div>
+    <div className="rh-why__bar" ref={ref} aria-hidden="true">
+      <div className="rh-why__row">
+        <p>Eau de Parfum</p>
+        <span className="rh-why__track">
+          <i style={{ width: filled ? "44%" : 0 }} />
+        </span>
       </div>
-      <div>
-        <p className="mb-1.5 text-[10px] tracking-[0.16em] text-ink uppercase">
-          Extrait de Parfum
-        </p>
-        <div className="h-[3px] w-full bg-line-2">
-          <div className="h-full w-[88%] bg-ink" />
-        </div>
+      <div className="rh-why__row rh-why__row--on">
+        <p>Extrait de Parfum</p>
+        <span className="rh-why__track">
+          <i style={{ width: filled ? "88%" : 0 }} />
+        </span>
       </div>
-      <p className="max-w-[34ch] pt-1 text-[12px] leading-[1.7] text-ink-2">
-        More perfume oil, less alcohol — the reason two sprays hold all day.
-      </p>
     </div>
   );
 }
 
 export function WhyExtrait() {
   return (
-    <section
-      id="why"
-      className="scroll-mt-[calc(var(--announce-h)+var(--header-h)+16px)] border-t border-line py-[clamp(60px,10vw,120px)]"
-    >
-      <Container className="grid gap-x-16 gap-y-12 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="lg:sticky lg:top-[calc(var(--announce-h)+var(--header-h)+44px)] lg:self-start">
-          <Reveal>
-            <span className="eyebrow mb-3 block">Concentration, not volume</span>
-            <h2 className="text-[clamp(1.8rem,3.6vw,2.7rem)]">
-              Why we only make extrait.
-            </h2>
-            <ConcentrationBar />
-          </Reveal>
-        </div>
-
-        <Reveal className="divide-y divide-line border-t border-line">
-          {POINTS.map((pt) => (
-            <div
-              key={pt.n}
-              className="grid grid-cols-[auto_1fr] gap-x-5 py-[clamp(24px,3.4vw,40px)] sm:gap-x-8"
+    <section className="rh-why" id="why" aria-labelledby="why-h">
+      <div className="rh-wrap">
+        <div className="rh-why__rule" />
+        <div className="rh-why__in">
+          <svg
+            viewBox="0 0 90 156"
+            width="78"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            style={{ color: "var(--ink)" }}
+          >
+            <rect x="33" y="3" width="24" height="26" rx="2" />
+            <rect x="29" y="29" width="32" height="8" />
+            <rect x="6" y="37" width="78" height="112" rx="5" />
+            <path d="M33 118h24" strokeWidth="1" />
+            <text
+              x="45"
+              y="94"
+              textAnchor="middle"
+              fontFamily="Newsreader,Georgia,serif"
+              fontStyle="italic"
+              fontSize="15"
+              fill="currentColor"
+              stroke="none"
             >
-              <span className="serif text-[clamp(1.6rem,2.4vw,2.1rem)] leading-none text-ink-3">
-                {pt.n}
-              </span>
-              <div>
-                <h3 className="text-[clamp(1.15rem,1.9vw,1.5rem)]">{pt.h}</h3>
-                <p className="mt-2 max-w-[40ch] text-[13.5px] leading-[1.7] text-ink-2">
-                  {pt.p}
-                </p>
-              </div>
+              extrait
+            </text>
+            <text
+              x="45"
+              y="76"
+              textAnchor="middle"
+              fontFamily="Jost,sans-serif"
+              fontSize="5.5"
+              letterSpacing="1.6"
+              fill="currentColor"
+              stroke="none"
+            >
+              THE RARESKIN
+            </text>
+            <text
+              x="45"
+              y="132"
+              textAnchor="middle"
+              fontFamily="Jost,sans-serif"
+              fontSize="4.6"
+              letterSpacing="1.2"
+              fill="currentColor"
+              stroke="none"
+            >
+              50 ml
+            </text>
+          </svg>
+          <p className="rh-why__tag">
+            <span className="rh-why__chip">Extrait</span>
+            <span className="rh-eyebrow">Concentration, not volume</span>
+          </p>
+          <h2 className="rh-h2 rh-h2--sentence" id="why-h">
+            Why we only make extrait.
+          </h2>
+          <p className="rh-lede">
+            Extrait carries more perfume oil than eau de parfum. A little does
+            the work of a lot.
+          </p>
+          <ConcentrationBars />
+          <p className="rh-why__note">
+            More perfume oil, less alcohol. The reason two sprays hold all day.
+          </p>
+        </div>
+        <div className="rh-why__pts">
+          {POINTS.map((pt) => (
+            <div key={pt.h}>
+              <h3>{pt.h}</h3>
+              <p>{pt.p}</p>
             </div>
           ))}
-        </Reveal>
-      </Container>
+        </div>
+        <div className="rh-why__cta">
+          <a className="rh-btn rh-btn--solid" href="#quiz">
+            Find your match <RhIcon name="arrow" />
+          </a>
+        </div>
+      </div>
     </section>
   );
 }

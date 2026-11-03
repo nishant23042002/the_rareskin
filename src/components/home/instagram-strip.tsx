@@ -3,23 +3,28 @@
 import Link from "next/link";
 import { useRef } from "react";
 
-import { Container } from "@/components/ui/container";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { RhIcon } from "@/components/ui/rh-icon";
+import { useDragX } from "@/hooks/use-drag-x";
 import { cloudinaryVariant } from "@/lib/catalog";
-import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import type { ShowcasePhoto } from "@/server/data/reviews";
 
 /**
- * "@THERARESKIN" — a slow horizontal band of Instagram-style posts (portrait
- * cards, the way a feed photo actually sits), same seamless-loop mechanic as the
- * announcement bar. The visual-proof layer between the written reviews and the
- * newsletter. Pauses on hover; a plain swipeable strip under reduced motion.
+ * "@THERARESKIN" — six portrait tiles (the way a feed photo actually sits): a
+ * six-up row from 900px, a scroll-snap row below that which a mouse can drag like
+ * a phone. The visual-proof layer between the founder and the footer. Each tile
+ * goes to the Instagram profile when one is set in Site Settings, else to the
+ * photo's own page, else nowhere.
  */
 
-const TILE =
-  "relative block aspect-[4/5] w-[clamp(150px,23vw,232px)] shrink-0 overflow-hidden rounded-[4px] border border-line bg-surface-2";
+const MAX = 6;
 
-function Tile({ photo, profileHref }: { photo: ShowcasePhoto; profileHref?: string }) {
+function Tile({
+  photo,
+  profileHref,
+}: {
+  photo: ShowcasePhoto;
+  profileHref?: string;
+}) {
   const src =
     cloudinaryVariant(photo.url, { w: 420, h: 525, fill: true }) ?? photo.url;
   const img = (
@@ -29,16 +34,17 @@ function Tile({ photo, profileHref }: { photo: ShowcasePhoto; profileHref?: stri
       alt={photo.alt}
       loading="lazy"
       decoding="async"
-      className="size-full object-cover transition-transform duration-500 ease-[var(--ease-brand)] hover:scale-[1.04]"
+      className="size-full object-cover transition-transform duration-[800ms] ease-[var(--ease-brand)] group-hover:scale-[1.04]"
     />
   );
+  const cls = "rh-ig__tile group rh-grain bg-[var(--stone)]";
   if (profileHref) {
     return (
       <a
         href={profileHref}
         target="_blank"
         rel="noopener noreferrer"
-        className={TILE}
+        className={cls}
         aria-label="See more on Instagram"
       >
         {img}
@@ -47,12 +53,12 @@ function Tile({ photo, profileHref }: { photo: ShowcasePhoto; profileHref?: stri
   }
   if (photo.href) {
     return (
-      <Link href={photo.href} className={TILE}>
+      <Link href={photo.href} className={cls}>
         {img}
       </Link>
     );
   }
-  return <span className={TILE}>{img}</span>;
+  return <span className={cls}>{img}</span>;
 }
 
 export function InstagramStrip({
@@ -64,87 +70,64 @@ export function InstagramStrip({
   profileHref?: string;
   handle?: string;
 }) {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
+  const rowRef = useRef<HTMLDivElement>(null);
+  const from = useRef(0);
 
-  // keep the loop wide enough to cover the viewport even with a handful of
-  // photos — cycle the set up to a floor, then the marquee doubles it.
-  const base: ShowcasePhoto[] = [];
-  if (photos.length > 0) {
-    while (base.length < Math.max(6, photos.length)) {
-      base.push(photos[base.length % photos.length]);
-    }
-  }
-
-  useGSAP(
-    () => {
-      const track = trackRef.current;
-      if (!track || reduced || base.length === 0) return;
-      gsap.set(track, { xPercent: 0 });
-      const tween = gsap.to(track, {
-        xPercent: -50,
-        duration: Math.max(24, base.length * 4.5),
-        ease: "none",
-        repeat: -1,
-      });
-      const root = rootRef.current;
-      const on = () => tween.timeScale(0);
-      const off = () => tween.timeScale(1);
-      root?.addEventListener("pointerenter", on);
-      root?.addEventListener("pointerleave", off);
-      return () => {
-        tween.kill();
-        root?.removeEventListener("pointerenter", on);
-        root?.removeEventListener("pointerleave", off);
-      };
+  // when the row scrolls sideways (below 900px) a mouse can drag it
+  useDragX(rowRef, {
+    mouseOnly: true,
+    enabled: () => {
+      const r = rowRef.current;
+      return !!r && r.scrollWidth > r.clientWidth + 2;
     },
-    { dependencies: [reduced, base.length], scope: rootRef },
-  );
+    start: () => {
+      const r = rowRef.current;
+      if (!r) return;
+      from.current = r.scrollLeft;
+      r.style.scrollSnapType = "none";
+    },
+    move: (dx) => {
+      const r = rowRef.current;
+      if (r) r.scrollLeft = from.current - dx;
+    },
+    end: () => {
+      window.setTimeout(() => {
+        const r = rowRef.current;
+        if (r) r.style.scrollSnapType = "";
+      }, 50);
+    },
+    cancel: () => {
+      const r = rowRef.current;
+      if (r) r.style.scrollSnapType = "";
+    },
+  });
 
-  if (base.length === 0) return null;
+  const tiles = photos.slice(0, MAX);
+  if (tiles.length === 0) return null;
 
   return (
-    <section className="overflow-hidden border-t border-line py-[clamp(52px,9vw,108px)]">
-      <Container className="mb-[clamp(20px,3vw,34px)] flex items-baseline justify-between gap-4">
+    <section className="rh-ig" aria-labelledby="ig-h">
+      <div className="rh-wrap rh-ig__head">
         <div>
-          <span className="eyebrow mb-2 block">On the skin</span>
-          <h2 className="text-[clamp(1.5rem,2.6vw,2.1rem)]">{handle}</h2>
+          <p className="rh-eyebrow">On the skin</p>
+          <h2 id="ig-h">{handle}</h2>
         </div>
         {profileHref && (
           <a
+            className="rh-link-u"
             href={profileHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="nav-underline shrink-0 text-[11px] tracking-[0.14em] text-ink-2 uppercase transition-colors hover:text-ink"
           >
-            Follow &rarr;
+            Follow <RhIcon name="arrow" small />
           </a>
         )}
-      </Container>
-
-      {reduced ? (
-        <div className="no-scrollbar flex gap-3 overflow-x-auto px-[clamp(16px,4vw,64px)]">
-          {base.map((p, i) => (
-            <Tile key={`${p.url}-${i}`} photo={p} profileHref={profileHref} />
-          ))}
-        </div>
-      ) : (
-        <div ref={rootRef}>
-          <div
-            ref={trackRef}
-            className="flex w-max gap-3 will-change-transform"
-          >
-            {[...base, ...base].map((p, i) => (
-              <Tile
-                key={`${p.url}-${i}`}
-                photo={p}
-                profileHref={profileHref}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+      </div>
+      <div className="rh-ig__row" ref={rowRef}>
+        {tiles.map((p, i) => (
+          <Tile key={`${p.url}-${i}`} photo={p} profileHref={profileHref} />
+        ))}
+      </div>
     </section>
   );
 }

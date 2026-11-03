@@ -188,6 +188,12 @@ export async function getCatalogNav(): Promise<CatalogNavItem[]> {
     slug: f.slug,
     name: f.name,
     accent: f.accent,
+    title: f.title,
+    mood: f.mood,
+    ground: f.ground,
+    onGround: f.onGround,
+    price: f.price,
+    mrp: f.mrp,
   }));
 }
 

@@ -1,21 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { Icon, type IconName } from "@/components/ui/icon";
-import { PaymentMarks, IndiaFlag } from "@/components/ui/payment-marks";
+import { RhIcon, type RhIconName } from "@/components/ui/rh-icon";
 
 /**
- * The base of the menu overlay — the reassurances a shopper wants before they
- * buy (delivery, payment, provenance), plus the counter's signature tri-juice
- * rule and a live clock for Roha. Laid out as three calm tiers with real air
- * between them so it never stacks into a cramped block on a narrow phone.
+ * The base of the sidebar — only the reassurances a shopper needs before they
+ * buy, kept to three quiet rows: one line of promises, the payment marks (hover
+ * or tap one to read how it works), and where it is made with a live Roha clock.
+ * Topped by the counter's signature tri-juice rule that draws in as the menu
+ * opens.
  */
 
-const TRUST: { icon: IconName; label: string; sub: string }[] = [
-  { icon: "truck", label: "Free shipping", sub: "All India" },
-  { icon: "banknote", label: "Cash on delivery", sub: "Pay on arrival" },
-  { icon: "returns", label: "7-day returns", sub: "No questions" },
+const TRUST: { icon: RhIconName; label: string }[] = [
+  { icon: "truck", label: "Free shipping" },
+  { icon: "cash", label: "Cash on delivery" },
+  { icon: "returns", label: "7-day returns" },
+];
+
+const NOTE_DEFAULT = "Secured by Razorpay";
+const NOTE_CARD = "Card details never reach us";
+
+const PAY: { src: string; label: string; note: string }[] = [
+  { src: "/pay/visa.svg", label: "Visa", note: NOTE_CARD },
+  { src: "/pay/mastercard.svg", label: "Mastercard", note: NOTE_CARD },
+  { src: "/pay/rupay.svg", label: "RuPay", note: NOTE_CARD },
+  { src: "/pay/bhim.svg", label: "UPI", note: "GPay · PhonePe · Paytm · BHIM" },
 ];
 
 const IST = new Intl.DateTimeFormat("en-IN", {
@@ -36,59 +46,91 @@ function RohaClock() {
   }, []);
 
   return (
-    <span className="inline-flex items-center gap-1.5 text-[9.5px] tracking-[0.08em] text-ink-3 uppercase tabular-nums">
-      <span className="relative flex size-1.5">
-        <span className="absolute inline-flex size-full animate-ping rounded-full bg-ok/60" />
-        <span className="relative inline-flex size-1.5 rounded-full bg-ok" />
-      </span>
-      Roha{now ? ` · ${now}` : ""}
+    <span className="rh-roha" title="Where it is made">
+      <i className="rh-pulse" aria-hidden="true" />
+      <span>Roha{now ? ` · ${now}` : ""}</span>
     </span>
   );
 }
 
 export function MenuFooter() {
-  return (
-    <div className="shrink-0 pt-6" data-stagger>
-      <span
-        aria-hidden
-        className="block h-[2px] w-full rounded-full"
-        style={{
-          backgroundImage:
-            "linear-gradient(90deg,#e0d7bf 0%,#c5872f 52%,#3d2712 100%)",
-        }}
-      />
+  const [pressed, setPressed] = useState<string | null>(null);
+  const [text, setText] = useState(NOTE_DEFAULT);
+  const [swap, setSwap] = useState(false);
+  const timer = useRef<number | undefined>(undefined);
 
-      {/* tier 1 — the three promises, always three columns so they never wrap */}
-      <ul className="mt-5 grid grid-cols-3 gap-x-3">
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  // fade the line out, change it, fade it back in
+  function say(next: string) {
+    window.clearTimeout(timer.current);
+    setSwap(true);
+    timer.current = window.setTimeout(() => {
+      setText(next);
+      setSwap(false);
+    }, 150);
+  }
+
+  const noteFor = (label: string | null) =>
+    PAY.find((p) => p.label === label)?.note ?? NOTE_DEFAULT;
+
+  return (
+    <div className="rh-sb__foot">
+      <div className="rh-sb__rule" aria-hidden="true" />
+
+      <ul className="rh-sb__trust">
         {TRUST.map((t) => (
-          <li key={t.label} className="flex flex-col items-center gap-1.5 text-center">
-            <Icon name={t.icon} className="size-[18px] text-ink-2" />
-            <span className="text-[9px] leading-tight font-medium tracking-[0.08em] text-ink uppercase">
-              {t.label}
-            </span>
-            <span className="text-[8px] tracking-[0.06em] text-ink-3 uppercase">
-              {t.sub}
-            </span>
+          <li key={t.label}>
+            <RhIcon name={t.icon} />
+            <b>{t.label}</b>
           </li>
         ))}
       </ul>
 
-      {/* tier 2 — how you pay */}
-      <div className="mt-6 border-t border-line pt-5">
-        <p className="text-[8.5px] font-medium tracking-[0.2em] text-ink-3 uppercase">
-          Pay your way
-        </p>
-        <PaymentMarks compact className="mt-3 gap-x-5 gap-y-2.5" />
-        <p className="mt-3 text-[9px] tracking-[0.06em] text-ink-3 uppercase">
-          Secured by Razorpay &middot; card details never reach us
+      <div className="rh-sb__pay">
+        <div
+          className="rh-pm-row"
+          role="group"
+          aria-label="Payment methods"
+          onPointerLeave={() => say(noteFor(pressed))}
+        >
+          {PAY.map((p) => (
+            <button
+              key={p.label}
+              type="button"
+              className="rh-pm"
+              aria-label={p.label}
+              aria-pressed={pressed === p.label}
+              onPointerEnter={(e) => {
+                if (e.pointerType === "mouse") say(p.note);
+              }}
+              onFocus={() => say(p.note)}
+              onBlur={() => say(noteFor(pressed))}
+              onClick={() => {
+                const next = pressed === p.label ? null : p.label;
+                setPressed(next);
+                say(noteFor(next));
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={p.src} alt="" width={28} height={28} />
+            </button>
+          ))}
+        </div>
+        <p
+          className={`rh-pm-note${swap ? " is-swap" : ""}`}
+          aria-live="polite"
+        >
+          <RhIcon name="lock" />
+          <span>{text}</span>
         </p>
       </div>
 
-      {/* tier 3 — provenance + the live counter */}
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-line pt-4">
-        <span className="inline-flex items-center gap-1.5 text-[9.5px] tracking-[0.08em] text-ink-3 uppercase">
-          <IndiaFlag className="!h-3" />
-          Made in India &middot; &#8377; INR
+      <div className="rh-sb__base">
+        <span className="rh-sb__made">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/pay/india.svg" alt="" width={19} height={13} />
+          Made in India
         </span>
         <RohaClock />
       </div>

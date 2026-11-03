@@ -13,6 +13,8 @@ import { CartDrawer } from "@/components/cart/cart-drawer";
 import { CartToast } from "@/components/cart/cart-toast";
 import { CartBar } from "@/components/cart/cart-bar";
 import { CampaignNote } from "@/components/layout/campaign-note";
+import { BackToTop } from "@/components/layout/back-to-top";
+import { DISCOVERY_SET_SLUG } from "@/lib/catalog";
 import { getCatalogNav, getBagSuggestions } from "@/server/data/catalog";
 import { getSiteSettings } from "@/server/data/settings";
 import { getCurrentUser } from "@/server/auth";
@@ -44,6 +46,12 @@ export default async function StoreLayout({
     }
   }
 
+  // The launch price (first fragrance) and the Discovery Set price feed the
+  // announcement bar's built-in messages and the header / sidebar copy.
+  const launch = nav[0] ? { price: nav[0].price, mrp: nav[0].mrp } : null;
+  const setPrice =
+    bagSuggestions.find((s) => s.slug === DISCOVERY_SET_SLUG)?.price ?? null;
+
   return (
     <AuthProvider>
       <CartProvider suggestions={bagSuggestions}>
@@ -56,8 +64,10 @@ export default async function StoreLayout({
                     .filter((a) => a.active)
                     .map((a) => ({ text: a.text, href: a.href }))}
                   rotateSeconds={settings.announcementRotateSeconds}
+                  launch={launch}
+                  setPrice={setPrice}
                 />
-                <Header nav={nav} />
+                <Header nav={nav} setPrice={setPrice} />
               </div>
               {children}
               <Footer />
@@ -65,6 +75,7 @@ export default async function StoreLayout({
             <CartDrawer />
             <CartToast />
             <CartBar />
+            <BackToTop />
             <CampaignNote
               campaign={settings.campaign}
               products={bagSuggestions

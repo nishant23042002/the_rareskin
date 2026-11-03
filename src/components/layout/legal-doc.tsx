@@ -42,7 +42,12 @@ export function LegalDoc({
 
         <div className="space-y-10">
           {sections.map((s) => (
-            <section key={s.h}>
+            <section
+              key={s.h}
+              // lets the footer deep-link a section, e.g. /privacy#cookies
+              id={s.h.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}
+              className="scroll-mt-32"
+            >
               <h2 className="mb-3 text-[13px] font-normal tracking-[0.08em] text-ink uppercase">
                 {s.h}
               </h2>

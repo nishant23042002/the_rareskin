@@ -87,9 +87,12 @@ src/
     sitemap.ts  robots.ts  manifest.ts  icon.tsx  apple-icon.tsx  opengraph-image.tsx
     api/newsletter/  api/contact/   (validation stubs — see below)
   components/
-    layout/    AnnouncementBar  Header  SiteMenu  Footer  PageIntro  LegalDoc
-    home/      Hero  ImpressionMarquee  Collection  ProductCard  Quiz  DiscoverySet
-               WhyExtrait  TheIdea  Reviews  Newsletter
+    layout/    AnnouncementBar  Header (glass + Fragrances dropdown)  SiteMenu (dark
+               left sidebar)  MenuFooter  BackToTop  Footer  PageIntro  LegalDoc
+    home/      Hero (+HeroMedia)  LaunchOffer (ticket + promises)  InFocus
+               Collection (tiles)  Quiz  DiscoverySet  WhyExtrait  FounderNote
+               MadeDeliberately  InstagramStrip
+    app/home.css   the homepage + chrome stylesheet, classes namespaced `rh-`
     product/   PdpGallery  PdpReviews
     cart/      CartProvider(*)  CartDrawer("The Counter")  CheckoutPanel  CartBar
                CartToast  CartLine  AddToBagButton
@@ -164,7 +167,7 @@ component uses `useGSAP({ scope })` for automatic cleanup. A global
 `gsap.matchMedia()` cover reduced motion.
 
 **Placeholder art.** Bottles and campaign scenes are art-directed SVG
-(`Flacon`, `HeroScene`). Real photography is uploaded to Cloudinary through the
+(`Flacon`, plus the three-flacon stage in `HeroMedia`). Real photography is uploaded to Cloudinary through the
 admin and stored on each product's `media` field; the DAL then serves those
 URLs in place of the `/images/<slug>/…` fallbacks.
 
@@ -225,16 +228,18 @@ are bundled into the route via `outputFileTracingIncludes`.
 `src/app/api/contact/route.ts` and `src/app/api/newsletter/route.ts` validate
 the payload and return `{ ok: true }` without delivering anything. Replace the
 `// TODO` in each with a call to your email/ESP provider. The client components
-(`ContactForm`, `Newsletter`) already handle success and error states.
+(`ContactForm`, and the footer's `FooterNewsletter`) already handle success and error states.
 
 ### Product photography
 
 Upload packshots through **`/admin/catalogue/<slug>/edit`** → Images (needs
 `CLOUDINARY_*`). An uploaded `hero`/`flat`/`box` immediately replaces the vector
-`<Flacon>` on the PDP gallery, the home collection cards, the Discovery Set
-vials, and the bag cross-sell — everywhere else (the animated `<HeroScene>`, the
-quiz) stays on vectors, a deliberate later polish. Aspect ratios are already the
-final ones.
+`<Flacon>` on the PDP gallery, the home collection tiles and In Focus, the
+Discovery Set picture, and the bag cross-sell — everywhere else (the sidebar
+thumbnails, the quiz result) stays on vectors, a deliberate later polish. The
+homepage hero is separate: it takes one photograph from **Admin → Settings →
+Homepage hero** (see "Homepage hero photograph" below). Aspect ratios are
+already the final ones.
 
 ---
 
@@ -282,7 +287,11 @@ before going live:
 - **Go live** — the storefront shows a **holding page** until `storeLive` is
   flipped on in `/admin/settings` (signed-in staff always see the real site).
   `checkoutEnabled` is a separate switch. Both flips need a phone OTP. Set the
-  announcement-bar messages and footer social links there too.
+  announcement-bar messages and footer social links there too. Write each
+  announcement as **`Lead | detail`** (e.g. `Free shipping | Across India`; an
+  em dash with spaces also works) for the bold-then-quiet look, and give a row a
+  link to make that message clickable. The built-in set is used when none are
+  configured.
 - **Stock** — every product seeds at `stock: 0`; set real levels in
   `/admin/catalogue/<slug>/edit` (or `pnpm catalog set <slug> stock <n>`) before
   launch.
@@ -294,12 +303,13 @@ before going live:
   disputes, reviews, staff sign-ins, low stock, email bounces and enquiries.
   Polls every 20 s; no extra infrastructure. See
   [`docs/notifications.md`](docs/notifications.md).
-- **Demo reviews** — `pnpm seed:reviews` adds 4 sample approved reviews (with
-  throwaway customer accounts + delivered orders, two carrying product photos
-  and two customers with avatars) so the storefront + admin can be seen with
-  content; `flags.reviewsEnabled` is currently **on**. Remove both before
-  launch: `pnpm seed:reviews --remove`, then turn `reviewsEnabled` off until
-  real reviews exist. (Photo uploads need `CLOUDINARY_*` — already set.)
+- **Demo reviews** — *removed on 2026-11-04.* `pnpm seed:reviews` can still add
+  4 sample approved reviews (throwaway customer accounts + delivered orders,
+  two with product photos) to preview the storefront + admin with content, and
+  `pnpm seed:reviews --remove` deletes exactly what it created. The demo data is
+  currently gone and `flags.reviewsEnabled` is **off**; turn it on in
+  `/admin/settings` once real reviews exist. (Photo uploads need
+  `CLOUDINARY_*` — already set.)
 - **Demo campaign** — the "Launch offer — ₹799" offer card is **on** in Site
   Settings (`campaign`) so the corner card can be seen. Edit or turn it off in
   `Admin → Settings → Running offer`; the vector flacons in the card become real
@@ -333,11 +343,13 @@ before going live:
   `public/founder/founder-fallback.webp` instead. Any portrait works; tall
   ~2:3 looks best. `--id=<new-id>` on the script keeps the previous Cloudinary
   asset.
-- **Homepage hero banners** — each fragrance's homepage-carousel slide shows the
-  vector placeholder scene until a banner is uploaded in
-  **Admin → Catalogue → \<fragrance\> → Homepage hero banner** (a 16:9 desktop
-  crop + an optional 9:16 mobile crop). The `bloom`/`scrim` overlays keep the
-  headline legible on top.
+- **Homepage hero photograph** — the picture beside "Three Extraits" is one
+  photograph of the three flacons together, uploaded in **Admin → Settings →
+  Homepage hero** (Site Settings `heroImage`; about 4:5 on a phone and
+  near-square on a desktop, e.g. 1600×1800+, nothing printed on it). Until one
+  is uploaded — or if it fails to load — an illustrated trio of the vector
+  flacons shows. (The per-fragrance "Homepage hero banner" fields in the
+  catalogue are no longer used by the homepage.)
 - **Packaging copy** — the PDP "What's in the box" answer describes a
   recyclable carton + a wear card; confirm this matches the actual packaging.
 - **Reviews** — verified buyers review a product from **`/account/reviews`**
@@ -345,10 +357,11 @@ before going live:
   `/account`) and up to 3 product photos; every review is moderated in
   **`/admin/reviews`** before it shows. A `review-request` email goes out ~5
   days after delivery (daily cron). The PDP "Impressions" section (avatars +
-  photo strips + a lightbox), the homepage animated marquee and the star
-  ratings render only while **`flags.reviewsEnabled`** is on in Site Settings —
-  currently **on** for the demo (see "Demo reviews" above); turn it off after
-  removing the demo data and leave it off until real reviews exist. See
-  [`docs/reviews.md`](docs/reviews.md).
+  photo strips + a lightbox) and the PDP star ratings render only while
+  **`flags.reviewsEnabled`** is on in Site Settings — currently **off** (the
+  demo reviews are removed; see "Demo reviews" above); turn it on once real
+  reviews exist. The **homepage no longer has a reviews
+  section** (the redesign dropped it); customer photos from approved reviews
+  still feed the "@therareskin" strip. See [`docs/reviews.md`](docs/reviews.md).
 - **Indexing** — `metadata.robots` in `layout.tsx` is `index: true`. Set it to
   `false` if you want the site hidden from search until launch.

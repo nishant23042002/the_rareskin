@@ -128,6 +128,8 @@ export const siteSettingsInput = z.object({
   campaign: campaignSettings.prefault({}),
   /** the founder photo shown on the homepage "first letter" card + /the-idea */
   founderPortrait: mediaRef.nullable().default(null),
+  /** the photograph beside the homepage headline (three flacons, ~4:5) */
+  heroImage: mediaRef.nullable().default(null),
   shipping: shippingSettings.prefault({}),
   cod: codSettings.prefault({}),
   gst: gstSettings.prefault({}),
@@ -152,6 +154,7 @@ export const siteSettingsUpdateInput = z.object({
   announcementRotateSeconds: z.number().int().min(3).max(60).optional(),
   campaign: campaignSettings.optional(),
   founderPortrait: mediaRef.nullable().optional(),
+  heroImage: mediaRef.nullable().optional(),
   shipping: shippingSettings.optional(),
   cod: codSettings.optional(),
   gst: gstSettings.optional(),

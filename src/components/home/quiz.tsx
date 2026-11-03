@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { Flacon } from "@/components/ui/flacon";
 import { AddToBagButton } from "@/components/cart/add-to-bag-button";
-import { cn } from "@/lib/cn";
 import { QUIZ, tallyWinner } from "@/lib/quiz";
 import { formatINR, type Fragrance, type FragranceSlug } from "@/lib/catalog";
 
@@ -54,29 +52,20 @@ export function Quiz({ fragrances }: { fragrances: Fragrance[] }) {
   const filled = step >= STEPS ? STEPS : step + 1;
 
   return (
-    <section
-      id="quiz"
-      className="flex min-h-svh flex-col justify-center scroll-mt-[calc(var(--announce-h)+var(--header-h)+16px)] border-t border-line"
-    >
-      <Container className="grid gap-[clamp(36px,6vw,60px)] py-[clamp(48px,9vw,104px)] lg:grid-cols-[0.82fr_1.18fr] lg:items-start lg:gap-20">
-        <div>
-          <span className="eyebrow mb-3.5 block">Not sure which</span>
-          <h2 className="text-[clamp(1.9rem,4.4vw,2.9rem)]">
+    <section id="quiz" className="rh-quiz" aria-labelledby="quiz-h">
+      <div className="rh-wrap rh-quiz__grid">
+        <div className="rh-quiz__intro">
+          <p className="rh-eyebrow">Not sure which</p>
+          <h2 className="rh-h2 rh-h2--sentence" id="quiz-h">
             Three questions. One that is yours.
           </h2>
-          <p className="mt-4 max-w-[34ch] text-[15px] text-ink-2">
+          <p className="rh-lede">
             A short way in. Answer honestly and we&rsquo;ll point you to the one
             most people like you keep wearing.
           </p>
-          <div className="mt-7 flex items-center gap-2" aria-hidden>
+          <div className="rh-quiz__bar" aria-hidden="true">
             {Array.from({ length: STEPS }).map((_, i) => (
-              <span
-                key={i}
-                className={cn(
-                  "h-[2px] w-[26px] transition-colors duration-300",
-                  i < filled ? "bg-ink" : "bg-line-2",
-                )}
-              />
+              <i key={i} className={i < filled ? "rh-on" : undefined} />
             ))}
           </div>
         </div>
@@ -184,7 +173,7 @@ export function Quiz({ fragrances }: { fragrances: Fragrance[] }) {
             )}
           </div>
         </div>
-      </Container>
+      </div>
     </section>
   );
 }

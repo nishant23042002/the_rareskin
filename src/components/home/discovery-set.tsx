@@ -1,8 +1,7 @@
 import type { CSSProperties } from "react";
-import { Container } from "@/components/ui/container";
+
+import { BagButton } from "@/components/cart/bag-button";
 import { Flacon } from "@/components/ui/flacon";
-import { Reveal } from "@/components/ui/reveal";
-import { AddToBagButton } from "@/components/cart/add-to-bag-button";
 import {
   cloudinaryVariant,
   formatINR,
@@ -11,12 +10,84 @@ import {
 } from "@/lib/catalog";
 
 /**
- * The Discovery Set — a dark two-column band: the pitch + credit logic + a
- * single prominent "add the set" CTA on the left, three bordered 10 ml vial
- * cards on the right. The set price is credited in full toward a first 50 ml
- * bottle; that's the whole argument, so it sits right next to the price and the
- * button. Data comes from the catalogue (`@/server/data/catalog`).
+ * The Discovery Set — a dark band where the picture and the words never share a
+ * surface, so real photography can drop in without fighting the type. Wide
+ * screens: the picture is the left half, the pitch sits on solid colour beside
+ * it. Phones and tablets: heading, a clean 4:3 picture frame, the three vials'
+ * names, the credit logic, then ONE full-width champagne bar. The set price is
+ * credited in full toward a first 50 ml bottle — that is the whole argument.
+ * Data comes from the catalogue (`@/server/data/catalog`).
  */
+
+// where the three vials stand in the picture, as a share of it
+const STAND = [
+  { i: 0, left: "6%", width: "28%", bottom: "15%", rotate: -9 },
+  { i: 2, left: "66%", width: "28%", bottom: "15%", rotate: 9 },
+  { i: 1, left: "33%", width: "34%", bottom: "11%", rotate: 0 },
+];
+
+function Art({
+  set,
+  fragrances,
+}: {
+  set: DiscoverySetInfo;
+  fragrances: Fragrance[];
+}) {
+  const photo = cloudinaryVariant(set.image, { w: 1400, q: "auto:best" });
+  if (photo) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={photo}
+        alt={`${set.name}: three ${set.perVialMl} ml extraits`}
+        loading="lazy"
+        decoding="async"
+        className="rh-dset__art object-cover"
+      />
+    );
+  }
+  return (
+    <div
+      aria-hidden="true"
+      className="rh-dset__art"
+      style={{
+        background: "linear-gradient(135deg,#2a2218,#0f0c09)",
+      }}
+    >
+      <span
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(62% 62% at 50% 48%,rgba(185,138,76,.55),transparent)",
+        }}
+      />
+      {STAND.map((s) => {
+        const f = fragrances[s.i];
+        if (!f) return null;
+        return (
+          <span
+            key={f.slug}
+            style={
+              {
+                position: "absolute",
+                left: s.left,
+                width: s.width,
+                bottom: s.bottom,
+                transform: `rotate(${s.rotate}deg)`,
+                transformOrigin: "50% 92%",
+                filter: "drop-shadow(0 22px 20px rgba(0,0,0,.55))",
+              } as CSSProperties
+            }
+          >
+            <Flacon fragrance={f.slug} label />
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
 export function DiscoverySet({
   set,
   fragrances,
@@ -24,92 +95,64 @@ export function DiscoverySet({
   set: DiscoverySetInfo;
   fragrances: Fragrance[];
 }) {
-  const vialShadow: CSSProperties = {
-    filter: "drop-shadow(0 18px 22px rgba(0,0,0,0.4))",
+  // "Meet all three. Keep the one that becomes yours." → a heading + an italic line
+  const [lead, ...rest] = set.headline.split(/(?<=[.!?])\s+/);
+  const tail = rest.join(" ");
+
+  const line = {
+    sku: set.sku,
+    name: set.name,
+    price: set.price,
+    mrp: set.mrp,
+    href: "/discovery-set",
+    meta: `${set.vialCount} × ${set.perVialMl} ml`,
   };
 
   return (
     <section
+      className="rh-dset rh-dark"
       id="discovery"
-      className="flex min-h-svh flex-col justify-center scroll-mt-[calc(var(--announce-h)+var(--header-h)+16px)] border-y border-line bg-w4 text-w0"
+      aria-labelledby="dset-h"
     >
-      <Container className="grid gap-[clamp(40px,7vw,72px)] py-[clamp(48px,9vw,104px)] min-[940px]:grid-cols-[1.05fr_0.95fr] min-[940px]:items-center min-[940px]:gap-20">
-        <Reveal>
-          <span className="eyebrow mb-3.5 block text-w0/68">The Discovery Set</span>
-          <h2 className="max-w-[20ch] text-[clamp(2rem,5vw,3.1rem)]">
-            {set.headline}
-          </h2>
-          <p className="mt-4 max-w-[46ch] text-[15px] text-w0/65">{set.detail}</p>
-
-          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-5">
-            <span className="text-[clamp(1.15rem,2.2vw,1.45rem)]">
-              {formatINR(set.price)}
-              <s className="ml-2 text-[0.72em] opacity-60">
-                {formatINR(set.mrp)}
-              </s>
-              <span className="mt-2 block text-[10px] tracking-[0.13em] text-w0/68 uppercase">
-                {set.vialCount} &times; {set.perVialMl} ml &middot; credited to
-                your first bottle
-              </span>
-            </span>
-            <AddToBagButton
-              sku={set.sku}
-              name={set.name}
-              price={set.price}
-              mrp={set.mrp}
-              href="/discovery-set"
-              meta={`${set.vialCount} × ${set.perVialMl} ml`}
-              label="Add the Discovery Set"
-              variant="solidLight"
-              size="md"
-            />
-          </div>
-
-          <p className="mt-6 text-[9.5px] tracking-[0.06em] text-w0/60 uppercase">
-            One credit per customer &middot; COD available &middot; Free shipping
-            across India
-          </p>
-        </Reveal>
-
-        <Reveal delay={0.08} className="grid grid-cols-3 gap-2">
+      <div className="rh-dset__scene">
+        <Art set={set} fragrances={fragrances} />
+      </div>
+      <div className="rh-wrap rh-dset__in">
+        <p className="rh-eyebrow">The Discovery Set</p>
+        <h2 className="rh-dset__h" id="dset-h">
+          {lead}
+        </h2>
+        {tail && <p className="rh-dset__h2 rh-serif">{tail}</p>}
+        <p className="rh-dset__detail">{set.detail}</p>
+        <BagButton
+          line={line}
+          className="rh-dset__cta"
+          added={<span style={{ margin: "0 auto" }}>Added ✓</span>}
+        >
+          <span>Add the set</span>
+          <span className="rh-tnum">
+            {formatINR(set.price)}
+            {set.mrp > set.price && <s>{formatINR(set.mrp)}</s>}
+          </span>
+        </BagButton>
+        <p className="rh-dset__fine">
+          <span>One credit per customer</span>
+          <span className="rh-dset__fine-x">
+            {" "}
+            &middot; COD available &middot; Free shipping across India
+          </span>
+        </p>
+        <div className="rh-dset__vials">
           {fragrances.map((f) => (
-            <figure
-              key={f.slug}
-              className="flex flex-col items-center gap-4 border border-white/[0.13] bg-white/[0.02] px-2.5 py-[clamp(18px,2.6vw,30px)] text-center"
-            >
-              {(() => {
-                const photo = cloudinaryVariant(f.images.flat ?? f.images.hero, {
-                  w: 220,
-                });
-                return photo ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
-                    src={photo}
-                    alt={f.name}
-                    className="block w-[72%] max-w-[104px]"
-                    style={vialShadow}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                ) : (
-                  <span className="block w-[58%] max-w-[76px]" style={vialShadow}>
-                    <Flacon fragrance={f.slug} />
-                  </span>
-                );
-              })()}
-              <figcaption className="flex flex-col gap-1.5">
-                <span className="text-[0.92rem] tracking-[0.12em]">{f.name}</span>
-                <span className="text-[8px] tracking-[0.18em] text-w0/65 uppercase">
-                  {f.mood[0]}
-                </span>
-                <span className="text-[8px] tracking-[0.1em] text-w0/60">
-                  {set.perVialMl} ml
-                </span>
-              </figcaption>
-            </figure>
+            <div key={f.slug}>
+              <b>{f.name}</b>
+              <span>
+                {f.mood[0]} &middot; {set.perVialMl} ml
+              </span>
+            </div>
           ))}
-        </Reveal>
-      </Container>
+        </div>
+      </div>
     </section>
   );
 }
