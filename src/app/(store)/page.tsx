@@ -42,22 +42,10 @@ export default async function HomePage() {
   // The launch price is the first fragrance's — all three share one price today.
   const lead = fragrances[0];
 
-  // "@THERARESKIN" strip: real customer photos first, then a set of placeholder
-  // lifestyle shots, then packshots — so the band is always full while the real
-  // feed fills in. DUMMY_INSTAGRAM is demo content; swap for a real feed / curated
-  // set before launch (see README).
-  const DUMMY_INSTAGRAM: ShowcasePhoto[] = [
-    "rareskin-ig-a",
-    "rareskin-ig-b",
-    "rareskin-ig-c",
-    "rareskin-ig-d",
-    "rareskin-ig-e",
-    "rareskin-ig-f",
-  ].map((seed) => ({
-    url: `https://picsum.photos/seed/${seed}/640/800`,
-    alt: "THE RARESKIN, worn",
-    href: null,
-  }));
+  // "@THERARESKIN" strip: real customer photos first, then real product
+  // packshots. Whatever slots are still empty, the strip fills itself with
+  // illustrated flacon placeholders (shot from different angles), so the band is
+  // always full and on-brand until a real feed is wired in (see README).
   const packshots: ShowcasePhoto[] = fragrances
     .map((f): ShowcasePhoto | null => {
       const url = cloudinaryVariant(f.images.flat ?? f.images.hero, { w: 560 });
@@ -66,7 +54,7 @@ export default async function HomePage() {
     .filter((p): p is ShowcasePhoto => p !== null);
   const strip: ShowcasePhoto[] = [];
   const seen = new Set<string>();
-  for (const p of [...showcasePhotos, ...DUMMY_INSTAGRAM, ...packshots]) {
+  for (const p of [...showcasePhotos, ...packshots]) {
     if (seen.has(p.url)) continue;
     seen.add(p.url);
     strip.push(p);

@@ -314,11 +314,12 @@ before going live:
   Settings (`campaign`) so the corner card can be seen. Edit or turn it off in
   `Admin → Settings → Running offer`; the vector flacons in the card become real
   packshots once product photos are uploaded.
-- **@THERARESKIN strip** — the homepage Instagram band is filled with
-  placeholder lifestyle photos (`DUMMY_INSTAGRAM` in `(store)/page.tsx`). Swap
-  for a real feed / curated set, and set the Instagram URL in Site Settings →
-  Social so "Follow →" links out. Real customer review photos already feed in
-  ahead of the placeholders.
+- **@THERARESKIN strip** — the homepage Instagram band shows six tiles. Real
+  customer review photos come first, then real product packshots; any empty
+  slot is an illustrated flacon placeholder (`PLACEHOLDERS` in
+  `components/home/instagram-strip.tsx`, shot at different angles). Swap for a
+  real feed / curated set, and set the Instagram URL in Site Settings → Social
+  so "Follow →" links out.
 - **Legal pages** — Shipping / Returns / Privacy / Terms carry real,
   brand-specific copy but should get a final legal review. Confirm the values
   chosen as sensible defaults: 7-day return window, 48-hour damage-report
