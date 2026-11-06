@@ -5,12 +5,14 @@ import { Flacon } from "@/components/ui/flacon";
 import { Carousel } from "@/components/ui/carousel";
 import { cn } from "@/lib/cn";
 import { cloudinaryVariant, type FragranceImages, type FragranceSlug } from "@/lib/catalog";
+import { PDP_GALLERY, pdpPhotoSrc } from "@/config/pdp-gallery";
 
 /**
  * PDP gallery — a draggable frame with dots, plus a thumbnail strip.
  *
- * With real photography attached (`images.hero|flat|box`), each non-null image
- * is a slide. With none, it falls back to the vector flacon in three label
+ * The official product photographs (`@/config/pdp-gallery`, six per extrait) come
+ * first; a photograph uploaded in the admin catalogue (`images.hero|flat|box`)
+ * follows them. With neither, it falls back to the vector flacon in three label
  * states (packshot / detail / carton), so the swipe + dot + thumb mechanic is
  * always real.
  */
@@ -35,18 +37,27 @@ export function PdpGallery({
 }) {
   const [active, setActive] = useState(0);
 
-  const photos = (["flat", "hero", "box"] as const)
-    .map((k) => images[k])
-    .filter((url): url is string => Boolean(url));
+  const official = (PDP_GALLERY[slug] ?? []).map((p, i) => ({
+    key: `official-${i}`,
+    full: pdpPhotoSrc(slug, p, "full"),
+    thumb: pdpPhotoSrc(slug, p, "small"),
+    srcSet: `${pdpPhotoSrc(slug, p, "small")} ${p.small}w, ${pdpPhotoSrc(slug, p, "full")} ${p.width}w`,
+    alt: p.alt,
+  }));
 
-  const slides =
-    photos.length > 0
-      ? photos.map((url, i) => ({
-          key: `photo-${i}`,
-          full: cloudinaryVariant(url, { w: 1000 }) ?? url,
-          thumb: cloudinaryVariant(url, { w: 200 }) ?? url,
-        }))
-      : null;
+  const uploaded = (["flat", "hero", "box"] as const)
+    .map((k) => images[k])
+    .filter((url): url is string => Boolean(url))
+    .map((url, i) => ({
+      key: `photo-${i}`,
+      full: cloudinaryVariant(url, { w: 1000 }) ?? url,
+      thumb: cloudinaryVariant(url, { w: 200 }) ?? url,
+      srcSet: undefined as string | undefined,
+      alt: name,
+    }));
+
+  const all = [...official, ...uploaded];
+  const slides = all.length > 0 ? all : null;
 
   return (
     <div className="grid gap-3 lg:sticky lg:top-[calc(var(--announce-h)+var(--header-h)+24px)]">
@@ -58,7 +69,7 @@ export function PdpGallery({
         viewportClassName="rounded-[3px] border border-line"
       >
         {slides
-          ? slides.map((s) => (
+          ? slides.map((s, idx) => (
               <div
                 key={s.key}
                 className="relative aspect-[1/1.06] overflow-hidden"
@@ -67,9 +78,12 @@ export function PdpGallery({
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={s.full}
-                  alt={name}
+                  srcSet={s.srcSet}
+                  sizes={s.srcSet ? "(min-width: 1024px) 560px, 100vw" : undefined}
+                  alt={s.alt}
                   className="h-full w-full object-cover"
-                  loading="eager"
+                  loading={idx === 0 ? "eager" : "lazy"}
+                  fetchPriority={idx === 0 ? "high" : undefined}
                   decoding="async"
                 />
               </div>
