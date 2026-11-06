@@ -9,6 +9,7 @@ import { dbConnect } from "@/server/db";
 import { Session, User, type SessionDoc, type UserDoc } from "@/server/models";
 import { isProduction } from "@/server/env";
 import {
+  COOKIES_SECURE,
   CUSTOMER_SESSION_DAYS,
   SESSION_COOKIE,
   STAFF_SESSION_HOURS,
@@ -100,7 +101,7 @@ export async function createSession(
   const jar = await cookies();
   jar.set(SESSION_COOKIE, token, {
     httpOnly: true,
-    secure: true, // works on http://localhost (a trustworthy origin)
+    secure: COOKIES_SECURE, // always true in production; off in dev so http://192.168.x.x (a phone) keeps it
     sameSite: "lax", // survives the payment-gateway return redirect
     path: "/",
     expires: expiresAt,
@@ -135,7 +136,7 @@ export async function clearSessionCookie(): Promise<void> {
   const jar = await cookies();
   jar.set(SESSION_COOKIE, "", {
     httpOnly: true,
-    secure: true,
+    secure: COOKIES_SECURE,
     sameSite: "lax",
     path: "/",
     maxAge: 0,

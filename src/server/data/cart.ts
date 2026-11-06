@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { dbConnect } from "@/server/db";
 import { Cart, Product, type CartDoc, type ProductDoc } from "@/server/models";
 import { getCurrentUser } from "@/server/auth";
+import { COOKIES_SECURE, COOKIE_HOST_PREFIX } from "@/lib/auth";
 import { toRupees } from "@/lib/money";
 import {
   MAX_CART_LINES,
@@ -25,7 +26,7 @@ import {
  * live. `hydrateCart` joins the live catalogue for display.
  */
 
-export const CART_COOKIE = "__Host-rrs.cart";
+export const CART_COOKIE = `${COOKIE_HOST_PREFIX}rrs.cart`;
 const CART_TTL_DAYS = 45;
 
 function ttl(): Date {
@@ -41,7 +42,7 @@ async function writeToken(token: string): Promise<void> {
   const jar = await cookies();
   jar.set(CART_COOKIE, token, {
     httpOnly: true,
-    secure: true,
+    secure: COOKIES_SECURE,
     sameSite: "lax",
     path: "/",
     expires: ttl(),

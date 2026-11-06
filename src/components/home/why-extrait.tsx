@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 
 import { RhIcon } from "@/components/ui/rh-icon";
+import { getHomeAsset } from "@/lib/home-images";
+import { frameStyle, HomeImage } from "./home-image";
 
 const POINTS = [
   {
@@ -72,10 +74,17 @@ function ConcentrationBars() {
 }
 
 export function WhyExtrait() {
+  // the atomizer macro (`extrait-atomizer-craft.webp`, 4:5): craft and precision,
+  // shown without any concentration figure — this block states none, on purpose
+  const macro = getHomeAsset("extrait-atomizer-craft");
   return (
     <section className="rh-why" id="why" aria-labelledby="why-h">
       <div className="rh-wrap">
         <div className="rh-why__rule" />
+        <div className="rh-why__top">
+          <figure className="rh-frame rh-why__macro" style={frameStyle(macro)}>
+            <HomeImage asset={macro} fill />
+          </figure>
         <div className="rh-why__in">
           <svg
             viewBox="0 0 90 156"
@@ -143,6 +152,7 @@ export function WhyExtrait() {
           <p className="rh-why__note">
             More perfume oil, less alcohol. The reason two sprays hold all day.
           </p>
+        </div>
         </div>
         <div className="rh-why__pts">
           {POINTS.map((pt) => (

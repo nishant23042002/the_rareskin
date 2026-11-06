@@ -17,7 +17,26 @@ export interface SessionUser {
   isStaff: boolean;
 }
 
-export const SESSION_COOKIE = "__Host-rrs.session";
+/**
+ * Cookie hardening, by environment.
+ *
+ * Production: `Secure` + the `__Host-` prefix (HTTPS only, no Domain, Path=/).
+ * Development: a plain name and no `Secure`. A browser drops `Secure` and
+ * `__Host-` cookies unless the page is HTTPS or exactly `localhost`, so a phone
+ * that opens the dev server at `http://192.168.x.x:3000` silently lost the
+ * session and the cart cookie: sign-in never stuck and the bag never synced.
+ * `process.env.NODE_ENV` is inlined at build time, so a production build always
+ * gets the hardened form. The one exception is `pnpm phone` (a LOCAL production
+ * build served over plain HTTP to a phone on the Wi-Fi, see scripts/phone.mjs):
+ * it sets NEXT_PUBLIC_LAN_TEST=1 for that build only, and the flag is ignored on
+ * Vercel, so a deployment can never run with it.
+ */
+export const COOKIES_SECURE =
+  process.env.NODE_ENV === "production" &&
+  !(process.env.NEXT_PUBLIC_LAN_TEST === "1" && !process.env.VERCEL);
+export const COOKIE_HOST_PREFIX = COOKIES_SECURE ? "__Host-" : "";
+
+export const SESSION_COOKIE = `${COOKIE_HOST_PREFIX}rrs.session`;
 
 /** What the account "Sign-in methods" UI needs. No tokens, no Google `sub` —
  *  safe to hand to a client component. Built server-side by `getSignInMethods`. */

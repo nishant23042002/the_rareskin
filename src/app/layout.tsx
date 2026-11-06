@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Jost, Newsreader } from "next/font/google";
 import { ScrollbarVar } from "@/components/providers/scrollbar-var";
 import { SvgDefs } from "@/components/ui/svg-defs";
+import { DEV_CLIENT_BEACON } from "@/lib/dev-client-beacon";
 import { SITE } from "@/lib/site";
 import { organizationJsonLd } from "@/lib/seo";
 import "./globals.css";
@@ -59,6 +60,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en-IN" className={`${jost.variable} ${newsreader.variable}`}>
+      {process.env.NODE_ENV !== "production" && (
+        <head>
+          {/* dev only: reports what a phone's browser does with this page (src/lib/dev-client-beacon.ts) */}
+          <script dangerouslySetInnerHTML={{ __html: DEV_CLIENT_BEACON }} />
+        </head>
+      )}
       <body>
         <script
           type="application/ld+json"

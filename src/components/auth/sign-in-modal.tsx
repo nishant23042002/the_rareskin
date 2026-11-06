@@ -176,7 +176,7 @@ export function SignInModal({
       <div
         ref={scrimRef}
         onClick={onClose}
-        className="fixed inset-0 bg-ink/45 backdrop-blur-[2px]"
+        className="fixed inset-0 bg-ink/50"
       />
 
       <div className="fixed inset-0 flex items-end justify-center sm:items-center sm:p-4">

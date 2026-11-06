@@ -7,8 +7,11 @@ import { gsap, ScrollTrigger } from "@/lib/gsap";
 
 /**
  * Rendered inside <ReactLenis>. `useLenis()` hands us the instance reactively
- * (the imperative ref lands a render too late), so we can drive Lenis from the
- * GSAP ticker and keep ScrollTrigger in lock-step.
+ * (the imperative ref lands a render too late). Lenis runs its own rAF loop
+ * (`autoRaf` in <SmoothScroll>), so GSAP's ticker is NOT hooked into it any more:
+ * the old coupling kept GSAP's ticker running on every frame, forever, with lag
+ * smoothing switched off. ScrollTrigger only needs to hear about Lenis' scroll
+ * position, which is what the listener below does.
  */
 export function GsapLenisBridge() {
   const lenis = useLenis();
@@ -19,16 +22,10 @@ export function GsapLenisBridge() {
 
     const onScroll = () => ScrollTrigger.update();
     lenis.on("scroll", onScroll);
-
-    const tick = (time: number) => lenis.raf(time * 1000);
-    gsap.ticker.add(tick);
-    gsap.ticker.lagSmoothing(0);
-
     ScrollTrigger.refresh();
 
     return () => {
       lenis.off("scroll", onScroll);
-      gsap.ticker.remove(tick);
     };
   }, [lenis]);
 

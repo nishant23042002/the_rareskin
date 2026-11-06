@@ -561,3 +561,8 @@ html.lenis body {
     scroll-behavior: auto !important;
   }
 }
+
+/* taps respond at once (no double-tap-zoom wait) on every control */
+a, button, summary, label, [role="button"], input, select, textarea {
+  touch-action: manipulation;
+}

@@ -60,7 +60,7 @@ The `localStorage` bag (`rareskin:cart:v1`) stays the fast working cart. The
 
 - **on sign-in** — `PUT /api/cart?merge=1` with the local lines, then `GET` the
   union and adopt it locally (so a bag started on another device carries over);
-  the guest cookie cart (`__Host-rrs.cart`) is folded into the account `Cart`.
+  the guest cookie cart (`__Host-rrs.cart`; `rrs.cart` and not `Secure` in development) is folded into the account `Cart`.
 - **while signed in** — a debounced `PUT /api/cart` keeps the server `Cart` in
   step (persistence + a base for abandoned-cart email later).
 

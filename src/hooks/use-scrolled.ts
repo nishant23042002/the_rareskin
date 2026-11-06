@@ -1,33 +1,36 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ScrollTrigger } from "@/lib/gsap";
 
 /**
- * `true` once the page has scrolled past `threshold` pixels. Backed by
- * ScrollTrigger (no scroll listener, synced with Lenis; also works with native
- * scrolling under reduced motion). Shared by the announcement bar (collapse)
+ * `true` once the page has scrolled past `threshold` pixels. A passive scroll
+ * listener read once per frame (no GSAP, no ScrollTrigger: it used to create a
+ * ScrollTrigger just to flip a boolean), so it costs nothing while the page is
+ * still and one `scrollY` read per frame while it moves; React only re-renders
+ * when the value actually changes. Works with Lenis (which scrolls the real
+ * window) and with native scrolling. Shared by the announcement bar (collapse)
  * and the header (condense).
  */
 export function useScrolled(threshold = 40): boolean {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const st = ScrollTrigger.create({
-      start: threshold,
-      // a real range [threshold, maxScroll] so `isActive` stays true the whole
-      // time the page is scrolled — `end: "max"` collapses to a 1px window here
-      // because there is no trigger element.
-      end: () => Math.max(threshold + 1, ScrollTrigger.maxScroll(window)),
-      onToggle: (self) => setScrolled(self.isActive),
-    });
+    let raf = 0;
+    const read = () => {
+      raf = 0;
+      setScrolled(window.scrollY > threshold);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(read);
+    };
 
+    window.addEventListener("scroll", onScroll, { passive: true });
     // seed the initial value on the next frame (deferred, not a sync setState)
-    const raf = requestAnimationFrame(() => setScrolled(st.isActive));
+    raf = requestAnimationFrame(read);
 
     return () => {
+      window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(raf);
-      st.kill();
     };
   }, [threshold]);
 

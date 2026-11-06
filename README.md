@@ -42,6 +42,28 @@ pnpm install
 pnpm dev            # http://localhost:3000
 ```
 
+**On a phone** (same Wi-Fi as the PC). `localhost` on a phone is the phone itself, so use
+the PC's IPv4 address (`ipconfig`, or the "Network" line `next dev` prints), for example
+`192.168.0.106`. Two ways:
+
+- `pnpm dev`, then `http://<IPv4>:3000`. It works, because `next.config.ts` lists
+  `allowedDevOrigins` (without it Next 16's dev server answers 403 to its own JS chunks
+  from any address but `localhost`, so the page looks right and nothing responds) and the
+  session / cart cookies are not `Secure` / `__Host-` in development (a browser drops
+  those on `http://192.168.x.x`, so sign-in and the bag would not stick). But dev ships
+  ~5 MB of unminified JS: a mid-range Android phone needed about 33 s to start the
+  homepage, so buttons look dead until then.
+- `pnpm phone` (use this for design review): a production build served at
+  `http://<IPv4>:3001`, fast. It builds with `NEXT_PUBLIC_LAN_TEST=1` (relaxed cookies for
+  plain HTTP; ignored on Vercel, never deploy that build) and `NEXT_PUBLIC_CARD_SWITCHER=1`
+  (the card-direction preview bar). No hot reload: run it again to see code changes.
+
+Dev-only diagnostics: open `/api/dev/phone-speed` on the phone (latency, download speed,
+CPU), and read `.next/dev/logs/phone-client.log` (every dev page reports its load time,
+hydration and errors there). If nothing loads at all, Windows Firewall is blocking Node
+on private networks. A tunnel (ngrok, Cloudflare) needs its host added to
+`allowedDevOrigins` on purpose.
+
 Other scripts:
 
 ```bash
@@ -90,8 +112,9 @@ src/
     layout/    AnnouncementBar  Header (glass + Fragrances dropdown)  SiteMenu (dark
                left sidebar)  MenuFooter  BackToTop  Footer  PageIntro  LegalDoc
     home/      Hero (+HeroMedia)  LaunchOffer (ticket + promises)  InFocus
-               Collection (tiles)  Quiz  DiscoverySet  WhyExtrait  FounderNote
-               MadeDeliberately  InstagramStrip
+               Collection (tiles)  Quiz  DiscoverySet  WhyExtrait  AtelierStory
+               FounderNote  UnboxingRitual  ScentOnSkin  MadeDeliberately
+               InstagramStrip  HomeImage (manifest-driven <Image>)
     app/home.css   the homepage + chrome stylesheet, classes namespaced `rh-`
     product/   PdpGallery  PdpReviews
     cart/      CartProvider(*)  CartDrawer("The Counter")  CheckoutPanel  CartBar
@@ -295,6 +318,32 @@ before going live:
 - **Stock** — every product seeds at `stock: 0`; set real levels in
   `/admin/catalogue/<slug>/edit` (or `pnpm catalog set <slug> stock <n>`) before
   launch.
+- **Homepage pictures** — nine pictures (hero 16:9 + 4:5, the three product
+  cards, atomizer macro, atelier, unboxing, discovery set, scent on skin) are
+  described in [`public/images/assets-manifest.json`](public/images/assets-manifest.json)
+  (file, pixel size, ratio, `sizes`, focal point, alt, creative direction,
+  `claimsToVerify`) and produced with [`ASSET_PROMPT_SHEET.md`](ASSET_PROMPT_SHEET.md).
+  The hero (16:9 + 4:5) and the three product cards are **final** (generated
+  plates + the approved flacon pixels); the other five files are **tonal
+  placeholders** until you replace them at the same path, set their `status` to
+  `"final"` **and bump `assetVersion`** in the manifest (Next's image cache cannot
+  be invalidated, so URLs carry `?v=<assetVersion>`); existing sections keep their
+  illustrations while a picture is a placeholder. **"The Three" cards: four pedestal-free
+  art directions are built** (grounded stone, studio light, mineral bed, liquid
+  light, three fragrances each, plus a "Stone v2" AURÉVAN alternative), next to the
+  original pedestal cards; plate prompts in `public/images/prompt-manifest.json`,
+  files in `public/images/homepage/cards/<direction>/`, choice in
+  `src/config/homepage-assets.ts`. For the founder showcase a **preview bar at the
+  bottom of the homepage switches the direction live** (`/?concept=<id>` opens one),
+  and it is on in every build while `CARD_SWITCHER_PUBLIC` is true. When a direction
+  is chosen: set `DEFAULT_CARD_CONCEPT`, set `CARD_SWITCHER_PUBLIC = false`, delete
+  the losing pictures and the pedestal cards. Every card has the bottle at the same
+  place (`BOTTLE` in the local build script). `pnpm home:images check` verifies
+  size / ratio / weight; `pnpm home:images placeholders` rewrites missing
+  placeholders. Hero: a Site Settings photograph still wins over the shipped one.
+  Before launch, confirm the `claimsToVerify` items (the unboxing box is not
+  approved packaging; no "30% extrait" figure is printed; the atelier and ritual
+  copy is a draft).
 - **Contact & newsletter** — the contact form now saves every enquiry to
   **`/admin/messages`** and raises a notification; wiring a real ESP for the
   newsletter list still goes in `/api/newsletter`.

@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "phone": "node scripts/phone.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -16,6 +17,7 @@
     "reset:stock": "tsx scripts/reset-stock.ts",
     "seed:reviews": "tsx scripts/seed-reviews.ts",
     "founder:portrait": "tsx scripts/founder-portrait.ts",
+    "home:images": "tsx scripts/home-images.ts",
     "revalidate": "tsx scripts/catalog.ts revalidate",
     "db:migrate": "migrate-mongo up",
     "db:migrate:down": "migrate-mongo down",

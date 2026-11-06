@@ -112,7 +112,7 @@ fixed dev code.
 ## Session model
 
 - The session token **is** the document `_id` — a 256-bit CSPRNG value, stored
-  only in the `__Host-rrs.session` cookie (`httpOnly; Secure; SameSite=Lax`)
+  only in the `__Host-rrs.session` cookie (`httpOnly; Secure; SameSite=Lax`; in development the cookie is named `rrs.session` and is not `Secure`, see `COOKIES_SECURE` in `src/lib/auth.ts`, so a phone on `http://192.168.x.x` keeps it)
   and in Mongo.
 - Sliding lifetime: 30 days for customers, 8 hours for staff. Extended on an
   active visit (`/api/auth/session`, throttled to one write / 30 min).

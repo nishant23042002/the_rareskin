@@ -1,0 +1,336 @@
+{
+  "$comment": "Plate prompts for the homepage card alternatives (the grounded, pedestal-free directions of 'The Three'). 12 entries = 4 concepts x 3 fragrances. `prompt` is the product-free plate prompt for FLUX / Kling / any prose generator; `midjourney` is the same scene as a Midjourney v6 string with its parameters and `--no`; `negative` is for tools that have a negative field (FLUX and Kling have none: the plate prompts avoid product words instead). The approved flacon is composited on top, never generated. Checked by `pnpm home:images check`.",
+  "version": 1,
+  "updated": "2026-11-06",
+  "aspect_ratio": "4:5",
+  "frame": {
+    "px": "1600x2000",
+    "export": "WebP quality 85 to public/images/homepage/<asset>",
+    "layout": "The tile is aspect-ratio 4/5 (.rh-tile__media). Keep the lower-right 12% and the vertical centre of the right edge quiet: the chevron and the two dots sit there.",
+    "placement": "Contact line at y about 80% of the frame height; the flacon about 62-64% of the frame height (the old cards shrank it to about 45%)."
+  },
+  "flaconSpec": {
+    "rule": "The bottle always stands directly on the ground surface: no pedestal, stand, stool, block or plinth anywhere in any plate.",
+    "approved": "50 ml thick-base flint glass flacon with clean vertical lines, heavy matte black cylindrical cap, centred off-white cotton-rag label reading THE RARESKIN / fragrance name / ESSENTIALS | 50ml, crystal-clear liquid.",
+    "briefLabel": "EXTRAIT DE PARFUM · 50 ML / 1.7 FL. OZ. is NOT adopted: the approved mockups and the product pages carry ESSENTIALS | 50ml (decision of 2026-11-06). Changing the label means new approved bottle art for all three products.",
+    "briefLiquid": "Amber / golden-amber liquid (brief, concept 4) is NOT adopted: the approved liquid is crystal clear. Concept 4's gold comes from the sun, not the extrait.",
+    "neverGenerate": "Never let a generator draw the bottle or its label: label text always comes out garbled. For a mood-only exploration add this clause to a prose prompt, and discard the text it draws: 'a 50 ml flint-glass perfume flacon with a thick clear base and clean straight sides, a heavy matte black cylindrical cap, an off-white cotton paper label'."
+  },
+  "workflow": [
+    "1. Generate the plate (Kling kling-image-v3_0_omni text_to_image at 3:4, about 2 credits; or Midjourney / FLUX at 4:5) and reject any plate that contains a pedestal, a bottle, text or an extra prop.",
+    "2. Crop to 4:5 above any generator logo (Kling returns 1760x2368 for 3:4).",
+    "3. Composite the approved flacon with design-explorations/packaging-renders/homepage/place_bottles.py (see each entry's `composite`).",
+    "4. Export 1600x2000 WebP q85 to public/images/homepage/<asset>.",
+    "5. In public/images/assets-manifest.json set status to final, fix the alt, re-measure overlayTone (chevron colour), and bump assetVersion."
+  ],
+  "concepts": [
+    {
+      "concept_id": "grounded_stone",
+      "label": "Grounded stone",
+      "direction": "Concept 1 - Grounded Seamless Surface (Direct Earth & Stone): the flacon stands directly on honed limestone, raw oak or basalt with its ingredients lying beside the base.",
+      "assets": {
+        "AURÉVAN": "cards/grounded_stone/aurevan.webp",
+        "ORVÉLIS": "cards/grounded_stone/orvelis.webp",
+        "VAYRÉN": "cards/grounded_stone/vayren.webp"
+      }
+    },
+    {
+      "concept_id": "chiaroscuro_studio",
+      "label": "Studio light",
+      "direction": "Concept 2 - Architectural Chiaroscuro & Studio Bleed: the flacon on an off-white plaster sweep, window-frame shadows across the backdrop, merging with the page.",
+      "assets": {
+        "AURÉVAN": "cards/chiaroscuro_studio/aurevan.webp",
+        "ORVÉLIS": "cards/chiaroscuro_studio/orvelis.webp",
+        "VAYRÉN": "cards/chiaroscuro_studio/vayren.webp"
+      }
+    },
+    {
+      "concept_id": "mineral_bed",
+      "label": "Mineral bed",
+      "direction": "Concept 3 - Raw Mineral & Botanical Bed: low-angle macro, the base slightly embedded in marble dust, crushed spice or volcanic sand.",
+      "assets": {
+        "AURÉVAN": "cards/mineral_bed/aurevan.webp",
+        "ORVÉLIS": "cards/mineral_bed/orvelis.webp",
+        "VAYRÉN": "cards/mineral_bed/vayren.webp"
+      }
+    },
+    {
+      "concept_id": "liquid_caustics",
+      "label": "Liquid light",
+      "direction": "Concept 4 - Optical Caustics & Liquid Refraction: the flacon on a shallow water film or an optical-glass plate, warm sun throwing golden caustics beside it.",
+      "assets": {
+        "AURÉVAN": "cards/liquid_caustics/aurevan.webp",
+        "ORVÉLIS": "cards/liquid_caustics/orvelis.webp",
+        "VAYRÉN": "cards/liquid_caustics/vayren.webp"
+      }
+    }
+  ],
+  "prompts": [
+    {
+      "fragrance": "AURÉVAN",
+      "concept_id": "grounded_stone",
+      "aspect_ratio": "4:5",
+      "asset": "cards/grounded_stone/aurevan.webp",
+      "prompt": "Quiet editorial still life, portrait 4:5 frame. A wide pale honed limestone floor with fine veining fills the entire lower half of the frame from the left edge to the right edge, with no corner or edge of the stone visible, runs to the bottom edge of the frame and meets a softly textured lime-washed plaster wall in warm off-white a little more than halfway down the frame. Soft early-morning window light at about 5200 K enters from the upper left and lays one gentle diagonal sun bar across the wall; shadows are soft-edged. In the foreground, large and slightly out of focus, one freshly sliced bergamot half with pebbled yellow-green rind and pale pith segments rests in the lower left corner of the frame, partly cut by the left and bottom frame edges, and a small scatter of white jasmine petals rests in the lower right corner, partly cut by the right and bottom frame edges. The whole middle of the floor between them, from the foreground to the wall, is wide, empty, bare limestone with nothing on it. Low camera at surface height, tilted down about 12 degrees, 100 mm macro lens at f/4, fine natural film grain. Calm, airy palette of ivory, pale stone and soft lime green.",
+      "midjourney": "quiet editorial still life, wide pale honed limestone floor with fine veining filling the lower half edge to edge with no corner visible, meeting a lime-washed off-white plaster wall a little more than halfway down, soft early-morning window light from the upper left with one diagonal sun bar, one freshly sliced bergamot half large and slightly out of focus in the lower left corner partly cut by the frame, white jasmine petals in the lower right corner partly cut by the frame, wide empty middle, low camera at surface height, 100mm macro, f/4, fine film grain, ivory pale stone and soft lime palette --ar 4:5 --style raw --v 6.1 --s 120 --no text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, whole fruit, lime, lemon",
+      "negative": "text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, whole fruit, lime, lemon",
+      "ingredients": [
+        "bergamot (half, sliced)",
+        "jasmine petals (a white floral)"
+      ],
+      "light": "5200 K morning, one diagonal sun bar from the upper left, soft diffusion",
+      "camera": "tabletop height, 12 degree downward tilt, 100 mm macro, f/5.6",
+      "composite": "Approved AUREVAN flacon, about 64% of the frame height, centred (x 50%), base resting on the slab at y about 80%. Contact shadow: tight dark core plus a long soft falloff to the right (light from the upper left), opacity about .35. The left glass edge catches the sun bar. Both ingredient groups stay more than 12% of the frame width away from the bottle.",
+      "verify": [
+        "jasmine is this brief's reading of the catalogue's 'White Florals'; swap to gardenia if the founder prefers",
+        "v2 (2026-11-06): the first plate drew a slab at a diagonal with the props in the middle, which pushed the bottle off-centre; this version uses a tabletop to the bottom edge and edge-cut props so the bottle can stand exactly where the ORVÉLIS bottle stands (x 50%, same size, same base)",
+        "v3 (2026-11-06): v2 drew a free-standing table with a corner and the bergamot at the back-centre (unusable for a centred bottle); v3 asks for a full-width floor and corner foreground props"
+      ],
+      "asset_id": "aurevan-card-grounded_stone",
+      "alternates": [
+        {
+          "concept_id": "grounded_stone_v2",
+          "asset": "cards/grounded_stone_v2/aurevan.webp",
+          "plate": "AQusi21p… (second AURÉVAN plate, kept on request)",
+          "prompt": "Quiet editorial still life, portrait 4:5 frame. A wide pale honed limestone tabletop with fine veining fills the lower half of the frame, runs to the bottom edge of the frame and meets a softly textured lime-washed plaster wall in warm off-white a little more than halfway down the frame. Soft early-morning window light at about 5200 K enters from the upper left and lays one gentle diagonal sun bar across the wall; shadows are soft-edged. On the limestone, level with the middle of the tabletop and not at the back, lie exactly one freshly sliced bergamot half, pebbled yellow-green rind with the pale pith segments facing the camera, at the very left edge of the frame, partly cut by the frame edge, and a small scatter of five white jasmine petals at the very right edge of the frame, partly cut by the frame edge. Between them the whole middle of the tabletop is wide, empty, bare limestone with nothing on it. Camera at tabletop height, tilted down about 12 degrees, 100 mm macro lens at f/5.6, shallow depth of field on the wall, fine natural film grain. Calm, airy palette of ivory, pale stone and soft lime green.",
+          "note": "the generator drew a free-standing table with a visible front edge and corner, the bergamot at the back-centre and jasmine buds at the back-right; the bergamot is relocated in the composite"
+        }
+      ]
+    },
+    {
+      "fragrance": "ORVÉLIS",
+      "concept_id": "grounded_stone",
+      "aspect_ratio": "4:5",
+      "asset": "cards/grounded_stone/orvelis.webp",
+      "prompt": "Quiet editorial still life, portrait 4:5 frame. A wide dark raw oak tabletop with open grain, visible pores and a few hairline cracks fills the lower third of the frame, runs to the bottom edge of the frame and runs back to a deep, warm plaster wall in muted umber. Golden-hour side light at about 3200 K comes low from the right and rakes across the wood so every pore throws a tiny shadow; long warm shadows fall to the left and a soft glow sits on the wall. On the oak lie exactly two long dark Bourbon vanilla beans, slightly oily, crossed gently, at the very left edge of the frame, partly cut by the frame edge, and two curled cinnamon bark quills with a few crumbs beside them at the very right edge of the frame, partly cut by the frame edge. Between them the whole middle of the oak surface is wide, empty, bare wood with nothing on it. Camera at tabletop height, tilted down about 12 degrees, 100 mm macro lens at f/5.6, shallow depth of field on the wall, fine natural film grain. Palette of amber, umber and deep caramel.",
+      "midjourney": "quiet editorial still life, wide dark raw oak tabletop with open grain running to the bottom edge running back to a warm umber plaster wall, golden-hour side light low from the right raking the wood, two Bourbon vanilla beans at the very left edge partly cut by the frame, two cinnamon bark quills at the very right edge partly cut by the frame, wide empty stretch of bare oak between them, camera at tabletop height, 100mm macro, f/5.6, shallow depth of field, fine film grain, amber umber caramel palette --ar 4:5 --style raw --v 6.1 --s 120 --no text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, honey, honeycomb, flowers",
+      "negative": "text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, honey, honeycomb, flowers",
+      "ingredients": [
+        "Bourbon vanilla beans",
+        "cinnamon bark"
+      ],
+      "light": "3200 K golden hour, low raking light from the right",
+      "camera": "tabletop height, 12 degree downward tilt, 100 mm macro, f/5.6",
+      "composite": "Approved ORVÉLIS flacon, about 64% of the frame height, centred, base resting on the oak at y about 80%. Contact shadow falls LEFT (light from the right), opacity about .45, warm brown rather than black. Rim light on the right glass edge; glass neutral factor about .8 on this warm set; sharpen about .35 (the source is 1254 px native).",
+      "verify": [
+        "the previous ORVÉLIS plate added a honeycomb that is not in the notes: reject any plate that shows honey or comb",
+        "the AURÉVAN plate clumped its ingredients in the middle although told 'left quarter / right quarter': the oak prompt pushes them to the frame edges ('partly cut by the frame edge') and drops the word 'honey' from the palette"
+      ],
+      "asset_id": "orvelis-card-grounded_stone"
+    },
+    {
+      "fragrance": "VAYRÉN",
+      "concept_id": "grounded_stone",
+      "aspect_ratio": "4:5",
+      "asset": "cards/grounded_stone/vayren.webp",
+      "prompt": "Moody editorial still life, portrait 4:5 frame. A wide honed black volcanic basalt floor with a fine matte grain and a few tiny pores fills the entire lower half of the frame from the left edge to the right edge; it is one continuous flat surface with no borders, no frame, no cracks and no edges, and it meets a charcoal-grey plaster wall, which falls to near black at the top, a little more than halfway down the frame. Low camera at surface height, tilted down only about 10 degrees, so the floor is seen at a shallow grazing angle. A soft cool light at about 5600 K from the upper left rims the grain; a faint warm 3000 K edge light comes from the right. A single thin wisp of white smoke rises against the dark wall only, above the line where the wall meets the floor, at about three quarters of the frame width, curls once and thins to nothing by the upper third of the frame; the smoke never crosses the floor. In the lower left corner of the frame only a small corner of a dark brown stitched leather strip is visible, cut by the left and bottom frame edges, and in the lower right corner about a dozen black peppercorns are scattered on the floor, partly cut by the right and bottom frame edges. The whole middle of the floor, from the foreground to the wall, is wide, empty, bare basalt with nothing on it. 100 mm macro lens at f/4, fine natural film grain. Palette of charcoal, graphite, warm brown and a single thread of white.",
+      "midjourney": "moody editorial still life, wide honed black volcanic basalt floor with a fine matte grain, one continuous flat surface with no borders or cracks, filling the lower half edge to edge, charcoal plaster wall fading to black, low camera at a shallow grazing angle, soft cool light from the upper left and a faint warm edge light from the right, one thin wisp of white smoke rising against the wall only and curling once, a small corner of dark stitched leather in the lower left corner cut by the frame, about a dozen black peppercorns in the lower right corner cut by the frame, wide empty middle, 100mm macro, f/4, fine film grain, charcoal graphite warm brown palette --ar 4:5 --style raw --v 6.1 --s 120 --no text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, oud chips, incense stick, brass, bowl, candle, gravel strip, border, frame, cracked edge",
+      "negative": "text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, oud chips, incense stick, brass, bowl, candle",
+      "ingredients": [
+        "leather strip",
+        "black peppercorns (the catalogue's 'Spices')",
+        "white smoke (a thin thread, not a cloud)"
+      ],
+      "light": "5600 K cool key from the upper left, 3000 K warm edge from the right",
+      "camera": "tabletop height, 12 degree downward tilt, 100 mm macro, f/5.6",
+      "composite": "Approved VAYRÉN flacon, about 64% of the frame height, centred, base resting on the basalt at y about 80%. Dark set: glass positive-light factor about .5 to .8, rim light about .5 on the cap and both glass edges (0.34 left the clear glass nearly invisible). The smoke thread passes just right of the cap and stays behind the bottle.",
+      "verify": [
+        "generators tend to draw a brass scoop or a bowl instead of a plain leather strip: if so, cut the strip from a re-roll",
+        "v2 (2026-11-06): rewritten with the lessons of the AURÉVAN v3 plate: full-width corner-free floor, whole middle empty, props large at the lower corners; peppercorns added (the catalogue's 'Spices'); the bottle stands at the shared BOTTLE position (x 880, base 1580, scale 1.04)",
+        "v3 (2026-11-06): the v2 prompt ('finely pitted ... vesicles', props 'large') made Kling draw a steeply tilted bordered strip of black gravel with smoke ribbons running THROUGH the floor, a huge leather panel and the peppercorns in a tray (plate AfyYFwNy…, discarded); v3 asks for one continuous honed floor with no borders, a grazing camera, smoke against the wall only, and only a corner of leather plus a dozen peppercorns"
+      ],
+      "asset_id": "vayren-card-grounded_stone"
+    },
+    {
+      "fragrance": "AURÉVAN",
+      "concept_id": "chiaroscuro_studio",
+      "aspect_ratio": "4:5",
+      "asset": "cards/chiaroscuro_studio/aurevan.webp",
+      "prompt": "Minimalist gallery interior, portrait 4:5 frame. One continuous seamless pale off-white hand-troweled plaster surface: the floor curves smoothly up into the wall with no corner, no skirting, no horizon line and no edges, and nothing at all stands on it. A tall four-pane window out of frame to the left throws a sharp geometric light pattern across the wall and the floor: crisp-edged parallelograms of cool morning sun at about 5200 K, with the thin straight cross-bars of the window frame drawing dark lines through them, falling from the upper left. The lit patches are pale cream and the shadows a soft neutral grey. The whole middle of the floor, from the foreground to the point where it curves into the wall, is calm, empty, evenly lit plaster with nothing on it. Low camera at surface height, tilted down about 10 degrees, 85 mm lens at f/4, fine natural film grain. High-key and mostly pale ivory so the edges of the picture dissolve into a white page.",
+      "midjourney": "minimalist gallery interior, one continuous seamless pale off-white hand-troweled plaster surface, floor curving smoothly into the wall with no corner or edge or horizon line, nothing standing on it, tall four-pane window out of frame on the left casting crisp geometric parallelograms of cool morning sun with window-bar shadows across wall and floor, calm empty floor, low camera at surface height, 85mm, f/4, high-key ivory, fine grain --ar 4:5 --style raw --v 6.1 --s 120 --no text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, plants, fruit, flowers, furniture, curtains, skirting board, corner, table, edge",
+      "negative": "text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, plants, fruit, flowers, furniture, curtains",
+      "ingredients": [
+        "none (gallery, no ingredients)"
+      ],
+      "light": "5200 K cool morning through a four-pane window, upper left",
+      "camera": "tabletop height, 10 degree downward tilt, 85 mm, f/4",
+      "composite": "Approved AUREVAN flacon, about 64% of the frame height, centred, base on the plaster at y about 80%. The window light patch must run past the bottle (a lit parallelogram behind it, one bar shadow crossing the floor in front). Contact shadow: soft, 18-24 px blur, falling right and slightly toward camera, opacity about .22. Plate edge luminance should sit within about 6% of the page background (#fafaf7) so the picture merges with the page.",
+      "verify": [
+        "measure the final plate's edge colour against --paper (#fafaf7); lift the exposure if it reads grey",
+        "v2 (2026-11-06): rewritten with the lessons of concept 1: one continuous surface, no corner / skirting / edges, nothing standing on it, low grazing camera; the bottle stands at the shared BOTTLE position (x 880, base 1580, scale 1.04). Measure the plate's edge colour against --paper (#fafaf7) once generated"
+      ],
+      "asset_id": "aurevan-card-chiaroscuro_studio"
+    },
+    {
+      "fragrance": "ORVÉLIS",
+      "concept_id": "chiaroscuro_studio",
+      "aspect_ratio": "4:5",
+      "asset": "cards/chiaroscuro_studio/orvelis.webp",
+      "prompt": "Minimalist gallery interior, portrait 4:5 frame. One continuous seamless pale sand-coloured hand-troweled plaster surface: the floor curves smoothly up into the wall with no corner, no skirting, no horizon line and no edges, and nothing at all stands on it; the floor is perfectly smooth and even with no tiles, no pattern and no stains. A tall two-pane window out of frame to the right, with one vertical mullion, throws a sharp geometric light pattern across the wall and the floor: crisp-edged long rectangles of late-afternoon amber sun at about 3400 K, with the straight dark line of the mullion running through them, raking from the upper right. The lit patches are warm cream gold and the shadows a soft warm taupe. The whole middle of the floor, from the foreground to the point where it curves into the wall, is calm, empty, evenly lit plaster with nothing on it. Low camera at surface height, tilted down about 10 degrees, 85 mm lens at f/4, fine natural film grain. High-key and warm cream so the edges of the picture dissolve into a pale page.",
+      "midjourney": "minimalist gallery interior, one continuous seamless pale sand hand-troweled plaster surface, floor curving smoothly into the wall with no corner or edge or horizon line, perfectly smooth floor with no tiles or stains, nothing standing on it, tall two-pane window out of frame on the right casting crisp long rectangles of late-afternoon amber sun with a mullion shadow across wall and floor, calm empty floor, low camera at surface height, 85mm, f/4, high-key warm cream, fine grain --ar 4:5 --style raw --v 6.1 --s 120 --no text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, plants, fruit, flowers, furniture, curtains, skirting board, corner, table, edge, tiles",
+      "negative": "text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, plants, fruit, flowers, furniture, curtains",
+      "ingredients": [
+        "none (gallery, no ingredients)"
+      ],
+      "light": "3400 K late-afternoon amber through a two-pane window, upper right",
+      "camera": "tabletop height, 10 degree downward tilt, 85 mm, f/4",
+      "composite": "Approved ORVÉLIS flacon, about 64% of the frame height, centred, base on the plaster at y about 80%. Light comes from the RIGHT: contact shadow falls left, opacity about .26, warm taupe. Glass neutral about .8, sharpen about .35. Keep the plate warm but high-key so it still merges with the page.",
+      "verify": [
+        "the sand tint lowers the page-merge: check the edge colour against --paper",
+        "v2 (2026-11-06): rewritten with the AURÉVAN studio lessons (continuous surface, nothing standing on it, smooth floor to avoid the mosaic artefact); the bottle stands at the shared BOTTLE position; light from the RIGHT so the shadows fall left"
+      ],
+      "asset_id": "orvelis-card-chiaroscuro_studio"
+    },
+    {
+      "fragrance": "VAYRÉN",
+      "concept_id": "chiaroscuro_studio",
+      "aspect_ratio": "4:5",
+      "asset": "cards/chiaroscuro_studio/vayren.webp",
+      "prompt": "Minimalist gallery interior, portrait 4:5 frame. One continuous seamless smoky warm-taupe hand-troweled plaster surface: the floor curves smoothly up into the wall with no corner, no skirting, no horizon line and no edges, and nothing at all stands on it; the floor is perfectly smooth and even with no tiles, no pattern, no ripples and no stains. A single narrow vertical slit window out of frame to the right throws one hard, crisp-edged blade of 4500 K light across the wall from the upper right and down onto the floor, with a deep soft shadow filling the left side of the frame: strong chiaroscuro, the lit blade pale cream and the shadow a deep warm grey. The whole middle of the floor, from the foreground to the point where it curves into the wall, is calm, empty plaster with nothing on it. Low camera at surface height, tilted down about 10 degrees, 85 mm lens at f/4, fine natural film grain. The top and bottom edges stay lighter than the middle.",
+      "midjourney": "minimalist gallery interior, one continuous seamless smoky warm-taupe hand-troweled plaster surface, floor curving smoothly into the wall with no corner or edge or horizon line, perfectly smooth floor with no tiles ripples or stains, nothing standing on it, one narrow slit window out of frame on the right casting a single hard crisp blade of light across wall and floor, deep soft shadow on the left, strong chiaroscuro, calm empty floor, low camera at surface height, 85mm, f/4, fine grain --ar 4:5 --style raw --v 6.1 --s 120 --no text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, plants, fruit, flowers, furniture, curtains, smoke, skirting board, corner, table, edge, tiles, smoke",
+      "negative": "text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, plants, fruit, flowers, furniture, curtains, smoke",
+      "ingredients": [
+        "none (gallery, no ingredients)"
+      ],
+      "light": "4500 K hard blade from a slit window, upper right, deep fill-less shadow on the left",
+      "camera": "tabletop height, 10 degree downward tilt, 85 mm, f/4",
+      "composite": "Approved VAYRÉN flacon, about 64% of the frame height, centred or 4% left of centre so the light blade grazes its right shoulder, base on the plaster at y about 80%. Rim light about .5 on the right glass edge and cap. Contact shadow falls left, opacity about .4. This is the darkest studio variant and will not dissolve into the page: judge it in the switcher.",
+      "verify": [
+        "checks: the page-merge claim of this concept is weakest here",
+        "v2 (2026-11-06): rewritten with the lessons of the two earlier studio cards; the bottle stands at the shared BOTTLE position; light from the RIGHT so shadows fall left; the plate may need shift_crop (floor must start above y 1580) and the logo painted out first (box clears the logo by > 14 px feather)"
+      ],
+      "asset_id": "vayren-card-chiaroscuro_studio"
+    },
+    {
+      "fragrance": "AURÉVAN",
+      "concept_id": "mineral_bed",
+      "aspect_ratio": "4:5",
+      "asset": "cards/mineral_bed/aurevan.webp",
+      "prompt": "Macro still life, portrait 4:5 frame. A bed of coarse white marble dust and tiny crushed marble grains, sparkling where the light touches, covers the entire lower half of the frame from the left edge to the right edge in soft drifts and low ridges, with no borders, no tray, no bowl and no edges, and runs to the bottom edge of the frame. Behind it, out of focus, a pale plaster wall with a soft bokeh of morning light from the upper left at about 5200 K. At the very left edge of the frame, partly cut by it, three white jasmine petals lie half sunk into the bed, and at the very right edge, partly cut by it, one thin curl of bergamot zest lies on the bed. The whole middle of the bed, from the foreground to the wall, is a wide, calm, flat stretch of fine marble dust with nothing on it. Extreme low camera, the lens almost touching the bed, 100 mm macro lens at f/4 focused on the middle of the bed, fine natural film grain. Pale ivory and white palette.",
+      "midjourney": "macro still life, bed of coarse white marble dust and crushed marble grains sparkling in the light, soft drifts and low ridges covering the lower half edge to edge with no border tray or bowl, pale plaster wall in soft bokeh with morning light from the upper left, three white jasmine petals half sunk at the very left edge partly cut by the frame, one thin curl of bergamot zest at the very right edge partly cut by the frame, wide calm empty middle, extreme low camera, 100mm macro, f/4, fine film grain, pale ivory and white palette --ar 4:5 --style raw --v 6.1 --s 120 --no text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, whole fruit, sand beach, shells, tray, bowl, border, whole fruit",
+      "negative": "text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, whole fruit, sand beach, shells",
+      "ingredients": [
+        "marble dust",
+        "jasmine petals",
+        "bergamot zest"
+      ],
+      "light": "5200 K morning from the upper left, sparkle on the grains",
+      "camera": "ground level, 100 mm macro, f/3.2",
+      "composite": "Approved AUREVAN flacon, about 62% of the frame height, centred. Embed it: sink the base about 4% of the bottle height below the bed line and paste the plate's own foreground ridge OVER the base with a wavy mask (grain-sized teeth), plus a tight ambient-occlusion shadow and a few loose grains resting on the bottle's foot. Light from the upper left.",
+      "verify": [
+        "the 'embedded base' is a composite effect: check the occlusion edge at 100% for a cut-out look",
+        "v2 (2026-11-06): rewritten with the lessons of concepts 1 and 2 (borderless bed edge to edge and to the bottom of the frame, empty middle, props at the frame edges partly cut); the bottle stands at the shared BOTTLE position (x 880, base 1580, scale 1.04) with its foot sunk into the bed by pasting the plate's own grains over it (embed_foot in card_build.py)"
+      ],
+      "asset_id": "aurevan-card-mineral_bed"
+    },
+    {
+      "fragrance": "ORVÉLIS",
+      "concept_id": "mineral_bed",
+      "aspect_ratio": "4:5",
+      "asset": "cards/mineral_bed/orvelis.webp",
+      "prompt": "Macro still life, portrait 4:5 frame. A low mound of coarse crushed spice grains, crumbled cinnamon bark in warm brown flakes with tiny black vanilla seeds like fine caviar, spreads wide across the lower middle of the frame, its crest about three fifths of the way down the frame, in soft drifts that run to the bottom edge of the frame, on a polished dark walnut surface with no borders and no edges. Behind it, out of focus, a deep warm umber plaster wall with a soft golden bokeh of low side light at about 3200 K from the right. At the very left edge of the frame, partly cut by it, two whole star anise lie half sunk into the mound, and at the very right edge, partly cut by it, one broken cinnamon quill lies on the surface. The whole middle of the mound is a calm, even stretch of fine spice grains with nothing on it. Extreme low camera, the lens almost touching the surface, 100 mm macro lens at f/4 focused on the middle of the mound, fine natural film grain. Palette of amber, umber and caramel.",
+      "midjourney": "macro still life, low mound of coarse crushed spice grains, crumbled cinnamon bark flakes and tiny black vanilla seeds, crest three fifths down the frame, soft drifts to the bottom edge on a polished dark walnut surface with no borders, deep umber plaster wall in soft golden bokeh from low side light on the right, two whole star anise half sunk at the very left edge partly cut by the frame, one broken cinnamon quill at the very right edge partly cut by the frame, calm empty middle, extreme low camera, 100mm macro, f/4, fine film grain, amber umber caramel palette --ar 4:5 --style raw --v 6.1 --s 120 --no text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, honey, honeycomb, flowers, tray, bowl, border",
+      "negative": "text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, honey, honeycomb, flowers",
+      "ingredients": [
+        "cinnamon bark",
+        "vanilla seeds",
+        "star anise (a spice)"
+      ],
+      "light": "3200 K low side light from the right",
+      "camera": "ground level, 100 mm macro, f/3.2",
+      "composite": "Approved ORVÉLIS flacon, about 62% of the frame height, centred. Embed it as for the other mineral beds (base sunk about 4%, foreground ridge pasted over it with a wavy mask, tight occlusion shadow). Light from the RIGHT: shadow falls left, warm brown. Glass neutral about .8, sharpen about .35.",
+      "verify": [
+        "star anise is the catalogue's 'Spices' made literal; drop it if it reads as a different scent",
+        "v2 (2026-11-06): same structure as the AURÉVAN mineral-bed plate that worked (a low mound with its crest three fifths down so the shared BOTTLE position sits inside it, props at the frame edges); no 'honey' anywhere"
+      ],
+      "asset_id": "orvelis-card-mineral_bed"
+    },
+    {
+      "fragrance": "VAYRÉN",
+      "concept_id": "mineral_bed",
+      "aspect_ratio": "4:5",
+      "asset": "cards/mineral_bed/vayren.webp",
+      "prompt": "Macro still life, portrait 4:5 frame. A low mound of black volcanic sand and fine basalt grit, glinting where the light touches, spreads wide across the lower middle of the frame, its crest about three fifths of the way down the frame, in soft windblown drifts that run to the bottom edge of the frame, on a polished black stone surface with no borders and no edges. Behind it, out of focus, a charcoal plaster wall fading to black, with a single hard rim light at about 5600 K skimming the grains from the left. At the very left edge of the frame, partly cut by it, three slivers of dark oud wood lie half sunk into the sand, and at the very right edge, partly cut by it, one thin thread of white smoke rises against the dark wall and curls once. The whole middle of the mound is a calm, even stretch of fine black sand with nothing on it. Extreme low camera, the lens almost touching the surface, 100 mm macro lens at f/4 focused on the middle of the mound, fine natural film grain. Palette of black, charcoal, graphite and a single thread of white.",
+      "midjourney": "macro still life, low mound of black volcanic sand and fine basalt grit glinting in the light, crest three fifths down the frame, windblown drifts to the bottom edge on a polished black stone surface with no borders, charcoal plaster wall fading to black, single hard rim light from the left, three slivers of dark oud wood half sunk at the very left edge partly cut by the frame, one thin thread of white smoke rising against the wall at the very right edge, calm empty middle, extreme low camera, 100mm macro, f/4, fine film grain, black charcoal graphite palette --ar 4:5 --style raw --v 6.1 --s 120 --no text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, ash cloud, fire, incense stick, bowl, tray, bowl, border",
+      "negative": "text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, ash cloud, fire, incense stick, bowl",
+      "ingredients": [
+        "black volcanic sand",
+        "oud wood slivers",
+        "white smoke thread"
+      ],
+      "light": "5600 K hard rim light skimming from the left",
+      "camera": "ground level, 100 mm macro, f/3.2",
+      "composite": "Approved VAYRÉN flacon, about 62% of the frame height, centred. Embed it as for the other mineral beds. Dark set: glass positive-light about .5 to .8, rim light about .5 on the left glass edge and cap (the hard light comes from the left). Keep the smoke thread right of the cap.",
+      "verify": [
+        "dark on dark: verify the clear glass edge stays visible at 375 px",
+        "v2 (2026-11-06): same structure as the AURÉVAN mineral-bed plate that worked; the smoke must stay against the wall above the mound and never cross the sand"
+      ],
+      "asset_id": "vayren-card-mineral_bed"
+    },
+    {
+      "fragrance": "AURÉVAN",
+      "concept_id": "liquid_caustics",
+      "aspect_ratio": "4:5",
+      "asset": "cards/liquid_caustics/aurevan.webp",
+      "prompt": "Fine-art product photography background with nothing in the middle, portrait 4:5 frame, shot perfectly level and straight-on, the camera at the height of the water, the line where the wall meets the water exactly horizontal and a little more than halfway down the frame. A very shallow, perfectly still sheet of clear water, a few millimetres deep, lies over a flat pale honed travertine floor that fills the whole lower half of the frame from the left edge to the right edge, with no borders, no edges, no tray and no waves, and runs to the bottom edge of the frame. The wall is a soft pale plaster, mirrored faintly in the water. Warm low sun at about 3800 K from the upper left sets a golden-white net of caustic light shimmering on the stone beneath the water in the right half of the frame, with a faint echo near the left edge. At the very left edge of the frame, partly cut by it, one white jasmine flower rests on the stone, and at the very right edge, partly cut by it, one thin curl of bergamot zest rests on the stone. The whole middle of the floor, from the foreground to the wall, is a calm, empty, evenly lit stretch of still water with nothing on it. No people, no faces, no hands. 100 mm lens at f/5.6, fine natural film grain. Pale ivory, soft gold and a touch of lime green.",
+      "midjourney": "fine-art product photography background, perfectly level straight-on view, camera at the height of a very shallow still sheet of clear water over a plain evenly toned stone floor filling the lower half edge to edge, plaster wall meeting the water on a horizontal line a little more than halfway down, net of caustic light shimmering beneath the water to one side, one small prop cut by each frame edge, calm empty middle, 100mm, f/5.6, fine film grain --ar 4:5 --style raw --v 6.1 --s 120 --no text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, bubbles, rain, waves, whole fruit, people, faces, hands, tray, border, waves, tilted camera",
+      "negative": "text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, bubbles, rain, waves, whole fruit",
+      "ingredients": [
+        "jasmine petal",
+        "bergamot zest"
+      ],
+      "light": "3800 K low sun from the upper left, caustics on the right",
+      "camera": "tabletop height, 12 degree downward tilt, 100 mm macro, f/5.6",
+      "composite": "Approved AUREVAN flacon, about 62% of the frame height, centred, standing in the water film at y about 80%. Add: a mirror reflection (flip, fade from 30% to 0 over about 18% of the frame height, 2 px ripple displacement), a thin dark meniscus ring at the foot, and line the plate's right-hand caustic pool up with the base so it reads as light passing through the bottle. The liquid stays crystal clear (approved mockup): the gold is the sun, not amber extrait.",
+      "verify": [
+        "the caustics are painted by the generator, not refracted through the approved bottle; the brief's amber liquid is NOT part of the approved mockups",
+        "v2 (2026-11-06): rewritten with the lessons of concepts 1-3 (borderless surface to the bottom edge, empty middle, props partly cut at the frame edges, caustic pool on the side AWAY from the light so it lands beside the shared BOTTLE position); reflection is composited (compositor refl), the clear liquid stays clear",
+        "v3 (2026-11-06): the first attempt (a tilted floor-and-ripple prompt) gave a woman's face in the water (AURÉVAN), a 45-degree view with a dark diagonal vein and concentric ripples (ORVÉLIS), and a steeply diagonal black slab with a big leather panel (VAYRÉN); v3 asks for a perfectly level straight-on view, a plain evenly toned floor, no people, props small at the frame edges; plate ids of the discarded first rolls are in homepage/plate_ids.txt"
+      ],
+      "asset_id": "aurevan-card-liquid_caustics"
+    },
+    {
+      "fragrance": "ORVÉLIS",
+      "concept_id": "liquid_caustics",
+      "aspect_ratio": "4:5",
+      "asset": "cards/liquid_caustics/orvelis.webp",
+      "prompt": "Fine-art product photography background with nothing in the middle, portrait 4:5 frame, shot perfectly level and straight-on, the camera at the height of the water, the line where the wall meets the water exactly horizontal and a little more than halfway down the frame. A very shallow, perfectly still sheet of clear water, a few millimetres deep, lies over a flat, plain, evenly toned warm sand-coloured limestone floor that fills the whole lower half of the frame from the left edge to the right edge, with no veins, no stripes, no borders, no edges, no tray and no waves, and runs to the bottom edge of the frame. The wall is a deep umber plaster, mirrored faintly in the water. Low sun at about 3200 K from the upper right sets a net of amber caustic light shimmering on the stone beneath the water in the left half of the frame, with a faint echo near the right edge. At the very left edge of the frame, partly cut by it, one long dark vanilla bean rests on the stone, and at the very right edge, partly cut by it, one cinnamon quill rests on the stone. The whole middle of the floor, from the foreground to the wall, is a calm, empty, evenly lit stretch of still water with nothing on it. No people, no faces, no hands. 100 mm lens at f/5.6, fine natural film grain. Palette of amber, umber and sand.",
+      "midjourney": "fine-art product photography background, perfectly level straight-on view, camera at the height of a very shallow still sheet of clear water over a plain evenly toned stone floor filling the lower half edge to edge, plaster wall meeting the water on a horizontal line a little more than halfway down, net of caustic light shimmering beneath the water to one side, one small prop cut by each frame edge, calm empty middle, 100mm, f/5.6, fine film grain --ar 4:5 --style raw --v 6.1 --s 120 --no text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, honey, honeycomb, bubbles, flowers, pedestal, people, faces, hands, tray, border, waves, tilted camera",
+      "negative": "text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, honey, honeycomb, bubbles, flowers, pedestal",
+      "ingredients": [
+        "vanilla bean",
+        "cinnamon quill"
+      ],
+      "light": "3200 K low sun from the right, caustics on the left",
+      "camera": "tabletop height, 12 degree downward tilt, 100 mm macro, f/5.6",
+      "composite": "Approved ORVÉLIS flacon, about 62% of the frame height, centred, standing on the glass at y about 80%. Light from the RIGHT, so the caustic pool lies to the LEFT of the base (line it up). Reflection as for AURÉVAN (flip, fade, tiny refraction offset because the plate is thick). Glass neutral about .8, sharpen about .35. The liquid stays crystal clear.",
+      "verify": [
+        "same caveat as AURÉVAN: caustics are painted, not refracted; check the glass plate does not read as a pedestal (it must be a thin plate)",
+        "v2 (2026-11-06): the optical-glass plate of the first prompt was replaced by a water film over limestone (a thick glass slab would read as a pedestal); light from the RIGHT so the caustics land on the left; no honey",
+        "v3 (2026-11-06): the first attempt (a tilted floor-and-ripple prompt) gave a woman's face in the water (AURÉVAN), a 45-degree view with a dark diagonal vein and concentric ripples (ORVÉLIS), and a steeply diagonal black slab with a big leather panel (VAYRÉN); v3 asks for a perfectly level straight-on view, a plain evenly toned floor, no people, props small at the frame edges; plate ids of the discarded first rolls are in homepage/plate_ids.txt"
+      ],
+      "asset_id": "orvelis-card-liquid_caustics"
+    },
+    {
+      "fragrance": "VAYRÉN",
+      "concept_id": "liquid_caustics",
+      "aspect_ratio": "4:5",
+      "asset": "cards/liquid_caustics/vayren.webp",
+      "prompt": "Fine-art product photography background with nothing in the middle, portrait 4:5 frame, shot perfectly level and straight-on, the camera at the height of the water, the line where the wall meets the water exactly horizontal and a little more than halfway down the frame. A very shallow, perfectly still sheet of clear water, a few millimetres deep, lies over a flat, plain, evenly toned polished black stone floor that fills the whole lower half of the frame from the left edge to the right edge, with no slab edges, no borders, no tray and no waves, and runs to the bottom edge of the frame. The wall is a charcoal plaster that falls to near black, mirrored faintly in the water. A single warm low sun at about 3000 K from the upper left sets fine thread-like amber-gold caustic light shimmering on the black stone beneath the water in the right half of the frame, with a faint echo near the left edge. At the very left edge of the frame, partly cut by it, two small dark oud wood chips rest on the stone. The whole middle of the floor, from the foreground to the wall, is a calm, empty, evenly lit stretch of still water with nothing on it. No people, no faces, no hands, no leather. 100 mm lens at f/5.6, fine natural film grain. Palette of black, charcoal, amber and warm brown.",
+      "midjourney": "fine-art product photography background, perfectly level straight-on view, camera at the height of a very shallow still sheet of clear water over a plain evenly toned stone floor filling the lower half edge to edge, plaster wall meeting the water on a horizontal line a little more than halfway down, net of caustic light shimmering beneath the water to one side, one small prop cut by each frame edge, calm empty middle, 100mm, f/5.6, fine film grain --ar 4:5 --style raw --v 6.1 --s 120 --no text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, bubbles, rain, waves, fire, smoke, people, faces, hands, tray, border, waves, tilted camera",
+      "negative": "text, letters, numbers, logo, label, packaging, box, bottle, jar, vial, vessel, vase, cup, pedestal, plinth, stand, cake stand, stool, podium, block, shelf, hands, people, extra props, clutter, watermark, signature, bubbles, rain, waves, fire, smoke",
+      "ingredients": [
+        "leather strip"
+      ],
+      "light": "3000 K low sun from the upper left, caustics on the right",
+      "camera": "tabletop height, 12 degree downward tilt, 100 mm macro, f/5.6",
+      "composite": "Approved VAYRÉN flacon, about 62% of the frame height, centred, standing in the water film at y about 80%. Dark set: glass positive-light about .5 to .8, rim light about .5. Mirror reflection fades faster (25% to 0 over about 14% of the frame height). The caustic pool lies to the right of the base. The liquid stays crystal clear.",
+      "verify": [
+        "same caveat: painted caustics; the mirror makes the contact line the hardest edge to get right",
+        "v2 (2026-11-06): only a small corner of leather (a larger leather panel took over the lower-left of an earlier basalt plate); caustics on the right, away from the light",
+        "v3 (2026-11-06): the first attempt (a tilted floor-and-ripple prompt) gave a woman's face in the water (AURÉVAN), a 45-degree view with a dark diagonal vein and concentric ripples (ORVÉLIS), and a steeply diagonal black slab with a big leather panel (VAYRÉN); v3 asks for a perfectly level straight-on view, a plain evenly toned floor, no people, props small at the frame edges; plate ids of the discarded first rolls are in homepage/plate_ids.txt"
+      ],
+      "asset_id": "vayren-card-liquid_caustics"
+    }
+  ]
+}

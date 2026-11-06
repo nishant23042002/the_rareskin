@@ -5,8 +5,9 @@ import { gsap, useGSAP } from "@/lib/gsap";
 import { DUR } from "@/lib/motion";
 
 /**
- * Scroll-in reveal: fade + rise + a touch of blur, once, when the element
- * enters the viewport. Under `prefers-reduced-motion` it renders plainly with
+ * Scroll-in reveal: fade + rise, once, when the element enters the viewport.
+ * `blur` is OFF by default: animating `filter: blur()` re-rasterises the element
+ * on every frame (opacity and transform stay on the compositor). Under `prefers-reduced-motion` it renders plainly with
  * no transform. Built on ScrollTrigger so there is no scroll listener.
  */
 export function Reveal({
@@ -14,7 +15,7 @@ export function Reveal({
   className,
   y = 24,
   delay = 0,
-  blur = true,
+  blur = false,
   start = "top 88%",
 }: {
   children: ReactNode;
@@ -34,11 +35,11 @@ export function Reveal({
       const mm = gsap.matchMedia();
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.set(el, { opacity: 0, y, filter: blur ? "blur(4px)" : "blur(0px)" });
+        gsap.set(el, blur ? { opacity: 0, y, filter: "blur(4px)" } : { opacity: 0, y });
         gsap.to(el, {
           opacity: 1,
           y: 0,
-          filter: "blur(0px)",
+          ...(blur ? { filter: "blur(0px)" } : {}),
           duration: DUR.reveal,
           delay,
           ease: "power3.out",

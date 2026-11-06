@@ -5,7 +5,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useId,
   useRef,
   useState,
   type ReactNode,
@@ -74,7 +73,6 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const lenis = useLenis();
   const reduced = useReducedMotion();
-  const grainId = useId();
 
   const rootRef = useRef<HTMLDivElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
@@ -398,7 +396,6 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
               overflow: "hidden",
             }}
           >
-            <Grain id={`${grainId}-${edge}`} />
           </div>
         ))}
 
@@ -483,33 +480,5 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
         </div>
       </div>
     </RouteTransitionContext.Provider>
-  );
-}
-
-function Grain({ id }: { id: string }) {
-  return (
-    <svg
-      aria-hidden
-      style={{
-        position: "absolute",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        opacity: 0.05,
-        mixBlendMode: "overlay",
-        pointerEvents: "none",
-      }}
-    >
-      <filter id={id}>
-        <feTurbulence
-          type="fractalNoise"
-          baseFrequency="0.9"
-          numOctaves="2"
-          stitchTiles="stitch"
-        />
-        <feColorMatrix type="saturate" values="0" />
-      </filter>
-      <rect width="100%" height="100%" filter={`url(#${id})`} />
-    </svg>
   );
 }

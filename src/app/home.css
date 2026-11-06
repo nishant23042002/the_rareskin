@@ -64,8 +64,8 @@
   .rh-announce::after {content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:rgba(197,168,128,.2)}
   .rh-announce__row {width:min(100%,780px);height:100%;margin-inline:auto;padding-inline:max(8px,env(safe-area-inset-left,0px)) max(8px,env(safe-area-inset-right,0px));display:grid;grid-template-columns:36px 1fr 36px;align-items:center;gap:6px}
   .rh-announce__stage {position:relative;height:100%;display:grid;place-items:center;overflow:hidden}
-  .rh-ann {grid-area:1/1;display:flex;align-items:center;justify-content:center;gap:14px;margin:0;white-space:nowrap;font:400 11px/1 var(--f-sans);letter-spacing:0.210em;text-transform:uppercase;opacity:0;transform:translateY(8px);filter:blur(3px);pointer-events:none;transition:opacity .55s var(--ease),transform .8s var(--ease),filter .55s var(--ease)}
-  .rh-ann.is-on {opacity:1;transform:none;filter:none;pointer-events:auto}
+  .rh-ann {grid-area:1/1;display:flex;align-items:center;justify-content:center;gap:14px;margin:0;white-space:nowrap;font:400 11px/1 var(--f-sans);letter-spacing:0.210em;text-transform:uppercase;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .55s var(--ease),transform .8s var(--ease)}
+  .rh-ann.is-on {opacity:1;transform:none;pointer-events:auto}
   .rh-ann.is-out {transform:translateY(-8px)}
   .rh-ann b {font-weight:500;letter-spacing:.24em}
   .rh-ann i {width:1px;height:11px;background:rgba(245,242,235,.26)}
@@ -87,7 +87,11 @@
     .rh-ann {font-size:11px;letter-spacing:0.145em;gap:11px}
     .rh-ann__d {letter-spacing:.14em}
   }
-  .rh-hdr {position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(250,250,247,.78);-webkit-backdrop-filter:saturate(1.6) blur(16px);backdrop-filter:saturate(1.6) blur(16px);border-bottom:1px solid transparent;transition:border-color .3s}
+  .rh-hdr {position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(250,250,247,.95);border-bottom:1px solid transparent;transition:border-color .3s}
+  /* the frosted bar re-blurs everything under it on every scroll frame: only on a mouse / trackpad machine, and lighter (no saturate, 10px); a phone gets the plain bar */
+  @media(hover:hover) and (pointer:fine) {
+    .rh-hdr {background:rgba(250,250,247,.8);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  }
   .rh-hdr.is-scrolled, .rh-hdr.is-open {border-bottom-color:rgba(31,29,27,.09)}
   .rh-hdr__r .rh-nav-btn {padding-inline:6px}
   .rh-hdr__row {height:var(--hh);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px}
@@ -312,12 +316,12 @@
   .rh-tile__slide .rh-bt {transition:transform .7s var(--ease);transform-origin:50% 83%;transform-box:fill-box}
   .rh-tile:hover .rh-tile__slide--shot .rh-bt {transform:translateY(-6px) scale(1.02)}
   .rh-tile__hit {position:absolute;inset:0;z-index:3}
-  .rh-tile__nav {position:absolute;z-index:4;top:50%;right:10px;transform:translateY(-50%);width:40px;height:40px;display:grid;place-items:center;color:var(--on);opacity:.75;transition:opacity .3s}
+  .rh-tile__nav {position:absolute;z-index:4;top:50%;right:10px;transform:translateY(-50%);width:40px;height:40px;display:grid;place-items:center;color:var(--ctl,var(--on));opacity:.75;transition:opacity .3s}
   .rh-tile__nav .rh-ico {transition:transform .5s var(--ease)}
   .rh-tile[data-i="1"] .rh-tile__nav .rh-ico {transform:rotate(180deg)}
   .rh-tile__nav:hover {opacity:1}
   .rh-tile__dots {position:absolute;z-index:4;left:0;right:0;bottom:14px;display:flex;justify-content:center;gap:6px;pointer-events:none}
-  .rh-tile__dots i {width:18px;height:2px;background:var(--on);opacity:.28;transition:opacity .4s}
+  .rh-tile__dots i {width:18px;height:2px;background:var(--ctl-dots,var(--ctl,var(--on)));opacity:.28;transition:opacity .4s}
   .rh-tile[data-i="0"] .rh-tile__dots i:nth-child(1), .rh-tile[data-i="1"] .rh-tile__dots i:nth-child(2) {opacity:.9}
   .rh-notes {height:100%;display:grid;grid-template-rows:auto auto 1fr auto;padding:clamp(18px,3vw,30px) clamp(18px,3vw,30px) 46px;background:var(--ground);color:var(--on)}
   .rh-notes__eye {font-size:11px;letter-spacing:0.255em;text-transform:uppercase;opacity:.7}
@@ -407,7 +411,7 @@
   }
   .rh-why__cta {display:flex;justify-content:center;margin-top:clamp(30px,4vw,48px)}
   .rh-founder {position:relative;isolation:isolate;background:#14100d;color:var(--champagne);overflow:hidden;padding-block:clamp(64px,9vw,120px);scroll-margin-top:var(--hh)}
-  .rh-founder__tex {position:absolute;inset:-4%;z-index:-1;background:radial-gradient(60% 80% at 22% 40%,rgba(197,168,128,.14),transparent 70%),repeating-linear-gradient(90deg,rgba(245,242,235,.06) 0 38px,transparent 38px 92px);filter:blur(26px);opacity:.7}
+  .rh-founder__tex {position:absolute;inset:-4%;z-index:-1;background:radial-gradient(60% 80% at 22% 40%,rgba(197,168,128,.14),transparent 70%),radial-gradient(50% 70% at 78% 60%,rgba(245,242,235,.05),transparent 72%);opacity:.7}  /* was a 26px-blurred stripe layer: a full-section blur filter for a texture nobody could read as stripes */
   .rh-founder__grid {display:grid;gap:clamp(30px,5vw,56px);justify-items:center;align-items:center;text-align:center}
   .rh-founder__photo {width:min(100%,340px);background:#222;position:relative}
   .rh-founder__photo img {width:100%;height:auto}
@@ -604,9 +608,15 @@
     .rh-ann b {letter-spacing:.1em}
     .rh-ann__d {letter-spacing:.08em}
   }
-  .rh-totop {position:fixed;z-index:40;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:rgba(250,250,247,.9);color:var(--ink);border:1px solid var(--line-2);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .3s,transform .5s var(--ease),visibility 0s .3s}
+  .rh-totop {position:fixed;z-index:40;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:rgba(250,250,247,.94);color:var(--ink);border:1px solid var(--line-2);opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .3s,transform .5s var(--ease),visibility 0s .3s}
   .rh-totop.is-on {opacity:1;visibility:visible;transform:none;transition-delay:0s}
   .rh-grain {position:relative}
+  /* film grain: a blend-mode overlay on a large photo forces an offscreen pass per frame while it moves; keep it where there is a mouse (desktop), drop it on touch */
+  @media(pointer:coarse) {
+    .rh-grain::after {display:none}
+  }
+  /* long pages: below-the-fold sections are not styled, laid out or painted until they are near the viewport; `auto` remembers the real height after the first render */
+  .rh-quiz, .rh-dset, .rh-why, .rh-atelier, .rh-founder, .rh-unbox, .rh-ig {content-visibility:auto;contain-intrinsic-size:auto 820px}
   .rh-grain::after {content:"";position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.3;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
   .rh-bt-edge {stroke:var(--ge,rgba(255,255,255,.4));stroke-width:1}
   @media(prefers-reduced-motion:reduce) {
@@ -662,4 +672,107 @@
   .rh-hdr {border-bottom:0;box-shadow:0 1px 0 transparent;transition:box-shadow .3s}
   .rh-hdr.is-scrolled, .rh-hdr.is-open {box-shadow:0 1px 0 rgba(31,29,27,.09)}
 
+
+  /* ------------------------------------------------------------------
+     Homepage image system (public/images/assets-manifest.json)
+     Every picture box reserves its aspect ratio (inline from the manifest or
+     the rule below), so a late-loading photograph cannot shift the page.
+     ------------------------------------------------------------------ */
+  .rh-frame {position:relative;overflow:hidden;background:var(--stone);margin:0}
+
+  /* hero: the shipped <picture>; from 1280px the box is ~square and shows the right of the 16:9 frame */
+  .rh-hero__media picture {display:block;width:100%;height:100%}
+  .rh-hero__media img {object-position:var(--op-m,50% 50%)}
+  @media(min-width:1280px) {
+    .rh-hero__media img {object-position:var(--op-d,100% 50%)}
+  }
+
+  /* tiles: the shipped 4:5 card picture covers the whole packshot face (the box is
+     aspect-ratio 4/5 in .rh-tile__media, so nothing shifts). Behind it sits the page
+     colour, not the fragrance ground, so a late picture cannot flash a dark panel; the
+     notes face keeps the ground. */
+  .rh-tile__slide--photo {background:var(--paper)}
+  .rh-tile__slide--shot .rh-tile__photo {object-fit:cover;transform-origin:50% 60%;transition:transform .9s var(--ease)}
+  @media(hover:hover) and (prefers-reduced-motion:no-preference) {
+    .rh-tile:hover .rh-tile__slide--shot .rh-tile__photo {transform:scale(1.04)}
+  }
+  /* chevron and dots over a picture follow the PICTURE (data-tone, from the manifest), not the
+     fragrance ground; on the notes face (data-i="1") they follow the ground again */
+  .rh-tile[data-i="0"][data-tone="dark"] {--ctl:#1f1d1b}
+  .rh-tile[data-i="0"][data-tone="light"] {--ctl:#fbf8f2}
+  .rh-tile[data-i="0"][data-dots="dark"] {--ctl-dots:#1f1d1b}
+  .rh-tile[data-i="0"][data-dots="light"] {--ctl-dots:#fbf8f2}
+
+  /* preview bar for the card art directions (development, or NEXT_PUBLIC_CARD_SWITCHER=1) */
+  .rh-cswitch {position:fixed;z-index:60;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;gap:2px;max-width:calc(100vw - 24px);overflow-x:auto;padding:4px;border-radius:999px;background:rgba(31,29,27,.94);color:#f5f2eb;box-shadow:0 8px 30px rgba(0,0,0,.28);font:500 11px/1 var(--f-sans);letter-spacing:.06em;scrollbar-width:none}
+  .rh-cswitch::-webkit-scrollbar {display:none}
+  .rh-cswitch__t {flex:none;padding:0 10px 0 12px;opacity:.55;text-transform:uppercase;letter-spacing:.2em;font-size:10px}
+  .rh-cswitch button {flex:none;white-space:nowrap;padding:10px 12px;border-radius:999px;color:inherit;opacity:.8;transition:background .25s,color .25s,opacity .25s}
+  .rh-cswitch button:hover {opacity:1}
+  .rh-cswitch button[aria-checked="true"] {background:#f5f2eb;color:#1f1d1b;opacity:1}
+  .rh-cswitch button[data-ready="none"]:not([aria-checked="true"]) {opacity:.5}
+  .rh-cswitch__n {margin-left:6px;font-variant-numeric:tabular-nums;opacity:.6}
+  @media(min-width:900px) {
+    .rh-cswitch {bottom:20px}
+  }
+
+  /* why extrait: the atomizer macro beside the argument (above it on a phone, text first) */
+  .rh-why__top {display:grid;justify-items:center;gap:clamp(8px,2vw,24px)}
+  .rh-why__macro {width:min(78vw,360px);order:2;margin-top:clamp(8px,3vw,24px)}
+  @media(min-width:900px) {
+    .rh-why__top {grid-template-columns:minmax(300px,420px) minmax(0,600px);justify-content:center;align-items:center;column-gap:clamp(48px,7vw,104px);justify-items:start;margin-top:clamp(20px,3vw,40px)}
+    .rh-why__macro {order:0;width:100%;margin-top:0}
+    .rh-why__top .rh-why__in {justify-items:start;text-align:left;margin-inline:0;max-width:none;padding-block:0}
+    .rh-why__top .rh-why__note {text-align:left}
+  }
+
+  /* atelier: picture (4:3) + note */
+  .rh-atelier {background:var(--paper);padding-block:clamp(64px,9vw,120px);scroll-margin-top:var(--hh)}
+  .rh-atelier__grid {display:grid;gap:clamp(28px,5vw,48px);align-items:center}
+  .rh-atelier__copy {display:grid;gap:clamp(14px,2vw,20px);justify-items:start}
+  .rh-atelier__h {font-size:clamp(1.55rem,3vw,2.5rem);line-height:1.22;text-wrap:balance;max-width:20ch}
+  @media(max-width:899px) {
+    .rh-atelier__media {order:2}
+    .rh-atelier__copy {order:1}
+  }
+  @media(min-width:900px) {
+    .rh-atelier__grid {grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);column-gap:clamp(48px,7vw,104px);max-width:1240px}
+  }
+
+  /* the ritual: the wide 3:2 picture takes the bigger column */
+  .rh-unbox {background:var(--bg);padding-block:clamp(64px,9vw,120px);scroll-margin-top:var(--hh)}
+  .rh-unbox__grid {display:grid;gap:clamp(28px,5vw,48px);align-items:center}
+  .rh-unbox__copy {display:grid;gap:clamp(14px,2vw,20px);justify-items:start}
+  .rh-unbox__copy .rh-btn {margin-top:clamp(6px,1.4vw,14px)}
+  @media(min-width:900px) {
+    .rh-unbox__grid {grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);column-gap:clamp(48px,6vw,96px);max-width:1280px}
+  }
+
+  /* on skin: a full-bleed mood break with the words over the picture.
+     CONTRAST (WCAG AA, 4.5:1 for normal text), worst case = a pure-white photograph under the scrim.
+     The scrim is near-black (rgb 16 14 12) and is never weaker than alpha .70 anywhere under the copy:
+     phone, bottom gradient is >= .70 up to 68% of the frame height, where the copy block ends; desktop,
+     left gradient is >= .70 up to 52% of the width, and the copy column is capped at min(34rem, 44vw) so
+     it ends at <= 49% of the width from 900px up. Under it, white becomes rgb 88,86,85:
+     headline / button (#f5f2eb) 6.51:1, the sub line and the eyebrow (both .94 opacity) 5.99:1. */
+  .rh-skin {position:relative;isolation:isolate;overflow:hidden;background:#2a1d15;color:var(--champagne);display:grid;align-items:end;aspect-ratio:4/5;max-height:92svh}
+  .rh-skin__media {position:absolute;inset:0;z-index:-2}
+  .rh-skin__scrim {position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,rgba(16,14,12,.86) 0%,rgba(16,14,12,.70) 68%,rgba(16,14,12,.18) 100%)}
+  .rh-skin__in {padding-block:clamp(36px,8vw,64px)}
+  .rh-skin__copy {display:grid;gap:clamp(12px,1.8vw,18px);justify-items:start;max-width:34rem}
+  .rh-skin__h {font-size:clamp(1.9rem,4.4vw,3.6rem);line-height:1.12;text-wrap:balance}
+  .rh-skin .rh-eyebrow {color:rgba(245,242,235,.94)}
+  .rh-skin__sub {font-size:clamp(14.5px,1.3vw,16px);line-height:1.7;color:rgba(245,242,235,.94);max-width:44ch}
+  @media(min-width:900px) {
+    .rh-skin {aspect-ratio:16/9;align-items:center}
+    .rh-skin__scrim {background:linear-gradient(90deg,rgba(16,14,12,.84) 0%,rgba(16,14,12,.70) 52%,rgba(16,14,12,.1) 84%)}
+    .rh-skin__copy {max-width:min(34rem,44vw)}
+    .rh-skin__in {padding-block:clamp(48px,6vw,96px)}
+  }
+
 }
+
+  /* touch: the 2.6 s scale-settle of the big hero photo is skipped (it kept the GPU busy while the page was still loading); it must come after the rules that set the animation */
+  @media(pointer:coarse) {
+    .rh-hero__media .rh-hero__art, .rh-hero__media img {animation:none}
+  }

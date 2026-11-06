@@ -8,6 +8,8 @@ import {
   type DiscoverySetInfo,
   type Fragrance,
 } from "@/lib/catalog";
+import { getHomeAsset, isFinal } from "@/lib/home-images";
+import { HomeImage } from "./home-image";
 
 /**
  * The Discovery Set — a dark band where the picture and the words never share a
@@ -45,6 +47,12 @@ function Art({
         className="rh-dset__art object-cover"
       />
     );
+  }
+  // the shipped picture (`discovery-set-10ml.webp`, 4:5) once it is final; the
+  // photograph uploaded for the set in the catalogue (above) still wins
+  const shipped = getHomeAsset("discovery-set-10ml");
+  if (isFinal(shipped)) {
+    return <HomeImage asset={shipped} fill className="rh-dset__art" />;
   }
   return (
     <div

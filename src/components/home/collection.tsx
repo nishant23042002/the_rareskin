@@ -14,6 +14,9 @@ import { RhIcon } from "@/components/ui/rh-icon";
 import { useDragX } from "@/hooks/use-drag-x";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { cloudinaryVariant, formatINR, type Fragrance } from "@/lib/catalog";
+import { resolveCardAsset } from "@/lib/home-images";
+import { useCardConcept } from "./card-concept";
+import { HomeImage } from "./home-image";
 
 /**
  * "The Three" — three tall tiles. Each tile's picture has two faces: the
@@ -51,6 +54,11 @@ function ProductTile({ f }: { f: Fragrance }) {
   const base = useRef(0);
   const w = useRef(1);
   const photo = cloudinaryVariant(f.images.flat ?? f.images.hero, { w: 640 });
+  // the 4:5 card picture of the chosen art direction (src/config/homepage-assets.ts)
+  // fills the whole packshot face once it is final, and falls back to the current
+  // picture, then to the catalogue packshot / vector flacon (never a grey plate)
+  const concept = useCardConcept();
+  const card = resolveCardAsset(f.slug, concept);
 
   // wide screens only, mouse only: drag the picture to flip between its faces
   useDragX(mediaRef, {
@@ -106,6 +114,8 @@ function ProductTile({ f }: { f: Fragrance }) {
       className="rh-tile"
       data-i={flipped ? "1" : "0"}
       data-dark={dark || undefined}
+      data-tone={card?.overlayTone}
+      data-dots={card?.dotsTone}
       style={
         {
           "--ground": f.ground,
@@ -116,25 +126,33 @@ function ProductTile({ f }: { f: Fragrance }) {
     >
       <div className="rh-tile__media rh-grain" ref={mediaRef}>
         <div className="rh-tile__slides" ref={trackRef}>
-          <div className="rh-tile__slide rh-tile__slide--shot">
-            <span className="rh-tile__ground" aria-hidden="true" />
-            <span
-              className="rh-tile__bottle rh-bt"
-              style={{ filter: `drop-shadow(0 24px 22px ${f.juice}66)` }}
-            >
-              {photo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={photo}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  className="block w-full"
-                />
-              ) : (
-                <Flacon fragrance={f.slug} label volume />
-              )}
-            </span>
+          <div
+            className={`rh-tile__slide rh-tile__slide--shot${card ? " rh-tile__slide--photo" : ""}`}
+          >
+            {card ? (
+              <HomeImage key={card.id} asset={card} fill className="rh-tile__photo" />
+            ) : (
+              <>
+                <span className="rh-tile__ground" aria-hidden="true" />
+                <span
+                  className="rh-tile__bottle rh-bt"
+                  style={{ filter: `drop-shadow(0 24px 22px ${f.juice}66)` }}
+                >
+                  {photo ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={photo}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="block w-full"
+                    />
+                  ) : (
+                    <Flacon fragrance={f.slug} label volume />
+                  )}
+                </span>
+              </>
+            )}
           </div>
           <div className="rh-tile__slide" aria-hidden={!flipped}>
             <div className="rh-notes">

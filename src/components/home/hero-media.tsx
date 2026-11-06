@@ -1,9 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { getImageProps } from "next/image";
+import { useState, type CSSProperties } from "react";
 
 import { Flacon } from "@/components/ui/flacon";
 import { cloudinaryVariant, FRAGRANCE_SLUGS } from "@/lib/catalog";
+import {
+  getHomeAsset,
+  getVariant,
+  homeImageSrc,
+  isFinal,
+} from "@/lib/home-images";
 
 /**
  * The picture half of the homepage hero. A real photograph (Site Settings →
@@ -77,9 +84,70 @@ function Trio() {
   );
 }
 
+/**
+ * The shipped hero (`public/images/homepage/hero-trilogy*.webp`, manifest id
+ * "hero"): an art-directed <picture> — the 16:9 master from 1280px up (the picture
+ * box is about square there, so it shows the right of the frame, where the three
+ * flacons stand), the 4:5 crop below. This is the LCP element, so it is the only
+ * homepage picture that loads eagerly with `fetchPriority="high"` (`priority` is
+ * deprecated in Next 16; `fetchPriority` is the documented replacement). The
+ * intrinsic width/height give the browser the ratio; the box has a fixed height in
+ * CSS, so nothing shifts.
+ */
+function ShippedHero({ onError }: { onError: () => void }) {
+  const asset = getHomeAsset("hero");
+  const desktop = getVariant(asset, "desktop");
+  const mobile = getVariant(asset, "mobile");
+  const common = {
+    alt: asset.alt,
+    sizes: asset.sizes,
+    quality: 85,
+    loading: "eager" as const,
+    fetchPriority: "high" as const,
+  };
+  const d = getImageProps({
+    ...common,
+    src: homeImageSrc(desktop.file),
+    width: desktop.width,
+    height: desktop.height,
+  });
+  const m = getImageProps({
+    ...common,
+    src: homeImageSrc(mobile.file),
+    width: mobile.width,
+    height: mobile.height,
+  });
+  return (
+    <picture>
+      <source media={desktop.media} srcSet={d.props.srcSet} sizes={asset.sizes} />
+      <img
+        {...m.props}
+        alt={asset.alt}
+        // the focal point of each art-directed variant comes from the manifest;
+        // home.css reads these two properties (mobile, and from 1280px desktop)
+        style={
+          {
+            ...m.props.style,
+            "--op-m": asset.objectPosition.mobile,
+            "--op-d": asset.objectPosition.desktop,
+          } as CSSProperties
+        }
+        onError={onError}
+      />
+    </picture>
+  );
+}
+
 export function HeroMedia({ photo }: { photo?: HeroPhotoSource | null }) {
   const [failed, setFailed] = useState(false);
-  if (!photo?.url || failed) return <Trio />;
+  // 1. a photograph uploaded in Site Settings wins; 2. the shipped hero from the
+  // manifest once it is final; 3. the illustrated trio
+  if (!photo?.url || failed) {
+    if (!failed && isFinal(getHomeAsset("hero"))) {
+      return <ShippedHero onError={() => setFailed(true)} />;
+    }
+    return <Trio />;
+  }
 
   const native = photo.width;
   const cloud = photo.url.includes("res.cloudinary.com");

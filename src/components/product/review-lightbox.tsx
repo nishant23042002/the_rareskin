@@ -61,7 +61,7 @@ export function ReviewLightbox({
       aria-modal="true"
       aria-label="Review photo"
       onClick={onClose}
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-ink/85 p-4 backdrop-blur-[2px]"
+      className="fixed inset-0 z-[70] flex items-center justify-center bg-ink/85 p-4"
     >
       <button
         type="button"
