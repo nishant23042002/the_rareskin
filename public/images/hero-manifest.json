@@ -1,0 +1,420 @@
+{
+  "$comment": "Hero (picture half of the homepage hero) design directions: four pedestal-free alternatives to the baseline stepped-pedestal trio. Each direction has a 16:9 desktop plate and a 4:5 mobile plate; the three approved flacons are composited onto the plates (never generated). Concept ids equal the card directions in src/config/homepage-assets.ts so one preview bar drives both. Files are registered in public/images/assets-manifest.json as `hero-<concept>`. Checked by `pnpm home:images check`.",
+  "version": 1,
+  "updated": "2026-11-06",
+  "baseline": {
+    "asset_id": "hero",
+    "note": "The shipped hero: three flacons on stepped honed travertine pedestals (kept as the default until a direction is chosen)."
+  },
+  "config": "src/config/hero.config.ts",
+  "frames": {
+    "desktop": {
+      "px": "2524x1420",
+      "ratio": "16:9",
+      "usedFrom": "min-width 1280px",
+      "visibleShare": "about 54% of the width at object-position 72% 50% (the picture box is ~square next to the text panel)",
+      "trio": "all three flacons inside x 35-91% of the frame"
+    },
+    "mobile": {
+      "px": "1600x2000",
+      "ratio": "4:5",
+      "usedBelow": "1280px",
+      "visibleShare": "the central ~62% band vertically (the box is landscape on a phone)",
+      "trio": "all three flacons inside the central band, x 12-88%"
+    }
+  },
+  "overlay": {
+    "measured": "2026-11-06 with the shipped layout",
+    "ticket": "`.rh-ticket` (LAUNCH OFFER card) overlaps the bottom of the picture box by 46 px at every size: 6% of the box height at 1440x900 (box 713x739), 15% at 375 wide (box 376x301)",
+    "rule": "keep the bottom quarter of the 16:9 plate and the bottom third of the 4:5 plate calm (plain surface, no props, no highlights); the ticket is an opaque off-white card, no text sits on the picture, so legibility never depends on the picture"
+  },
+  "flaconSpec": {
+    "rule": "no pedestal, stand, block or stool anywhere; the three bottles stand on the ground at slightly different depths",
+    "approved": "50 ml thick-base flint glass flacon, heavy matte black cap, off-white cotton-paper label THE RARESKIN / name / ESSENTIALS | 50ml, crystal-clear liquid",
+    "briefLabel": "EXTRAIT DE PARFUM · 50 ML / 1.7 FL. OZ. and the amber / champagne / cognac liquid colours of the brief are NOT adopted (decision of 2026-11-06: approved mockups). A generator never draws the bottle: the label comes out garbled",
+    "composite": {
+      "desktop": "AURÉVAN x 43% / VAYRÉN x 83% / ORVÉLIS x 63% (middle, slightly behind, scale 0.92) of the 16:9 frame, ground y 74% (middle 71%), bottle height about 46% of the frame",
+      "mobile": "x 22% / 50% / 78% of the 4:5 frame, ground y 68% (middle 65%), bottle height about 30% of the frame"
+    }
+  },
+  "tools": {
+    "kling": "kling-image-v3_0_omni text_to_image, aspect 16:9 and 3:4 (cropped to 4:5), about 2 credits per plate (8 plates = 16 credits)",
+    "midjourney": "v6.1, --style raw, --no list in `negative`",
+    "flux": "FLUX.1 has no negative field: the plate prompts avoid product words instead"
+  },
+  "concepts": [
+    {
+      "concept_id": "grounded_stone",
+      "asset_id": "hero-grounded_stone",
+      "label": "Grounded stone",
+      "direction": "The trio stands directly on a honed pale limestone floor in morning light, at three depths, with a bergamot half, jasmine and a cinnamon quill lying between the bottles. No pedestal, no stand.",
+      "files": {
+        "desktop": "hero/grounded_stone/desktop.webp",
+        "mobile": "hero/grounded_stone/mobile.webp"
+      },
+      "prompts": {
+        "desktop": {
+          "aspect_ratio": "16:9",
+          "target_px": "2524x1420",
+          "prompt": "Fine-art product photography background with no product in it, wide landscape 16:9 frame, shot perfectly level and straight-on with the camera at the height of the floor, the line where the wall meets the floor exactly horizontal. A wide pale honed limestone floor that runs edge to edge and to the bottom of the frame, with no borders, no tray and no edges, meets a lime-washed off-white plaster wall a little more than halfway down the frame. Soft early-morning window light at about 5200 K from the upper left, one diagonal sun bar on the wall, long soft shadows to the right. On the floor, in the middle band of the frame and far apart from each other, lie one freshly sliced bergamot half in the left third of the frame, and, in the right third, one cinnamon quill and two white jasmine petals. Across the middle of the floor, between them, there is a wide, calm, empty stretch, level and evenly lit, about three times as wide as it is deep, with nothing on it. The bottom quarter of the frame is calm, plain, evenly toned limestone with no props, no bright highlights and no pattern. No people, no faces, no hands, no text, no logos. 100 mm lens at f/5.6, fine natural film grain. Palette of ivory, pale stone, soft lime green and a little warm brown.",
+          "midjourney": "fine-art product photography background, perfectly level straight-on view, the trio stands directly on a honed pale limestone floor in morning light, empty calm middle and quiet lower quarter, 100mm, f/5.6, fine film grain --ar 16:9 --style raw --v 6.1 --s 120 --no pedestal, plinth, podium, stand, cake stand, stool, block, table, shelf, bottle, jar, vial, vessel, perfume, label, packaging, box, text, letters, logo, watermark, people, faces, hands, tray, bowl, border, frame, tilted camera, fisheye",
+          "negative": "pedestal, plinth, podium, stand, cake stand, stool, block, table, shelf, bottle, jar, vial, vessel, perfume, label, packaging, box, text, letters, logo, watermark, people, faces, hands, tray, bowl, border, frame, tilted camera, fisheye",
+          "usedAs": "the shipped plate (Kling kling-image-v3_0_omni, 16:9, 2720x1536)"
+        },
+        "mobile": {
+          "aspect_ratio": "4:5",
+          "target_px": "1140x1425",
+          "prompt": "Fine-art product photography background with no product in it, portrait 4:5 frame, shot perfectly level and straight-on with the camera at the height of the floor, the line where the wall meets the floor exactly horizontal. A wide pale honed limestone floor that runs edge to edge and to the bottom of the frame, with no borders, no tray and no edges, meets a lime-washed off-white plaster wall a little more than halfway down the frame. Soft early-morning window light at about 5200 K from the upper left, one diagonal sun bar on the wall, long soft shadows to the right. On the floor, in the middle band of the frame and far apart from each other, lie one freshly sliced bergamot half at the left edge and, at the right edge, one cinnamon quill and two white jasmine petals, each partly cut by the frame edge. Across the middle of the floor, between them, there is a wide, calm, empty stretch, level and evenly lit, with nothing on it. The bottom third of the frame is calm, plain, evenly toned limestone with no props, no bright highlights and no pattern. No people, no faces, no hands, no text, no logos. 100 mm lens at f/5.6, fine natural film grain. Palette of ivory, pale stone, soft lime green and a little warm brown.",
+          "midjourney": "fine-art product photography background, perfectly level straight-on view, the trio stands directly on a honed pale limestone floor in morning light, empty calm middle and quiet lower quarter, 100mm, f/5.6, fine film grain --ar 4:5 --style raw --v 6.1 --s 120 --no pedestal, plinth, podium, stand, cake stand, stool, block, table, shelf, bottle, jar, vial, vessel, perfume, label, packaging, box, text, letters, logo, watermark, people, faces, hands, tray, bowl, border, frame, tilted camera, fisheye",
+          "negative": "pedestal, plinth, podium, stand, cake stand, stool, block, table, shelf, bottle, jar, vial, vessel, perfume, label, packaging, box, text, letters, logo, watermark, people, faces, hands, tray, bowl, border, frame, tilted camera, fisheye",
+          "usedAs": "generated (3:4) and REJECTED (tile seams); the shipped mobile picture is a 4:5 crop of the desktop plate"
+        }
+      },
+      "lighting": "soft early-morning window light at about 5200 K from the upper left, one diagonal sun bar on the wall, long soft shadows to the right",
+      "camera": "level, at floor height, 100 mm, f/5.6",
+      "verify": [
+        "lessons from the cards: ask for a level straight-on view, a borderless surface that runs to the bottom, an empty middle and props at the frame edges; expect a mound, a pool or a diagonal anyway, and check for generator logos, text scribbles, tiles and faces",
+        "the plate must leave the floor starting above the trio's ground line (y 71-74%)"
+      ],
+      "status": "final 2026-11-06",
+      "objectPosition": {
+        "desktop": "75% 50%",
+        "mobile": "50% 80%"
+      },
+      "built": {
+        "script": "design-explorations/packaging-renders/homepage/hero_build.py (local, gitignored): gs_desktop / gs_mobile [--export]",
+        "positions": "desktop (plate px): ORVÉLIS x 1651 y 1040 scale 0.47; AURÉVAN x 1245 y 1100 scale 0.50; VAYRÉN x 2056 y 1100 scale 0.50; mobile crop spacing 340 px, scales 0.43 / 0.46",
+        "lesson": "a 16:9 plate whose props sit at the thirds does not fit a trio into the ~54% window the hero box shows: the props land behind a bottle. Keep the props out of the middle 60% or clone them out; a diffusion fill leaves a smooth rectangle, a same-row clone of the clean floor does not"
+      }
+    },
+    {
+      "concept_id": "chiaroscuro_studio",
+      "asset_id": "hero-chiaroscuro_studio",
+      "label": "Studio light",
+      "direction": "The trio on a seamless off-white plaster sweep with crisp window-frame shadows across the backdrop; the picture is high-key so its edges melt into the white page.",
+      "files": {
+        "desktop": "hero/chiaroscuro_studio/desktop.webp",
+        "mobile": "hero/chiaroscuro_studio/mobile.webp"
+      },
+      "prompts": {
+        "desktop": {
+          "aspect_ratio": "16:9",
+          "target_px": "2524x1420",
+          "prompt": "Fine-art product photography background with no product in it, wide landscape 16:9 frame; the left third of the frame is quiet empty wall and floor, the three standing places are in the middle and right of the frame, shot perfectly level and straight-on with the camera at the height of the floor, the line where the wall meets the floor exactly horizontal. One continuous seamless pale off-white hand-troweled plaster surface: the floor curves smoothly up into the wall with no corner, no skirting, no horizon line and no edges, perfectly smooth with no tiles, no ripples and no stains. Cool morning sun at about 5200 K through a tall four-pane window out of frame on the left, crisp-edged parallelograms of light with thin dark window-bar lines falling across the wall and the floor. No props at all, a gallery stillness. Across the middle of the floor there is a wide, calm, empty stretch, level and evenly lit, about three times as wide as it is deep, with nothing on it. The bottom quarter of the frame is calm, plain, evenly toned surface with no props, no bright highlights and no pattern. No people, no faces, no hands, no text, no logos. 100 mm lens at f/5.6, fine natural film grain. Palette of ivory and soft neutral grey.",
+          "midjourney": "fine-art product photography background, perfectly level straight-on view, the trio on a seamless off-white plaster sweep with crisp window-frame shadows across the backdrop; the picture is high-key so its edges melt into the white page., empty calm middle and quiet lower quarter, 100mm, f/5.6, fine film grain --ar 16:9 --style raw --v 6.1 --s 120 --no pedestal, plinth, podium, stand, cake stand, stool, block, table, shelf, bottle, jar, vial, vessel, perfume, label, packaging, box, text, letters, logo, watermark, people, faces, hands, tray, bowl, border, frame, tilted camera, fisheye",
+          "negative": "pedestal, plinth, podium, stand, cake stand, stool, block, table, shelf, bottle, jar, vial, vessel, perfume, label, packaging, box, text, letters, logo, watermark, people, faces, hands, tray, bowl, border, frame, tilted camera, fisheye",
+          "usedAs": "the shipped plate (Kling kling-image-v3_0_omni, 16:9, 2720x1536)"
+        },
+        "mobile": {
+          "aspect_ratio": "4:5",
+          "target_px": "1229x1536",
+          "prompt": "Fine-art product photography background with no product in it, portrait 4:5 frame, the middle band of the frame empty, shot perfectly level and straight-on with the camera at the height of the floor, the line where the wall meets the floor exactly horizontal. One continuous seamless pale off-white hand-troweled plaster surface: the floor curves smoothly up into the wall with no corner, no skirting, no horizon line and no edges, perfectly smooth with no tiles, no ripples and no stains. Cool morning sun at about 5200 K through a tall four-pane window out of frame on the left, crisp-edged parallelograms of light with thin dark window-bar lines falling across the wall and the floor. No props at all, a gallery stillness. Across the middle of the floor there is a wide, calm, empty stretch, level and evenly lit, about three times as wide as it is deep, with nothing on it. The bottom third of the frame is calm, plain, evenly toned surface with no props, no bright highlights and no pattern. No people, no faces, no hands, no text, no logos. 100 mm lens at f/5.6, fine natural film grain. Palette of ivory and soft neutral grey.",
+          "midjourney": "fine-art product photography background, perfectly level straight-on view, the trio on a seamless off-white plaster sweep with crisp window-frame shadows across the backdrop; the picture is high-key so its edges melt into the white page., empty calm middle and quiet lower quarter, 100mm, f/5.6, fine film grain --ar 4:5 --style raw --v 6.1 --s 120 --no pedestal, plinth, podium, stand, cake stand, stool, block, table, shelf, bottle, jar, vial, vessel, perfume, label, packaging, box, text, letters, logo, watermark, people, faces, hands, tray, bowl, border, frame, tilted camera, fisheye",
+          "negative": "pedestal, plinth, podium, stand, cake stand, stool, block, table, shelf, bottle, jar, vial, vessel, perfume, label, packaging, box, text, letters, logo, watermark, people, faces, hands, tray, bowl, border, frame, tilted camera, fisheye",
+          "usedAs": "not generated: the shipped mobile picture is a 4:5 crop of the desktop plate"
+        }
+      },
+      "lighting": "cool morning sun at about 5200 K through a tall four-pane window out of frame on the left, crisp-edged parallelograms of light with thin dark window-bar lines falling across the wall and the floor",
+      "camera": "level, at floor height, 100 mm, f/5.6",
+      "verify": [
+        "lessons from the cards: ask for a level straight-on view, a borderless surface that runs to the bottom, an empty middle and props at the frame edges; expect a mound, a pool or a diagonal anyway, and check for generator logos, text scribbles, tiles and faces",
+        "the plate must leave the floor starting above the trio's ground line (y 71-74%)"
+      ],
+      "status": "final 2026-11-07",
+      "objectPosition": {
+        "desktop": "75% 50%",
+        "mobile": "50% 90%"
+      },
+      "built": {
+        "script": "design-explorations/packaging-renders/homepage/hero_build.py (local, gitignored): cs_desktop / cs_mobile [--export]",
+        "retouch": "none (the plate had no props); wall/floor line at y 1133, bases at y 1190 (ORVÉLIS) and 1240 (AURÉVAN, VAYRÉN) inside the lit strip that ends at y ~1300"
+      }
+    },
+    {
+      "concept_id": "mineral_bed",
+      "asset_id": "hero-mineral_bed",
+      "label": "Mineral bed",
+      "direction": "The trio low in a bed of natural grains (white marble dust, crushed spice, black volcanic sand), shot very low so the bottles feel embedded in the material, with the matching ingredients half-sunk at the frame edges.",
+      "files": {
+        "desktop": "hero/mineral_bed/desktop.webp",
+        "mobile": "hero/mineral_bed/mobile.webp"
+      },
+      "prompts": {
+        "desktop": {
+          "aspect_ratio": "16:9",
+          "target_px": "2524x1420",
+          "prompt": "Fine-art product photography background with no product in it, wide landscape 16:9 frame, shot perfectly level and straight-on with the camera low, at the height of the ground, the line where the wall meets the ground exactly horizontal. A smooth, softly mounded, finely grained bed of loose mineral grains fills the whole lower part of the frame from the wall to the bottom edge and from the left edge to the right edge: pale marble dust on the left third, warm ground cinnamon and spice in the middle, black volcanic sand on the right third, the three blending softly into each other. The surface is nearly flat and calm with only the faintest low ripples, no raked lines, no patterns, no paths, no slabs, no stones, no borders, no tray and no edges, under a deep warm umber plaster wall. Low golden side light at about 3400 K from the right, a soft glow on the wall. At the very left edge of the frame, partly cut by it, one white jasmine flower lies half sunk in the pale grains, and at the very right edge, partly cut by it, two slivers of dark oud wood lie half sunk in the black sand. The wide middle of the frame is empty: only calm grains and the plain wall; nothing stands anywhere in the frame. The bottom quarter of the frame is calm, plain, evenly toned grains with no props, no bright highlights and no pattern. No people, no faces, no hands, no text, no logos. 100 mm lens at f/5.6, fine natural film grain. Palette of ivory, amber, umber and black.",
+          "midjourney": "fine-art product photography background, perfectly level straight-on view, the trio low in a bed of natural grains (white marble dust, empty calm middle and quiet lower quarter, 100mm, f/5.6, fine film grain --ar 16:9 --style raw --v 6.1 --s 120 --no pedestal, plinth, podium, stand, cake stand, stool, block, table, shelf, bottle, jar, vial, vessel, perfume, label, packaging, box, text, letters, logo, watermark, people, faces, hands, tray, bowl, border, frame, tilted camera, fisheye",
+          "negative": "pedestal, plinth, podium, stand, cake stand, stool, block, table, shelf, bottle, jar, vial, vessel, perfume, label, packaging, box, text, letters, logo, watermark, people, faces, hands, tray, bowl, border, frame, tilted camera, fisheye",
+          "usedAs": "the shipped plate (Kling kling-image-v3_0_omni, 16:9, 2720x1536) - second roll; the first roll used the phrase 'the three standing places' and got three stone stools"
+        },
+        "mobile": {
+          "aspect_ratio": "4:5",
+          "target_px": "1229x1536",
+          "prompt": "Fine-art product photography background with no product in it, portrait 4:5 frame, the middle band of the frame empty, shot perfectly level and straight-on with the camera at the height of the floor, the line where the wall meets the floor exactly horizontal. A low drift of fine mixed grains (pale marble dust on the left fading to ground cinnamon and spice in the middle and black volcanic sand on the right) that covers the whole lower half of the frame edge to edge in soft ridges, with no tray, no bowl and no borders, under a deep warm plaster wall. Low golden side light at about 3400 K from the right, a soft bokeh of warm light on the wall. At the very left edge of the frame, partly cut by it, one white jasmine flower lies half sunk in the pale grains, and at the very right edge, partly cut by it, two slivers of dark oud wood lie half sunk in the black sand. Across the middle of the floor there is a wide, calm, empty stretch, level and evenly lit, about three times as wide as it is deep, with nothing on it. The bottom third of the frame is calm, plain, evenly toned surface with no props, no bright highlights and no pattern. No people, no faces, no hands, no text, no logos. 100 mm lens at f/5.6, fine natural film grain. Palette of ivory, amber, umber and black.",
+          "midjourney": "fine-art product photography background, perfectly level straight-on view, the trio low in a bed of natural grains (white marble dust, empty calm middle and quiet lower quarter, 100mm, f/5.6, fine film grain --ar 4:5 --style raw --v 6.1 --s 120 --no pedestal, plinth, podium, stand, cake stand, stool, block, table, shelf, bottle, jar, vial, vessel, perfume, label, packaging, box, text, letters, logo, watermark, people, faces, hands, tray, bowl, border, frame, tilted camera, fisheye",
+          "negative": "pedestal, plinth, podium, stand, cake stand, stool, block, table, shelf, bottle, jar, vial, vessel, perfume, label, packaging, box, text, letters, logo, watermark, people, faces, hands, tray, bowl, border, frame, tilted camera, fisheye",
+          "usedAs": "not generated: the shipped mobile picture is a 4:5 crop of the desktop plate"
+        }
+      },
+      "lighting": "low golden side light at about 3400 K from the right, a soft bokeh of warm light on the wall",
+      "camera": "level, at floor height, 100 mm, f/5.6",
+      "verify": [
+        "lessons from the cards: ask for a level straight-on view, a borderless surface that runs to the bottom, an empty middle and props at the frame edges; expect a mound, a pool or a diagonal anyway, and check for generator logos, text scribbles, tiles and faces",
+        "the plate must leave the floor starting above the trio's ground line (y 71-74%)"
+      ],
+      "status": "final 2026-11-07",
+      "objectPosition": {
+        "desktop": "75% 50%",
+        "mobile": "50% 85%"
+      },
+      "built": {
+        "script": "design-explorations/packaging-renders/homepage/hero_build.py (local, gitignored): ms_desktop / ms_mobile [--export]",
+        "retouch": "feet sunk into the grains with embed_foot (26 px pile); glass: posk .6 / negk .9 / rim .35 with the plate softened behind it at sigma 4 / mix .4 (the dark glass set and sigma 7 / mix .85 made the glass read smoky on this coarse bed); wall/floor line at y 850, bases at y 1140 (ORVÉLIS) and 1170"
+      }
+    },
+    {
+      "concept_id": "liquid_caustics",
+      "asset_id": "hero-liquid_caustics",
+      "label": "Liquid light",
+      "direction": "The trio standing in a shallow, perfectly still sheet of water over pale stone, their reflections beneath them and golden-white caustic light rippling on the stone beside them.",
+      "files": {
+        "desktop": "hero/liquid_caustics/desktop.webp",
+        "mobile": "hero/liquid_caustics/mobile.webp"
+      },
+      "prompts": {
+        "desktop": {
+          "aspect_ratio": "16:9",
+          "target_px": "2524x1420",
+          "prompt": "Fine-art product photography background with no product in it, wide landscape 16:9 frame, shot perfectly level and straight-on with the camera low, at the height of the water, the line where the wall meets the water exactly horizontal. A very shallow, perfectly still sheet of clear water, a few millimetres deep, lies over a flat, plain, evenly toned pale stone floor that fills the whole lower part of the frame from the wall to the bottom edge and from the left edge to the right edge, with no pool, no steps, no edge, no coping, no tiles, no joints and no waves; a soft pale plaster wall rises straight out of the water and is mirrored faintly in it. Warm low sun at about 3800 K from the upper left sets a golden-white net of caustic light shimmering on the stone beneath the water, strongest on the right half. At the very left edge of the frame, partly cut by it, one white jasmine flower rests on the stone, and at the very right edge, partly cut by it, one thin curl of bergamot zest rests on the stone. The wide middle of the frame is empty: only calm water, stone and the plain wall; nothing stands anywhere in the frame. The bottom quarter of the frame is calm, plain, evenly toned water over stone with no props, no bright highlights and no pattern. No people, no faces, no hands, no text, no logos. 100 mm lens at f/5.6, fine natural film grain. Palette of pale ivory, soft gold, a touch of aqua and lime green.",
+          "midjourney": "fine-art product photography background, perfectly level straight-on view, the trio standing in a shallow, empty calm middle and quiet lower quarter, 100mm, f/5.6, fine film grain --ar 16:9 --style raw --v 6.1 --s 120 --no pedestal, plinth, podium, stand, cake stand, stool, block, table, shelf, bottle, jar, vial, vessel, perfume, label, packaging, box, text, letters, logo, watermark, people, faces, hands, tray, bowl, border, frame, tilted camera, fisheye",
+          "negative": "pedestal, plinth, podium, stand, cake stand, stool, block, table, shelf, bottle, jar, vial, vessel, perfume, label, packaging, box, text, letters, logo, watermark, people, faces, hands, tray, bowl, border, frame, tilted camera, fisheye",
+          "usedAs": "the shipped plate (Kling kling-image-v3_0_omni, 16:9, 2720x1536) - second roll; the first roll used the phrase 'the three standing places' and got three men standing"
+        },
+        "mobile": {
+          "aspect_ratio": "4:5",
+          "target_px": "1229x1536",
+          "prompt": "Fine-art product photography background with no product in it, portrait 4:5 frame, the middle band of the frame empty, shot perfectly level and straight-on with the camera at the height of the floor, the line where the wall meets the floor exactly horizontal. A very shallow, perfectly still sheet of clear water, a few millimetres deep, over a flat plain evenly toned pale stone floor that fills the whole lower half of the frame edge to edge with no borders, no edges, no tray and no waves, under a soft pale plaster wall mirrored faintly in the water. Warm low sun at about 3800 K from the upper left sets a golden-white net of caustic light shimmering on the stone beneath the water. At the very left edge of the frame, partly cut by it, one white jasmine flower rests on the stone, and at the very right edge, partly cut by it, one thin curl of bergamot zest rests on the stone. Across the middle of the floor there is a wide, calm, empty stretch, level and evenly lit, about three times as wide as it is deep, with nothing on it. The bottom third of the frame is calm, plain, evenly toned surface with no props, no bright highlights and no pattern. No people, no faces, no hands, no text, no logos. 100 mm lens at f/5.6, fine natural film grain. Palette of pale ivory, soft gold, a touch of aqua and lime green.",
+          "midjourney": "fine-art product photography background, perfectly level straight-on view, the trio standing in a shallow, empty calm middle and quiet lower quarter, 100mm, f/5.6, fine film grain --ar 4:5 --style raw --v 6.1 --s 120 --no pedestal, plinth, podium, stand, cake stand, stool, block, table, shelf, bottle, jar, vial, vessel, perfume, label, packaging, box, text, letters, logo, watermark, people, faces, hands, tray, bowl, border, frame, tilted camera, fisheye",
+          "negative": "pedestal, plinth, podium, stand, cake stand, stool, block, table, shelf, bottle, jar, vial, vessel, perfume, label, packaging, box, text, letters, logo, watermark, people, faces, hands, tray, bowl, border, frame, tilted camera, fisheye",
+          "usedAs": "not generated: the shipped mobile picture is a 4:5 crop of the desktop plate"
+        }
+      },
+      "lighting": "warm low sun at about 3800 K from the upper left sets a golden-white net of caustic light shimmering on the stone beneath the water",
+      "camera": "level, at floor height, 100 mm, f/5.6",
+      "verify": [
+        "lessons from the cards: ask for a level straight-on view, a borderless surface that runs to the bottom, an empty middle and props at the frame edges; expect a mound, a pool or a diagonal anyway, and check for generator logos, text scribbles, tiles and faces",
+        "the plate must leave the floor starting above the trio's ground line (y 71-74%)"
+      ],
+      "status": "final 2026-11-07",
+      "objectPosition": {
+        "desktop": "75% 50%",
+        "mobile": "50% 45%"
+      },
+      "built": {
+        "script": "design-explorations/packaging-renders/homepage/hero_build.py (local, gitignored): lq_desktop / lq_mobile [--export]",
+        "retouch": "none; bases at y 895 (ORVÉLIS) and 945 on the ledge (top surface y 830-975), no reflection (the ledge is stone); the plate is softened behind the glass; the generator's glitter shows as bokeh through the glass"
+      }
+    }
+  ],
+  "lesson": "Plate prompts must not say 'standing places' (or any word for a place where something stands): the generator fills them with people or stools. Say 'nothing stands anywhere in the frame'. Ask for the surface to run to the frame edges (no tray, no slabs, no pool edge, no tiles); expect a ledge or a raked pattern anyway and design the trio around it. Mobile is a 4:5 crop of the desktop plate (a separate 3:4 roll came back with tile seams).",
+  "referenceVariants": [
+    {
+      "variant": 1,
+      "id": "variant_1_uncapping",
+      "asset_id": "hero-variant_1_uncapping",
+      "label": "The Uncapping Ritual",
+      "status": "final 2026-11-07",
+      "reference": {
+        "description": "Reference 1 (Salt & Stone ritual): high-key studio, clean row, a manicured hand lifts the cap off the centre bottle to show the black spray nozzle",
+        "note": "a third-party photograph used as a mood benchmark ONLY: it is never uploaded to a generator, traced or reproduced, and no third-party name, label or text appears in the output"
+      },
+      "brief": {
+        "concept": "Three flacons aligned in a row on a seamless white reflective studio surface. A clean, manicured hand lifts the matte black cap off the centre flacon (VAYRÉN), revealing the black spray nozzle.",
+        "lighting": "High-key commercial studio lighting, soft specular contact reflections below, zero background clutter.",
+        "prompt": "Commercial studio product photography for THE RARESKIN. Three 50ml luxury perfume flacons (AURÉVAN, VAYRÉN, ORVÉLIS) standing in a row on a smooth, reflective white studio floor. A manicured hand enters from top right, lifting the matte black cylindrical cap off the center bottle to expose the black spray nozzle. Liquids in pale champagne, deep amber, and cognac. High-key lighting, soft contact reflections, seamless white background, Hasselblad H6D-100c, 85mm, f/8, ultra-clean --ar 16:9 --style raw --v 6.1",
+        "promptNote": "the brief's own wording, kept verbatim. A generator never draws the bottle (the label comes out garbled), so this prompt is NOT run as it stands: the plate prompt below is."
+      },
+      "aspect_ratios": {
+        "desktop": "16:9",
+        "mobile": "4:5"
+      },
+      "files": {
+        "desktop": "hero/variant_1_uncapping/desktop.webp",
+        "mobile": "hero/variant_1_uncapping/mobile.webp"
+      },
+      "plate": {
+        "desktop": {
+          "aspect_ratio": "16:9",
+          "target_px": "2524x1420",
+          "prompt": "Studio photograph on a seamless pure white background, no floor line, no horizon, no table, no shadow plane. A manicured woman's bare right forearm comes straight down from the top edge of the frame, wrist and forearm clearly visible, no sleeve; the hand, seen from the front and slightly from above, thumb pad in front and index fingertip behind, gently pinches the two sides of a small matte black cylinder only as wide as two fingers side by side and as tall as it is wide, lifted in the middle of the frame; the other fingers relaxed and softly curled; short natural almond nails, natural skin, no jewellery. The small cylinder looks small in the hand. Nothing else is in the frame. Soft diffused light from the left, high-key, 85 mm lens, ultra-clean, fine natural film grain.",
+          "usedAs": "roll E of 6 (2026-11-07): only the hand and forearm are used. Lessons: ask for a pure white ground (no floor, no table), the forearm coming from the top edge, and a SMALL cylinder ('two fingers wide, looks small in the hand'): the generator draws the object far too big for the hand otherwise, and scaling the hand to the real cap then makes it child-sized"
+        },
+        "mobile": "not generated: a 4:5 crop (1229x1536) of the desktop plate, composited with its own bottle spacing"
+      },
+      "allowsPlinthWords": false,
+      "objectPosition": {
+        "desktop": "75% 50%",
+        "mobile": "50% 76%"
+      },
+      "production": {
+        "method": "Plate = floor + hand + lifted cap (generated). The three approved flacons are composited under it with place_bottles.py: AURÉVAN and ORVÉLIS capped, the centre flacon UNCAPPED (option nocap=1: the approved art minus its cap, a drawn black atomizer nozzle on the chrome collar).",
+        "centre": "the centre flacon (the brief says VAYRÉN) stands under the lifted cap, its nozzle a few mm below it; the hand's own cap is the generated one (a plain matte black cylinder), sized to the approved cap by choosing the flacon scale from the cap's apparent width",
+        "risks": [
+          "a generated hand can have wrong fingers: roll until the pinch is clean",
+          "the generated cap has no grain: acceptable at ~70 px in the hero box, but flag it",
+          "hand and cap must sit in frame x 40-85% (the hero box shows ~54% of the frame)"
+        ]
+      }
+    },
+    {
+      "variant": 2,
+      "id": "variant_2_spraying",
+      "asset_id": "hero-variant_2_spraying",
+      "label": "The Act of Application",
+      "status": "final 2026-11-07",
+      "reference": {
+        "description": "Reference 2 (Salt & Stone application): studio row, an index finger presses the nozzle, the removed cap stands on the floor beside the base",
+        "note": "a third-party photograph used as a mood benchmark ONLY: it is never uploaded to a generator, traced or reproduced, and no third-party name, label or text appears in the output"
+      },
+      "brief": {
+        "concept": "Three flacons standing in a row on a pristine white floor. The right flacon is uncapped, its black cap resting on the ground beside it; a clean index finger depresses the atomizer.",
+        "lighting": "Ultra-clean studio illumination, soft contact shadow, crisp edge definition.",
+        "prompt": "Luxury perfume editorial campaign for THE RARESKIN. Three 50ml perfume bottles in a horizontal row on a pure white studio surface. An elegant hand with an index finger pressing the black spray head of the rightmost bottle. The removed matte black cap rests neatly beside the base. Liquids glowing in gold and amber. Pure white seamless background, soft reflections, high-end e-commerce campaign, Phase One IQ4, 100mm, f/9 --ar 16:9 --style raw --v 6.1",
+        "promptNote": "the brief's own wording, kept verbatim. A generator never draws the bottle (the label comes out garbled), so this prompt is NOT run as it stands: the plate prompt below is."
+      },
+      "aspect_ratios": {
+        "desktop": "16:9",
+        "mobile": "4:5"
+      },
+      "files": {
+        "desktop": "hero/variant_2_spraying/desktop.webp",
+        "mobile": "hero/variant_2_spraying/mobile.webp"
+      },
+      "plate": {
+        "desktop": {
+          "aspect_ratio": "16:9",
+          "target_px": "2524x1420",
+          "prompt": "High-key commercial studio photography background, wide landscape 16:9 frame, shot straight-on at floor height. A seamless pure white glossy studio floor runs edge to edge and to the bottom of the frame with soft faint reflections and meets a seamless light-grey to white gradient studio wall about two thirds of the way down the frame, with no horizon line, no tiles, no seams and no stains. In the right half of the frame a manicured woman's right hand, cut by the top edge of the frame, comes down from above with the index finger extended straight down and the other fingers curled, the fingertip pointing at an empty spot on the floor about a third of the frame height above it; short natural almond nails, natural skin. The floor and the wall are otherwise completely empty, the left third of the frame is quiet and empty. The bottom quarter of the frame is calm, plain, evenly toned white floor with no props and no pattern. No text, no logos, no face, no jewellery, no watermark. 85 mm lens at f/8, soft diffused studio light from the left, ultra-clean, fine natural film grain."
+        },
+        "mobile": "not generated: a 4:5 crop (1229x1536) of the desktop plate, composited with its own bottle spacing"
+      },
+      "allowsPlinthWords": false,
+      "objectPosition": {
+        "desktop": "72% 50%",
+        "mobile": "50% 75%"
+      },
+      "production": {
+        "method": "Plate = floor + hand with an extended index finger (generated). The right flacon is UNCAPPED (nocap=1) with its nozzle just under the fingertip; its approved cap is the cap-only layer (caponly=1: the approved cap pixels) standing upright on the floor to the right of the base with its own contact shadow; AURÉVAN and ORVÉLIS capped.",
+        "centre": "the fingertip decides the right flacon's position and scale (nozzle top = fingertip); the other two follow at the same scale and ground line",
+        "risks": [
+          "the fingertip has to land on the nozzle: the bottle is composited OVER the plate, so the nozzle top is placed at the fingertip's lower edge (touching), not under the finger pad",
+          "trio + cap need ~48% of the frame width: the hero box shows ~54%, so the bottle scale is 0.46 and the mobile crop uses 0.40",
+          "a generated hand can have wrong fingers: roll until the pose is clean"
+        ]
+      }
+    },
+    {
+      "variant": 3,
+      "id": "variant_3_cylinders",
+      "asset_id": "hero-variant_3_cylinders",
+      "label": "Studio Cylindrical Plinths",
+      "status": "final 2026-11-07",
+      "reference": {
+        "description": "Reference 3 (architectural cylinders): matte-white cylindrical plinths at staggered heights against a seamless light-grey gradient",
+        "note": "a third-party photograph used as a mood benchmark ONLY: it is never uploaded to a generator, traced or reproduced, and no third-party name, label or text appears in the output"
+      },
+      "brief": {
+        "concept": "Three smooth, seamless matte-white architectural cylindrical columns at subtle staggered heights against an ethereal off-white studio backdrop. Each column holds one flacon.",
+        "lighting": "Soft directional studio key light creating smooth, delicate vertical gradients around the curved plinths.",
+        "prompt": "Minimalist high-fashion studio photography of THE RARESKIN collection. Three 50ml perfume flacons displayed on three matte white cylindrical plinths of varying heights. Clear heavy glass, weighted black magnetic caps, centered labels. Diffused studio strobe lighting with soft curved shadows on the white columns. Ethereal light-grey to pure-white gradient background. Clean, sculptural, editorial luxury, 50mm, f/8 --ar 16:9 --style raw --v 6.1",
+        "promptNote": "the brief's own wording, kept verbatim. A generator never draws the bottle (the label comes out garbled), so this prompt is NOT run as it stands: the plate prompt below is."
+      },
+      "aspect_ratios": {
+        "desktop": "16:9",
+        "mobile": "4:5"
+      },
+      "files": {
+        "desktop": "hero/variant_3_cylinders/desktop.webp",
+        "mobile": "hero/variant_3_cylinders/mobile.webp"
+      },
+      "plate": {
+        "desktop": {
+          "aspect_ratio": "16:9",
+          "target_px": "2524x1420",
+          "prompt": "Minimalist high-fashion studio photography background, wide landscape 16:9 frame, shot straight-on slightly above the lowest column top. Three smooth seamless matte white cylindrical columns of clearly different heights (the left one medium, the middle one the lowest, the right one the tallest) stand close together in a row in the middle and right of the frame on a seamless white studio floor, in front of a seamless ethereal light-grey to white gradient wall. Each column has a wide, perfectly flat, empty top, its diameter about half its own height, with nothing on it. Diffused studio strobe light from the upper left with soft curved shadows and delicate vertical gradients on the columns. The left third of the frame is quiet and empty. The bottom quarter of the frame is calm, plain, evenly toned white floor. No people, no text, no logos, no watermark. 50 mm lens at f/8, ultra-clean, fine natural film grain."
+        },
+        "mobile": "not generated: a 4:5 crop (1229x1536) of the desktop plate, composited with its own bottle spacing"
+      },
+      "allowsPlinthWords": true,
+      "objectPosition": {
+        "desktop": "96% 50%",
+        "mobile": "50% 13%"
+      },
+      "production": {
+        "method": "Plate = three generated cylinders. Each flacon stands on a cylinder top: the top's ellipse (centre x, near-edge y, width) is MEASURED on the plate and the flacon is placed at the centre line of the top, base 60% toward the front edge, scale = 0.8 x top width / 651.",
+        "centre": "staggered heights come from the plate; if the generator makes them equal, re-roll",
+        "risks": [
+          "the generator may draw a shelf, a fourth column, a tray or a visible floor edge: re-roll",
+          "the hero box shows ~54% of the frame: the three columns must sit within frame x 36-86%",
+          "the brief's own wording is kept in brief.prompt; plinths are the point of this variant (the earlier hero brief asked for none)"
+        ]
+      }
+    },
+    {
+      "variant": 4,
+      "id": "variant_4_geometric_risers",
+      "asset_id": "hero-variant_4_geometric_risers",
+      "label": "Geometric Risers",
+      "status": "final 2026-11-07",
+      "reference": {
+        "description": "Reference 4 (geometric steps and olfactory accents): crisp off-white geometric steps, minimal raw notes (a citrus slice) resting at the base",
+        "note": "a third-party photograph used as a mood benchmark ONLY: it is never uploaded to a generator, traced or reproduced, and no third-party name, label or text appears in the output"
+      },
+      "brief": {
+        "concept": "Razor-sharp, clean off-white geometric block risers. The trio sits at staggered levels. At the base of the lowest step sit a freshly cut green bergamot wheel and one dark Madagascar vanilla pod.",
+        "lighting": "Bright, airy daylight casting crisp diagonal architectural shadows.",
+        "prompt": "High-end fragrance still-life for THE RARESKIN. Three 50ml glass perfume bottles arranged on clean, geometric matte-white stepped pedestals. A freshly sliced bergamot wheel with glistening juice and one dark vanilla bean lie flat on the bottom step. Crisp architectural shadows, bright studio daylight, seamless white canvas, tack-sharp product focus, 85mm macro lens, f/10 --ar 16:9 --style raw --v 6.1",
+        "promptNote": "the brief's own wording, kept verbatim. A generator never draws the bottle (the label comes out garbled), so this prompt is NOT run as it stands: the plate prompt below is."
+      },
+      "aspect_ratios": {
+        "desktop": "16:9",
+        "mobile": "4:5"
+      },
+      "files": {
+        "desktop": "hero/variant_4_geometric_risers/desktop.webp",
+        "mobile": "hero/variant_4_geometric_risers/mobile.webp"
+      },
+      "plate": {
+        "desktop": {
+          "aspect_ratio": "16:9",
+          "target_px": "2524x1420",
+          "prompt": "High-end still-life photography background, wide landscape 16:9 frame, shot straight-on slightly above the lowest step. A low, wide, clean geometric arrangement of three matte off-white rectangular blocks of gently increasing height, like three shallow stairs rising from left to right, the whole group no taller than a third of the frame, standing in the middle and right of the frame on a seamless white floor, each block with a wide, perfectly flat, empty top, in front of a seamless plain pale wall with no mouldings, no skirting board, no columns and no ornament. On the floor just left of the lowest block lie one freshly sliced green bergamot wheel with glistening juice and one dark vanilla bean, small, a little apart. Soft bright daylight from the upper left, crisp diagonal architectural shadows. The left third of the frame is quiet and empty. The bottom quarter of the frame is calm, plain white floor. No people, no text, no logos, no watermark. 85 mm lens at f/10, tack sharp, fine natural film grain.",
+          "usedAs": "roll B of 2 (2026-11-07). Roll A (shallow slabs cut by the right frame edge) was not used. Lesson: ask for a compact group no taller than a third of the frame and a plain wall"
+        },
+        "mobile": "not generated: a 4:5 crop (1229x1536) of the desktop plate, composited with its own bottle spacing"
+      },
+      "allowsPlinthWords": true,
+      "objectPosition": {
+        "desktop": "38% 50%",
+        "mobile": "50% 54%"
+      },
+      "production": {
+        "method": "Plate = three generated stepped blocks + a bergamot wheel and a vanilla pod. Each flacon stands on a step top: the top's front edge and width are MEASURED on the plate; flacon base 60% toward the front edge; scale from the narrowest top. The props stay on the floor at the foot of the lowest step.",
+        "centre": "the lowest step is on the left (nearest the text panel): the props sit left of the trio, inside the box on desktop",
+        "risks": [
+          "the generator may round the blocks, draw a staircase with risers it cannot fit a bottle on, or put the fruit on a plate: re-roll",
+          "the bottle is bigger than a step top on a thin plate: scale it down",
+          "the props must stay inside frame x 36-86% to show in the hero box"
+        ]
+      }
+    }
+  ],
+  "referenceVariantsNote": {
+    "decided": "2026-11-07 brief ('Engineering 4 Hero Image Systems from Absolute Visual References'). Preview with ?hero=1..4 or the HERO bar; src/config/hero.config.ts: activeHeroVariant.",
+    "specKept": "bottle = the approved pixels (label ESSENTIALS | 50ml, crystal-clear liquid). The brief's EXTRAIT DE PARFUM · 50 ML / 1.7 FL. OZ. label and champagne / amber / cognac liquids are not adopted: same decision as 2026-11-06 (approved mockups).",
+    "newPixels": "the uncapped flacon (nozzle drawn on the approved collar), the hand and, in variant 1, the cap it holds, are the only non-approved pixels.",
+    "background": "the page is --paper #fafaf7 and the hero text panel is warm stone, not pure white: the plates are high-key neutrals and the picture box is flush with the panel, so there is no white-on-white seam to match.",
+    "sizes": "the manifest's measured `sizes` (cover-scaled width) is kept, not the brief's '(max-width: 768px) 100vw, 1200px': at 1440 px the box shows a 1300 px-wide scaled picture."
+  }
+}

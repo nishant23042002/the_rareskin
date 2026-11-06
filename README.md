@@ -341,6 +341,14 @@ before going live:
   place (`BOTTLE` in the local build script). `pnpm home:images check` verifies
   size / ratio / weight; `pnpm home:images placeholders` rewrites missing
   placeholders. Hero: a Site Settings photograph still wins over the shipped one.
+  The hero has eight shipped pictures (four card directions + four reference variants,
+  `src/config/hero.config.ts`; `/?hero=1..4` or the Hero bar previews the variants,
+  `activeHeroVariant` ships one). The text panel beside the picture is tinted from the
+  picture's own edge (`HeroFrame`): after replacing a hero picture run
+  `pnpm home:images panels` to resample its `panel` colours. The launch-offer ticket
+  (`launch-ticket.tsx`) counts the price down once when it scrolls into view and links
+  to the three product pages; it shows its final state without JavaScript or with
+  reduced motion.
   Before launch, confirm the `claimsToVerify` items (the unboxing box is not
   approved packaging; no "30% extrait" figure is printed; the atelier and ritual
   copy is a draft).

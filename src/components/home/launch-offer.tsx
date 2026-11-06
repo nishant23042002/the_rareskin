@@ -1,5 +1,5 @@
 import { RhIcon, type RhIconName } from "@/components/ui/rh-icon";
-import { formatINR } from "@/lib/catalog";
+import { LaunchTicket, type TicketItem } from "./launch-ticket";
 
 /**
  * The launch-offer ticket straddling the hero's seam, then the four promises.
@@ -19,43 +19,21 @@ export function LaunchOffer({
   price,
   mrp,
   volumeMl,
+  items,
 }: {
   price: number;
   mrp: number;
   volumeMl: number;
+  /** the fragrances the launch price applies to (name + slug), for the ticket's links */
+  items: TicketItem[];
 }) {
   const hasOffer = mrp > price;
-  const pct = hasOffer ? Math.round((1 - price / mrp) * 100) : 0;
 
   return (
     <>
       {hasOffer && (
         <div className="rh-ticket-wrap" id="offer">
-          <aside className="rh-ticket" aria-label="Launch offer">
-            <div className="rh-ticket__a">
-              <p className="rh-eyebrow">Launch offer</p>
-              <p className="rh-ticket__price">
-                <b className="rh-tnum">{formatINR(price)}</b>
-                <s className="rh-tnum">{formatINR(mrp)}</s>
-              </p>
-            </div>
-            <span className="rh-ticket__perf" aria-hidden="true" />
-            <div className="rh-ticket__b">
-              <p className="rh-ticket__save">
-                <span className="rh-pill rh-tnum">&minus;{pct}%</span>
-                <span>
-                  Save {formatINR(mrp - price)} on every {volumeMl}&nbsp;ml
-                  extrait.
-                </span>
-              </p>
-              <p className="rh-ticket__fine">
-                <span>All-inclusive price</span>
-                <span className="rh-ticket__fine-b">
-                  Free shipping across India
-                </span>
-              </p>
-            </div>
-          </aside>
+          <LaunchTicket price={price} mrp={mrp} volumeMl={volumeMl} items={items} />
         </div>
       )}
       <section

@@ -1,8 +1,8 @@
 {
   "$comment": "Single source of truth for the homepage image system. Read by src/lib/home-images.ts (components), scripts/home-images.ts (placeholders + checks) and ASSET_PROMPT_SHEET.md (prompts). To ship a real image: replace the file at the same path with the final WebP (same aspect ratio) and set \"status\" to \"final\" in this file. While \"placeholder\", components that already had an illustration keep showing it and the alt text stays empty (a tonal plate is decorative). For a picture that a frame crops (object-fit: cover), `sizes` must describe the scaled picture width, not the frame width (see sizesNote).",
   "version": 1,
-  "assetVersion": 5,
-  "assetVersionNote": "Next's image optimizer caches by URL and has no invalidation: images are requested as <file>?v=<assetVersion> and next.config.ts allows exactly that query string. BUMP THIS NUMBER whenever any file in public/images/homepage is replaced (placeholder -> final, or a new render). v1 = placeholders, v2 = first generated hero + product cards.",
+  "assetVersion": 9,
+  "assetVersionNote": "Next's image optimizer caches by URL and has no invalidation: images are requested as <file>?v=<assetVersion> and next.config.ts allows exactly that query string. BUMP THIS NUMBER whenever any file in public/images/homepage is replaced (placeholder -> final, or a new render). v1 = placeholders, v2 = first generated hero + product cards, v6 = stone hero (hero-grounded_stone), v7 = the other three hero directions, v8 = the four reference-benchmark hero variants (a borrowed-image test had cached variant 3 at v7), v9 = cylinders re-centred, uncapping hand + cap redone, risers on a compact plate.",
   "updated": "2026-11-06",
   "basePath": "/images/homepage",
   "spec": {
@@ -74,6 +74,533 @@
         "credits": 4
       },
       "sizesNote": "The 16:9 picture is cropped by an almost square box, so object-fit: cover scales it to box-height x 16/9 (about 1300px at 1440x900): `sizes` must describe that SCALED width (max(50vw, 146vh), capped at 1460px = the largest box), not the 50vw the box occupies; with 50vw the browser fetched a 720px file and stretched it."
+    },
+    {
+      "section": "Hero (above the fold)",
+      "component": "src/components/home/hero-media.tsx (via hero.tsx)",
+      "route": "composite",
+      "lcp": true,
+      "sizes": "(min-width: 1280px) min(1460px, max(50vw, 146vh)), (min-width: 900px) 50vw, 100vw",
+      "objectPosition": {
+        "desktop": "75% 50%",
+        "mobile": "50% 80%"
+      },
+      "sizesNote": "The 16:9 picture is cropped by an almost square box, so object-fit: cover scales it to box-height x 16/9 (about 1300px at 1440x900): `sizes` must describe that SCALED width (max(50vw, 146vh), capped at 1460px = the largest box), not the 50vw the box occupies; with 50vw the browser fetched a 720px file and stretched it.",
+      "id": "hero-grounded_stone",
+      "status": "final",
+      "concept": "grounded_stone",
+      "variants": [
+        {
+          "key": "desktop",
+          "file": "hero/grounded_stone/desktop.webp",
+          "width": 2524,
+          "height": 1420,
+          "aspect": "16:9",
+          "media": "(min-width: 1280px)"
+        },
+        {
+          "key": "mobile",
+          "file": "hero/grounded_stone/mobile.webp",
+          "width": 1140,
+          "height": 1425,
+          "aspect": "4:5",
+          "media": "(max-width: 1279px)"
+        }
+      ],
+      "alt": "The three extraits, AURÉVAN, ORVÉLIS and VAYRÉN, standing side by side on a pale limestone floor in front of a plaster wall, a bar of morning sun falling diagonally across the wall behind them.",
+      "placeholderTone": [
+        "#e6e0d3",
+        "#b9ae98"
+      ],
+      "layoutNote": "Same box as the baseline hero (see the `hero` entry). Desktop: the box shows ~54% of the 16:9 frame; objectPosition 75% 50% centres the trio (frame x 39-84%) in it. Mobile: a 4:5 crop (1140 x 1425) shown as a landscape band; objectPosition 50% 80% keeps the bottle bases at ~76% of the band (at 375 wide: bases at 228 of 301 px, ticket from 255), above the LAUNCH OFFER ticket (it covers the bottom 15%). Bottom 18% (desktop 6% ticket overlap) is plain stone with a soft shadow band.",
+      "creativeDirection": "The trio stands directly on a honed pale limestone floor in early-morning light, ORVÉLIS a step further back between AURÉVAN and VAYRÉN. No pedestal, no stand. The plate's own bergamot half stays at the far left of the 16:9 plate, outside the hero box; the generator's cinnamon + jasmine cluster was cloned out so it does not show through the clear glass.",
+      "promptRef": "public/images/hero-manifest.json (grounded_stone)",
+      "claimsToVerify": [
+        "the label reads AUREVAN (no accent) on the AURÉVAN flacon: approved art, spelling decision still open",
+        "the label stays ESSENTIALS | 50ml and the liquid crystal clear (approved mockups), not the brief's EXTRAIT DE PARFUM label / amber liquids",
+        "no ingredient is visible in the hero box on desktop or mobile (the bergamot half sits outside the window): the alt text must not mention one",
+        "the picture is a daylight scene lit from the right; the sun bar on the wall is a plate feature, not a claim about a place or time"
+      ],
+      "generation": {
+        "desktop": "Kling plate AbQXruDfTRo0_IJcYAQ5phBx2RwUr6Ha-cek2bRNGADqcoWnTSdc158ZR3LYnJvNuiCjkAUc (2720x1536, 16:9), cropped to x 93-2626 / y 0-1425 (above the generator logo and a dark slab edge) = 2524x1420",
+        "mobile": "NOT a separate plate: a 4:5 crop (x 1081-2221, y 0-1425, 1140x1425) of the same desktop plate, composited with its own bottle spacing. The 3:4 mobile plate ATUlBPc_m8NnxLZAIK36gNquBoJDYhqJUoGhbauhiBWn2BQfj3hYLxbGl98ReDcxfj0h-WU1 (2 credits) was rejected: a mosaic of tile seams with a vertical joint through the centre bottle's position",
+        "composite": "approved flacons at scale 0.47 (ORVÉLIS, base y 1040) and 0.50 (AURÉVAN, VAYRÉN, base y 1100) on the desktop plate; 0.43 / 0.46 for the mobile crop; light from the right, cast shadows fall left; design-explorations/packaging-renders/homepage/hero_build.py (gs_desktop, gs_mobile)",
+        "retouch": "generator cinnamon + petals replaced by a clone of the clean floor 600 px to the left (same rows, feathered)",
+        "credits": 4
+      },
+      "panel": {
+        "desktop": [
+          "#a1a29c",
+          "#a8a9a4",
+          "#d2d1cb",
+          "#e9e8e2",
+          "#d2cec5",
+          "#8a908e"
+        ],
+        "mobile": "#eceae6",
+        "tone": "light"
+      }
+    },
+    {
+      "section": "Hero (above the fold)",
+      "component": "src/components/home/hero-media.tsx (via hero.tsx)",
+      "route": "composite",
+      "lcp": true,
+      "sizes": "(min-width: 1280px) min(1460px, max(50vw, 146vh)), (min-width: 900px) 50vw, 100vw",
+      "objectPosition": {
+        "desktop": "75% 50%",
+        "mobile": "50% 90%"
+      },
+      "sizesNote": "The 16:9 picture is cropped by an almost square box, so object-fit: cover scales it to box-height x 16/9 (about 1300px at 1440x900): `sizes` must describe that SCALED width (max(50vw, 146vh), capped at 1460px = the largest box), not the 50vw the box occupies; with 50vw the browser fetched a 720px file and stretched it.",
+      "id": "hero-chiaroscuro_studio",
+      "status": "final",
+      "concept": "chiaroscuro_studio",
+      "variants": [
+        {
+          "key": "desktop",
+          "file": "hero/chiaroscuro_studio/desktop.webp",
+          "width": 2524,
+          "height": 1420,
+          "aspect": "16:9",
+          "media": "(min-width: 1280px)"
+        },
+        {
+          "key": "mobile",
+          "file": "hero/chiaroscuro_studio/mobile.webp",
+          "width": 1229,
+          "height": 1536,
+          "aspect": "4:5",
+          "media": "(max-width: 1279px)"
+        }
+      ],
+      "alt": "The three extraits, AURÉVAN, ORVÉLIS and VAYRÉN, standing side by side on a pale plaster floor, window light throwing long bars of shadow across the wall behind them.",
+      "placeholderTone": [
+        "#f1eee6",
+        "#dcd6c8"
+      ],
+      "layoutNote": "Same box as the baseline hero (see the `hero` entry). Desktop: the box shows ~54% of the 16:9 frame; objectPosition 75% 50% centres the trio (frame x 39-84%). The window frame at the plate's left edge (frame x 0-5%) stays out of the box. Mobile: 1229 x 1536 (4:5) shown as a landscape band; objectPosition 50% 90% keeps the bases at ~76% of the band (at 375 wide: 229 of 301 px), above the LAUNCH OFFER ticket. The plate's bottom ~17% is a calm deep-grey shadow band.",
+      "creativeDirection": "The trio stands on a pale plaster floor in a high-key room: a tall window out of frame on the left throws bars of light and shadow across the wall and the floor (shadows fall right). ORVÉLIS a step further back. No pedestal, no stand, no ingredients.",
+      "promptRef": "public/images/hero-manifest.json (chiaroscuro_studio)",
+      "claimsToVerify": [
+        "the label reads AUREVAN (no accent) on the AURÉVAN flacon: approved art, spelling decision still open",
+        "the label stays ESSENTIALS | 50ml and the liquid crystal clear (approved mockups), not the brief's EXTRAIT DE PARFUM label / amber liquids",
+        "the window at the left of the plate is not visible in the hero box on desktop; the alt text does not mention one"
+      ],
+      "generation": {
+        "desktop": "Kling plate AVhYbQTywCGMmH6tIAniRP5WUBR-uiVUi3LAfmKPVUW2lRsk7vnR2VuJbx8LrF8e5xncD6k9 (2720x1536, 16:9), cropped to x 93-2626 / y 0-1425 (above the generator logo) = 2524x1420",
+        "mobile": "NOT a separate plate: a 4:5 crop (x 1020-2249, y 0-1536, 1229x1536) of the same desktop plate, composited with its own bottle spacing (the crop stays left of the generator logo, which sits at x 2280-2660)",
+        "composite": "approved flacons at scale 0.47 (ORVÉLIS, a step further back) and 0.50 (AURÉVAN, VAYRÉN) on the desktop plate, trio at plate x 1245 / 1651 / 2056; 0.43 / 0.46 for the mobile crop; design-explorations/packaging-renders/homepage/hero_build.py (cs_desktop, cs_mobile)",
+        "retouch": "none (the plate had no props); wall/floor line at y 1133, bases at y 1190 (ORVÉLIS) and 1240 (AURÉVAN, VAYRÉN) inside the lit strip that ends at y ~1300",
+        "credits": 2
+      },
+      "panel": {
+        "desktop": [
+          "#94908a",
+          "#acaca9",
+          "#f3f1ed",
+          "#ebe9e5",
+          "#f0ece6",
+          "#9c9f9c"
+        ],
+        "mobile": "#a4a49f",
+        "tone": "light"
+      }
+    },
+    {
+      "section": "Hero (above the fold)",
+      "component": "src/components/home/hero-media.tsx (via hero.tsx)",
+      "route": "composite",
+      "lcp": true,
+      "sizes": "(min-width: 1280px) min(1460px, max(50vw, 146vh)), (min-width: 900px) 50vw, 100vw",
+      "objectPosition": {
+        "desktop": "75% 50%",
+        "mobile": "50% 85%"
+      },
+      "sizesNote": "The 16:9 picture is cropped by an almost square box, so object-fit: cover scales it to box-height x 16/9 (about 1300px at 1440x900): `sizes` must describe that SCALED width (max(50vw, 146vh), capped at 1460px = the largest box), not the 50vw the box occupies; with 50vw the browser fetched a 720px file and stretched it.",
+      "id": "hero-mineral_bed",
+      "status": "final",
+      "concept": "mineral_bed",
+      "variants": [
+        {
+          "key": "desktop",
+          "file": "hero/mineral_bed/desktop.webp",
+          "width": 2524,
+          "height": 1420,
+          "aspect": "16:9",
+          "media": "(min-width: 1280px)"
+        },
+        {
+          "key": "mobile",
+          "file": "hero/mineral_bed/mobile.webp",
+          "width": 1229,
+          "height": 1536,
+          "aspect": "4:5",
+          "media": "(max-width: 1279px)"
+        }
+      ],
+      "alt": "The three extraits, AURÉVAN, ORVÉLIS and VAYRÉN, standing in a low bed of white marble dust, ground spice and black volcanic sand in front of a terracotta wall lit from the right.",
+      "placeholderTone": [
+        "#d9cdb4",
+        "#4a3a2b"
+      ],
+      "layoutNote": "Same box as the baseline hero (see the `hero` entry). Desktop: the box shows ~54% of the 16:9 frame; objectPosition 75% 50% centres the trio (frame x 39-84%): AURÉVAN and ORVÉLIS stand on the spice, VAYRÉN on the edge of the black sand; the pale marble dust is out of the box at 1440 and shows at the left on wide screens. Mobile: 1229 x 1536 (4:5) shown as a landscape band; objectPosition 50% 85% keeps the bases clear of the LAUNCH OFFER ticket.",
+      "creativeDirection": "The trio low in a bed of grains that runs from pale marble dust through ground spice to black volcanic sand, the foot of each flacon sunk a little into the grains, in front of a terracotta wall with sun from the right. The plate's own jasmine (far left) and oud slivers (far right) stay outside the hero box.",
+      "promptRef": "public/images/hero-manifest.json (mineral_bed)",
+      "claimsToVerify": [
+        "the label reads AUREVAN (no accent) on the AURÉVAN flacon: approved art, spelling decision still open",
+        "the label stays ESSENTIALS | 50ml and the liquid crystal clear (approved mockups), not the brief's EXTRAIT DE PARFUM label / amber liquids",
+        "the wall is terracotta red-brown, not the brief's umber: check it against the brand palette",
+        "no ingredient is visible in the hero box (jasmine at frame x 0-3%, oud at x 97-100%): the alt text must not mention one"
+      ],
+      "generation": {
+        "desktop": "Kling plate AZiHOMqcIHHmxH9XvBHZcChiFaYQpAseTf3GtTkQGpI94Hqr0EqIcHiH_mriHHnrAzTUHAQq (2720x1536, 16:9, second roll), cropped to x 93-2626 / y 0-1425 = 2524x1420. First roll AQ2FKp_f... discarded: three stone stools in the middle, tray slabs at the sides, a raked Zen pattern",
+        "mobile": "NOT a separate plate: a 4:5 crop (x 1020-2249, y 0-1536, 1229x1536) of the same desktop plate, composited with its own bottle spacing (the crop stays left of the generator logo, which sits at x 2280-2660)",
+        "composite": "approved flacons at scale 0.47 (ORVÉLIS, a step further back) and 0.50 (AURÉVAN, VAYRÉN) on the desktop plate, trio at plate x 1245 / 1651 / 2056; 0.43 / 0.46 for the mobile crop; design-explorations/packaging-renders/homepage/hero_build.py (ms_desktop, ms_mobile)",
+        "retouch": "feet sunk into the grains with embed_foot (26 px pile); glass: posk .6 / negk .9 / rim .35 with the plate softened behind it at sigma 4 / mix .4 (the dark glass set and sigma 7 / mix .85 made the glass read smoky on this coarse bed); wall/floor line at y 850, bases at y 1140 (ORVÉLIS) and 1170",
+        "credits": 4
+      },
+      "panel": {
+        "desktop": [
+          "#321713",
+          "#341712",
+          "#371813",
+          "#5f3d2e",
+          "#936f55",
+          "#886141"
+        ],
+        "mobile": "#391914",
+        "tone": "dark"
+      }
+    },
+    {
+      "section": "Hero (above the fold)",
+      "component": "src/components/home/hero-media.tsx (via hero.tsx)",
+      "route": "composite",
+      "lcp": true,
+      "sizes": "(min-width: 1280px) min(1460px, max(50vw, 146vh)), (min-width: 900px) 50vw, 100vw",
+      "objectPosition": {
+        "desktop": "75% 50%",
+        "mobile": "50% 45%"
+      },
+      "sizesNote": "The 16:9 picture is cropped by an almost square box, so object-fit: cover scales it to box-height x 16/9 (about 1300px at 1440x900): `sizes` must describe that SCALED width (max(50vw, 146vh), capped at 1460px = the largest box), not the 50vw the box occupies; with 50vw the browser fetched a 720px file and stretched it.",
+      "id": "hero-liquid_caustics",
+      "status": "final",
+      "concept": "liquid_caustics",
+      "variants": [
+        {
+          "key": "desktop",
+          "file": "hero/liquid_caustics/desktop.webp",
+          "width": 2524,
+          "height": 1420,
+          "aspect": "16:9",
+          "media": "(min-width: 1280px)"
+        },
+        {
+          "key": "mobile",
+          "file": "hero/liquid_caustics/mobile.webp",
+          "width": 1229,
+          "height": 1536,
+          "aspect": "4:5",
+          "media": "(max-width: 1279px)"
+        }
+      ],
+      "alt": "The three extraits, AURÉVAN, ORVÉLIS and VAYRÉN, standing in a row on a pale stone ledge at the edge of still turquoise water, sunlight glittering on the shallow water behind them.",
+      "placeholderTone": [
+        "#cfe0dc",
+        "#8fb0ab"
+      ],
+      "layoutNote": "Same box as the baseline hero (see the `hero` entry). Desktop: the box shows ~54% of the 16:9 frame; objectPosition 75% 50% centres the trio (frame x 39-84%). Mobile: 1229 x 1536 (4:5) shown as a landscape band; objectPosition 50% 45% frames the bottles (top ~42 px, bases ~213 px of 301) with the ledge edge and turquoise water under them, behind the LAUNCH OFFER ticket.",
+      "creativeDirection": "The trio stands on a pale stone ledge between shallow, sun-glittering water behind and still turquoise water in front, in front of a plain plaster wall. ORVÉLIS a step further back. The plate's jasmine (far left) stays outside the hero box; a thin bergamot-zest curl can show at the far right on wide screens.",
+      "promptRef": "public/images/hero-manifest.json (liquid_caustics)",
+      "claimsToVerify": [
+        "the label reads AUREVAN (no accent) on the AURÉVAN flacon: approved art, spelling decision still open",
+        "the label stays ESSENTIALS | 50ml and the liquid crystal clear (approved mockups), not the brief's EXTRAIT DE PARFUM label / amber liquids",
+        "the bottles do not stand IN the water (they stand on the ledge) and have no reflection: the picture does not claim otherwise",
+        "a thin zest curl at frame x 87-100% shows in the right margin of boxes wider than ~65% of the frame (1920 px screens); the alt text does not mention it"
+      ],
+      "generation": {
+        "desktop": "Kling plate Abe4NtvrEqDk_XmD4LPpHAaQqdUxRIlVLYb0CALdu_oU2PLNhiNI8yb0Q80JmM82RaIrEjL6 (2720x1536, 16:9, second roll), cropped to x 93-2626 / y 0-1425 = 2524x1420. First roll AemlxKLN... discarded: three men standing at the back and a tiled pool deck",
+        "mobile": "NOT a separate plate: a 4:5 crop (x 1020-2249, y 0-1536, 1229x1536) of the same desktop plate, composited with its own bottle spacing (the crop stays left of the generator logo, which sits at x 2280-2660)",
+        "composite": "approved flacons at scale 0.47 (ORVÉLIS, a step further back) and 0.50 (AURÉVAN, VAYRÉN) on the desktop plate, trio at plate x 1245 / 1651 / 2056; 0.43 / 0.46 for the mobile crop; design-explorations/packaging-renders/homepage/hero_build.py (lq_desktop, lq_mobile)",
+        "retouch": "none; bases at y 895 (ORVÉLIS) and 945 on the ledge (top surface y 830-975), no reflection (the ledge is stone); the plate is softened behind the glass; the generator's glitter shows as bokeh through the glass",
+        "credits": 4
+      },
+      "panel": {
+        "desktop": [
+          "#b7b2a7",
+          "#b7b3a7",
+          "#c3b6a3",
+          "#e2cfb8",
+          "#8c9b8d",
+          "#7c978a"
+        ],
+        "mobile": "#b2aea3",
+        "tone": "light"
+      }
+    },
+    {
+      "section": "Hero (above the fold)",
+      "component": "src/components/home/hero-media.tsx (via hero.tsx)",
+      "route": "composite",
+      "lcp": true,
+      "sizes": "(min-width: 1280px) min(1460px, max(50vw, 146vh)), (min-width: 900px) 50vw, 100vw",
+      "sizesNote": "The 16:9 picture is cropped by an almost square box, so object-fit: cover scales it to box-height x 16/9 (about 1300px at 1440x900): `sizes` must describe that SCALED width (max(50vw, 146vh), capped at 1460px = the largest box), not the 50vw the box occupies; with 50vw the browser fetched a 720px file and stretched it.",
+      "id": "hero-variant_1_uncapping",
+      "status": "final",
+      "concept": "variant_1_uncapping",
+      "objectPosition": {
+        "desktop": "75% 50%",
+        "mobile": "50% 76%"
+      },
+      "variants": [
+        {
+          "key": "desktop",
+          "file": "hero/variant_1_uncapping/desktop.webp",
+          "width": 2524,
+          "height": 1420,
+          "aspect": "16:9",
+          "media": "(min-width: 1280px)"
+        },
+        {
+          "key": "mobile",
+          "file": "hero/variant_1_uncapping/mobile.webp",
+          "width": 1229,
+          "height": 1536,
+          "aspect": "4:5",
+          "media": "(max-width: 1279px)"
+        }
+      ],
+      "alt": "A manicured hand lifts the black cap off the centre extrait, VAYRÉN, pinching it between thumb and finger above its black spray nozzle, between AURÉVAN and ORVÉLIS on a white studio floor.",
+      "placeholderTone": [
+        "#f3f2ef",
+        "#d6d5d1"
+      ],
+      "layoutNote": "Same box as the baseline hero (see the `hero` entry). Desktop: objectPosition 75% 50% (window 33-87%); the hand and cap sit over frame x 45-70%. Mobile: 4:5 crop, objectPosition 50% 76% keeps the bases at ~78% of the band (above the LAUNCH OFFER ticket) and the hand, cap and nozzle inside it; the forearm leaves through the band's top.",
+      "creativeDirection": "Three flacons aligned in a row on a seamless white reflective studio surface. A clean, manicured hand lifts the matte black cap off the centre flacon (VAYRÉN), revealing the black spray nozzle.",
+      "promptRef": "public/images/hero-manifest.json (referenceVariants: variant_1_uncapping)",
+      "claimsToVerify": [
+        "the label reads ESSENTIALS | 50ml and the liquid is crystal clear (approved mockups): the brief's EXTRAIT DE PARFUM label and tinted liquids are NOT adopted (decision of 2026-11-06); AUREVAN is spelt without the accent on the approved art (open decision)",
+        "the atomizer nozzle is drawn (the approved art has none: it is inside the cap): check it against a real unit",
+        "the hand is generated; the cap it holds is the approved cap pixels (not the generated one)",
+        "the brief's order AURÉVAN | VAYRÉN | ORVÉLIS is used here, the other pictures use AURÉVAN | ORVÉLIS | VAYRÉN"
+      ],
+      "generation": {
+        "desktop": "Kling plate AT0au7bsLorkX04sLXheooz6eDh_vqr93zZ1etcPda2w7e8yUDBju3F7pFjn-2hXGFvFJf9s (2720x1536, roll E of 6, 2026-11-07): ONLY the hand and forearm are used (cut out by skin chroma R-B). Earlier plates were discarded: the first (AXn8gCa1...) pinched a tiny cap from above over a light-box table, so the fingers read as claws once the approved cap was put between them; roll A (a good pinch but cut at the knuckles by the plate's top edge, so the arm ended mid-frame), roll C (a tube lying on a table), roll D (a forearm and a hand closing over a cylinder 4x too big for the hand: scaled to the cap the hand looked child-sized). Roll B/F unused",
+        "mobile": "NOT a separate plate: the same hand, scaled to the smaller phone flacons (0.39) for a 4:5 crop (x 1020-2249, y 0-1536), so the band shows the whole hand above the cap",
+        "composite": "hero_hand.py (v1_desktop, v1_mobile): procedural white studio sweep; flacons at 0.49 (desktop) / 0.39 (mobile), AURÉVAN | VAYRÉN (centre, uncapped: the approved art minus its cap, a drawn nozzle) | ORVÉLIS; the approved VAYRÉN cap (trimmed at the collar line so no collar teeth show under it) hovers above the nozzle. The hand grips a small 110 px cylinder in the plate; it is scaled 1.25 x (1.0 x on the phone) so its thumb pad and index fingertip meet the approved cap's sides, its pinch point sits on the cap's centre, and it is laid OVER the cap",
+        "retouch": "the matte is the skin chroma with speckle holes closed, the edge pulled in 1 px and thin structures near the pinch removed; grain removed with a median over the hand's box; graded (gamma 0.92, slightly warmer); a faint soft shadow. The forearm comes from the plate's top edge and leaves the frame by itself at this size",
+        "credits": 12
+      },
+      "panel": {
+        "desktop": [
+          "#d0cfd3",
+          "#d5d7db",
+          "#e1e1e4",
+          "#efeef1",
+          "#f3f3f5",
+          "#eeeff1"
+        ],
+        "mobile": "#d9d9db",
+        "tone": "light"
+      }
+    },
+    {
+      "section": "Hero (above the fold)",
+      "component": "src/components/home/hero-media.tsx (via hero.tsx)",
+      "route": "composite",
+      "lcp": true,
+      "sizes": "(min-width: 1280px) min(1460px, max(50vw, 146vh)), (min-width: 900px) 50vw, 100vw",
+      "sizesNote": "The 16:9 picture is cropped by an almost square box, so object-fit: cover scales it to box-height x 16/9 (about 1300px at 1440x900): `sizes` must describe that SCALED width (max(50vw, 146vh), capped at 1460px = the largest box), not the 50vw the box occupies; with 50vw the browser fetched a 720px file and stretched it.",
+      "id": "hero-variant_2_spraying",
+      "status": "final",
+      "concept": "variant_2_spraying",
+      "objectPosition": {
+        "desktop": "72% 50%",
+        "mobile": "50% 75%"
+      },
+      "variants": [
+        {
+          "key": "desktop",
+          "file": "hero/variant_2_spraying/desktop.webp",
+          "width": 2524,
+          "height": 1420,
+          "aspect": "16:9",
+          "media": "(min-width: 1280px)"
+        },
+        {
+          "key": "mobile",
+          "file": "hero/variant_2_spraying/mobile.webp",
+          "width": 1229,
+          "height": 1536,
+          "aspect": "4:5",
+          "media": "(max-width: 1279px)"
+        }
+      ],
+      "alt": "A fingertip touches the black spray nozzle of the right-hand extrait, VAYRÉN, its black cap standing on the white floor beside it, next to AURÉVAN and ORVÉLIS.",
+      "placeholderTone": [
+        "#f3f2ef",
+        "#d6d5d1"
+      ],
+      "layoutNote": "Same box as the baseline hero (see the `hero` entry). Desktop: objectPosition 72% 50% (window 33-87%). Trio + cap span frame x 36-84%. Mobile: 4:5 crop, objectPosition 50% 75% (bases at ~79% of the band, above the LAUNCH OFFER ticket).",
+      "creativeDirection": "Three flacons standing in a row on a pristine white floor. The right flacon is uncapped, its black cap resting on the ground beside it; a clean index finger depresses the atomizer.",
+      "promptRef": "public/images/hero-manifest.json (referenceVariants: variant_2_spraying)",
+      "claimsToVerify": [
+        "the label reads ESSENTIALS | 50ml and the liquid is crystal clear (approved mockups): the brief's EXTRAIT DE PARFUM label and tinted liquids are NOT adopted (decision of 2026-11-06); AUREVAN is spelt without the accent on the approved art (open decision)",
+        "the atomizer nozzle is drawn (the approved art has none: it is inside the cap)",
+        "the finger touches the nozzle top; it does not wrap over it",
+        "the hand is generated and slightly backlit in the source: graded warmer to sit in the high-key scene"
+      ],
+      "generation": {
+        "desktop": "Kling plate AZT1PUsCkAJf3_xU3ICSqng3-z_tIFjn5XLh_Wde_QaroqN-zohRalH0ahP-uFawBhFp7BoJ (2720x1536, 16:9, first roll): ONLY the hand and finger are used (cut out by skin chroma R-B)",
+        "mobile": "NOT a separate plate: a 4:5 crop (1229x1536) of the same plate, composited with its own bottle spacing",
+        "composite": "hero_hand.py (v2_desktop, v2_mobile): procedural white studio sweep; AURÉVAN | ORVÉLIS | VAYRÉN (right, uncapped, scale 0.46 desktop / 0.40 mobile); the approved VAYRÉN cap upright on the floor beside it with its own contact shadow and reflection; the generated fingertip lands on the nozzle's top",
+        "retouch": "the hand is graded (gamma 0.72, warmer) and given a faint soft shadow; the finger's own floor reflection is left out of the matte",
+        "credits": 2
+      },
+      "panel": {
+        "desktop": [
+          "#cfd0d4",
+          "#d5d7db",
+          "#e1e2e4",
+          "#efeff1",
+          "#f2f2f4",
+          "#eeeff1"
+        ],
+        "mobile": "#d9dbdd",
+        "tone": "light"
+      }
+    },
+    {
+      "section": "Hero (above the fold)",
+      "component": "src/components/home/hero-media.tsx (via hero.tsx)",
+      "route": "composite",
+      "lcp": true,
+      "sizes": "(min-width: 1280px) min(1460px, max(50vw, 146vh)), (min-width: 900px) 50vw, 100vw",
+      "sizesNote": "The 16:9 picture is cropped by an almost square box, so object-fit: cover scales it to box-height x 16/9 (about 1300px at 1440x900): `sizes` must describe that SCALED width (max(50vw, 146vh), capped at 1460px = the largest box), not the 50vw the box occupies; with 50vw the browser fetched a 720px file and stretched it.",
+      "id": "hero-variant_3_cylinders",
+      "status": "final",
+      "concept": "variant_3_cylinders",
+      "objectPosition": {
+        "desktop": "96% 50%",
+        "mobile": "50% 13%"
+      },
+      "variants": [
+        {
+          "key": "desktop",
+          "file": "hero/variant_3_cylinders/desktop.webp",
+          "width": 2524,
+          "height": 1420,
+          "aspect": "16:9",
+          "media": "(min-width: 1280px)"
+        },
+        {
+          "key": "mobile",
+          "file": "hero/variant_3_cylinders/mobile.webp",
+          "width": 1229,
+          "height": 1536,
+          "aspect": "4:5",
+          "media": "(max-width: 1279px)"
+        }
+      ],
+      "alt": "The three extraits, AURÉVAN, ORVÉLIS and VAYRÉN, each on its own matte white cylindrical plinth of a different height, in soft studio light against a pale grey-white wall.",
+      "placeholderTone": [
+        "#efeeec",
+        "#d3d2d0"
+      ],
+      "layoutNote": "Same box as the baseline hero (see the `hero` entry). Desktop: the three plinths sit at frame x 53-95%: objectPosition 96% 50% shows them whole (window ~44-98% at 1440, wider on bigger screens). The flacons are small on large plinths (as in the reference). Mobile: 1229 x 1536 shown as a landscape band; objectPosition 50% 13% keeps the tall flacon's top ~15 px from the band's top and the middle flacon's base at ~77% of the band, above the LAUNCH OFFER ticket.",
+      "creativeDirection": "Three smooth, seamless matte-white architectural cylindrical columns at subtle staggered heights against an ethereal off-white studio backdrop. Each column holds one flacon.",
+      "promptRef": "public/images/hero-manifest.json (referenceVariants: variant_3_cylinders)",
+      "claimsToVerify": [
+        "the label reads ESSENTIALS | 50ml and the liquid is crystal clear (approved mockups): the brief's EXTRAIT DE PARFUM label and tinted liquids are NOT adopted (decision of 2026-11-06); AUREVAN is spelt without the accent on the approved art (open decision)",
+        "the flacons stand on plinths: the earlier 2026-11-06 hero brief asked for pedestal-free directions; this variant follows the 2026-11-07 brief",
+        "the flacons are small in the box (about 24% of its height at 1440): that is the reference's look, but a bigger flacon would crowd the tall plinth's top"
+      ],
+      "generation": {
+        "desktop": "Kling plate AVB3GkaXBvlPRm2Lz1v6l422M55RYN6ixcCWfLkhaIPfzPdTRS9ynXXGJx7RrY7N5Lnkxz6W (2720x1536, 16:9, first roll), cropped to x 93-2626 / y 0-1425 = 2524x1420 (desktop); mobile x 1360-2589 / y 0-1536",
+        "mobile": "NOT a separate plate: a 4:5 crop (1229x1536) of the same plate, composited with its own bottle spacing",
+        "composite": "hero_build.py (v3_desktop, v3_mobile): flacons at scale 0.30 (AURÉVAN, left, medium cylinder), 0.31 (ORVÉLIS, middle, low cylinder), 0.28 (VAYRÉN, right, tall cylinder), centred on the MEASURED top faces: left x 1640 / back edge y 587 / front edge y 647.5, middle x 1975 / 769 / 844.5, right x 2285 / 367 / 404; base_y = face centre + half the footprint depth seen from here. Mobile scale x 0.86",
+        "retouch": "the generator logo filled out of the plate; a thin contact line under each base sized to the small flacon. 2026-11-07 fix: the first version put each base at (guessed centre + 14 px), 8-19 px toward the front lip, so the flacons looked pushed to the front edge of their cylinder",
+        "credits": 2
+      },
+      "panel": {
+        "desktop": [
+          "#eaecee",
+          "#e8eaeb",
+          "#e1e3e6",
+          "#d9dcdf",
+          "#e9ebed",
+          "#eaecee"
+        ],
+        "mobile": "#e1e3e6",
+        "tone": "light"
+      }
+    },
+    {
+      "section": "Hero (above the fold)",
+      "component": "src/components/home/hero-media.tsx (via hero.tsx)",
+      "route": "composite",
+      "lcp": true,
+      "sizes": "(min-width: 1280px) min(1460px, max(50vw, 146vh)), (min-width: 900px) 50vw, 100vw",
+      "sizesNote": "The 16:9 picture is cropped by an almost square box, so object-fit: cover scales it to box-height x 16/9 (about 1300px at 1440x900): `sizes` must describe that SCALED width (max(50vw, 146vh), capped at 1460px = the largest box), not the 50vw the box occupies; with 50vw the browser fetched a 720px file and stretched it.",
+      "id": "hero-variant_4_geometric_risers",
+      "status": "final",
+      "concept": "variant_4_geometric_risers",
+      "objectPosition": {
+        "desktop": "38% 50%",
+        "mobile": "50% 54%"
+      },
+      "variants": [
+        {
+          "key": "desktop",
+          "file": "hero/variant_4_geometric_risers/desktop.webp",
+          "width": 2524,
+          "height": 1420,
+          "aspect": "16:9",
+          "media": "(min-width: 1280px)"
+        },
+        {
+          "key": "mobile",
+          "file": "hero/variant_4_geometric_risers/mobile.webp",
+          "width": 1229,
+          "height": 1536,
+          "aspect": "4:5",
+          "media": "(max-width: 1279px)"
+        }
+      ],
+      "alt": "The three extraits, AURÉVAN, ORVÉLIS and VAYRÉN, each on its own block of three off-white geometric steps in bright daylight, a halved green citrus fruit and a vanilla bean on the floor at the foot of the steps.",
+      "placeholderTone": [
+        "#f1eee7",
+        "#d6d1c6"
+      ],
+      "layoutNote": "Same box as the baseline hero (see the `hero` entry). Desktop: the group (blocks + props) is ~62% of the frame and the box shows ~54%: objectPosition 38% 50% keeps the three flacons and the citrus half, and cuts the tall block's far side and the bean's left end. Mobile: 4:5 crop, objectPosition 50% 54% keeps the tall flacon's top in the band and the low flacon's base above the LAUNCH OFFER ticket.",
+      "creativeDirection": "Razor-sharp, clean off-white geometric block risers. The trio sits at staggered levels. At the base of the lowest step sit a freshly cut green bergamot wheel and one dark Madagascar vanilla pod.",
+      "promptRef": "public/images/hero-manifest.json (referenceVariants: variant_4_geometric_risers)",
+      "claimsToVerify": [
+        "the label reads ESSENTIALS | 50ml and the liquid is crystal clear (approved mockups): the brief's EXTRAIT DE PARFUM label and tinted liquids are NOT adopted (decision of 2026-11-06); AUREVAN is spelt without the accent on the approved art (open decision)",
+        "the flacons stand on stepped blocks: the earlier 2026-11-06 hero brief asked for pedestal-free directions; this variant follows the 2026-11-07 brief",
+        "the generated fruit reads as a LIME half, not a bergamot (the brief asked for a bergamot wheel): the alt text says 'green citrus fruit'",
+        "the blocks are warm ivory, not pure white",
+        "the citrus half and the bean are not in the phone crop"
+      ],
+      "generation": {
+        "desktop": "Kling plate AV3i3zpaAWhLHMGlwL-Hs1bWTHCBnV3WTKtAuFQpQea3vIuhm1SguKf8dWZwSCwAc8L84mzW (2720x1536, roll B of 2, 2026-11-07), cropped to x 93-2626 / y 0-1425 = 2524x1420 (desktop). It replaces the first plate ASLXkfm4...: tall steps and a moulded wall with a fluted pilaster, which a landscape phone band could not hold with all three flacons",
+        "mobile": "NOT a separate plate: a 4:5 crop (x 780-2009, y 0-1536, 1229x1536) of the same plate, the same three blocks centred on the middle one, flacons 0.9 x",
+        "composite": "hero_build.py (v4_desktop, v4_mobile): flacons 0.34 (AURÉVAN, low block), 0.33 (ORVÉLIS, middle block), 0.32 (VAYRÉN, tall block), centred on the measured top faces (933, 1043) / (1329, 913) / (1736, 790); base_y = face centre + half the footprint depth",
+        "retouch": "the generator logo filled out of the plate; none otherwise. The props (citrus half, vanilla bean) stay where the generator put them, left of the lowest block; on the phone crop they are outside",
+        "credits": 4
+      },
+      "panel": {
+        "desktop": [
+          "#a9aca6",
+          "#aeb3ab",
+          "#b6bcb3",
+          "#c8cdc3",
+          "#b8c290",
+          "#8f999c"
+        ],
+        "mobile": "#a0a196",
+        "tone": "light"
+      }
     },
     {
       "id": "aurevan-product",

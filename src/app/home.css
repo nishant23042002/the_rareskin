@@ -239,18 +239,8 @@
   @media(min-width:1500px) {
     .rh-hero__text {padding-left:calc((100vw - var(--maxw))/2 + var(--gutter))}
   }
-  .rh-ticket-wrap {position:relative;z-index:3;margin-top:-46px;display:flex;justify-content:center;padding-inline:max(var(--gutter),env(safe-area-inset-left,0px)) max(var(--gutter),env(safe-area-inset-right,0px))}
-  .rh-ticket {position:relative;display:grid;grid-template-columns:1fr 0 1.15fr;width:min(100%,700px);background:var(--paper);border:1px solid var(--line-2);box-shadow:0 26px 40px -30px rgba(31,29,27,.4)}
-  .rh-ticket::before {content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:3px;background:var(--tri)}
-  .rh-ticket__a, .rh-ticket__b {padding:clamp(18px,2.6vw,26px) clamp(16px,3vw,32px) clamp(16px,2.4vw,22px)}
-  .rh-ticket__perf {border-left:1px dashed var(--line-2);margin-block:14px}
-  .rh-ticket__price {display:flex;align-items:baseline;gap:10px;margin-top:8px;flex-wrap:wrap}
-  .rh-ticket__price b {font:300 clamp(2rem,4vw,2.9rem)/1 var(--f-sans);letter-spacing:.01em}
-  .rh-ticket__price s {font-size:15px;color:var(--ink-3)}
-  .rh-ticket__save {display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13.5px;line-height:1.45;margin-top:4px}
+  .rh-ticket-wrap {position:relative;z-index:3;margin-top:-46px;display:flex;justify-content:center;padding-inline:max(var(--gutter),env(safe-area-inset-left,0px)) max(var(--gutter),env(safe-area-inset-right,0px));background:linear-gradient(to bottom,transparent 46px,var(--paper) 46px)}
   .rh-pill {display:inline-block;background:var(--ink);color:var(--paper);font:400 11px/1 var(--f-sans);letter-spacing:0.138em;text-transform:uppercase;padding:6px 9px;border-radius:99px}
-  .rh-ticket__fine {margin-top:10px;font-size:11px;letter-spacing:0.134em;text-transform:uppercase;color:var(--ink-3);line-height:1.7}
-  .rh-ticket__fine span {display:block}
   .rh-promises {background:var(--paper);padding:clamp(32px,4vw,44px) 0 clamp(36px,4.6vw,56px)}
   .rh-promises .rh-wrap {display:flex;flex-direction:column;align-items:center;gap:20px}
   .rh-promises ul {display:grid;grid-template-columns:repeat(2,auto);gap:14px clamp(18px,4vw,34px);justify-content:center}
@@ -486,19 +476,6 @@
     .rh-founder__photo {width:min(72%,260px)}
   }
   @media(max-width:599px) {
-    .rh-ticket {--n:9px;--ny:92px;grid-template-columns:1fr auto;grid-template-rows:var(--ny) auto auto}
-    .rh-ticket__a {grid-area:1/1;align-self:center;padding:0 0 0 22px}
-    .rh-ticket__price {margin-top:6px;gap:9px}
-    .rh-ticket__price b {font-size:2.45rem}
-    .rh-ticket__b, .rh-ticket__save {display:contents}
-    .rh-ticket__save .rh-pill {grid-area:1/2;align-self:center;justify-self:end;margin-right:22px;display:grid;place-items:center;width:56px;height:56px;padding:0;border-radius:50%;font-size:12px;letter-spacing:.03em;box-shadow:inset 0 0 0 3px var(--ink),inset 0 0 0 4px rgba(250,250,247,.28)}
-    .rh-ticket__save>span:not(.rh-pill) {grid-area:2/1/3/3;margin:0 22px;padding-top:15px;border-top:1px dashed var(--line-2);font-size:14px;line-height:1.45}
-    .rh-ticket__fine {grid-area:3/1/4/3;margin:0 22px;padding:3px 0 17px;line-height:1.6}
-    .rh-ticket__fine .rh-ticket__fine-b {display:none}
-    .rh-ticket__perf {position:absolute;inset:0;margin:0;border:0;pointer-events:none}
-    .rh-ticket__perf::before, .rh-ticket__perf::after {content:"";position:absolute;top:calc(var(--ny) - var(--n));box-sizing:border-box;width:calc(var(--n)*2);height:calc(var(--n)*2);border-radius:50%;background:var(--paper);border:1px solid var(--line-2)}
-    .rh-ticket__perf::before {left:calc(-1px - var(--n));clip-path:inset(0 0 0 50%)}
-    .rh-ticket__perf::after {right:calc(-1px - var(--n));clip-path:inset(0 50% 0 0)}
   }
   @media(max-width:899px) {
     .rh-focus {min-height:0}
@@ -714,6 +691,101 @@
   .rh-cswitch__n {margin-left:6px;font-variant-numeric:tabular-nums;opacity:.6}
   @media(min-width:900px) {
     .rh-cswitch {bottom:20px}
+  }
+
+  /* ==========================================================================
+     Hero panel + launch ticket (2026-11-07)
+     The panel is lit by its picture (HeroFrame sets --hp-grad / --hp-m / data-panel from
+     the picture's own edge); the ticket is the one live element of the first screen.
+     ========================================================================== */
+  .rh-hero[data-panel] .rh-hero__text {background:var(--hp-m);color:var(--ink)}
+  .rh-hero[data-panel="dark"] .rh-hero__text {--ink:#f5f2eb;--ink-2:rgba(245,242,235,.84);--ink-3:rgba(245,242,235,.64);--line:rgba(245,242,235,.16);--line-2:rgba(245,242,235,.3);--paper:#100e0c}
+  @media(min-width:900px) {
+    .rh-hero[data-panel] .rh-hero__text {background:var(--hp-grad)}
+  }
+  .rh-hero__eyebrow {display:flex;align-items:center;gap:14px}
+  .rh-hero__rule {flex:none;width:34px;height:1px;background:currentColor;opacity:.5}
+  .rh-hero__index {display:none;list-style:none;margin:clamp(10px,2.2vw,28px) 0 0;padding:0;width:min(100%,440px);border-top:1px solid var(--line-2)}
+  @media(min-width:900px) {
+    .rh-hero__index {display:block}
+  }
+  .rh-hero__index a {display:grid;grid-template-columns:28px auto 1fr 16px;align-items:baseline;column-gap:14px;padding:14px 2px;border-bottom:1px solid var(--line);color:var(--ink);transition:padding-left .5s var(--ease)}
+  .rh-hero__no {font:400 11px/1 var(--f-sans);letter-spacing:.14em;color:var(--ink-3)}
+  .rh-hero__index b {font:400 12px/1 var(--f-sans);letter-spacing:.24em;text-transform:uppercase}
+  .rh-hero__index em {font:italic 400 14px/1.2 var(--f-serif);color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rh-hero__index .rh-ico {width:14px;height:14px;align-self:center;opacity:0;transform:translateX(-8px);transition:opacity .4s,transform .5s var(--ease)}
+  .rh-hero__index a:hover, .rh-hero__index a:focus-visible {padding-left:10px}
+  .rh-hero__index a:hover .rh-ico, .rh-hero__index a:focus-visible .rh-ico {opacity:1;transform:none}
+
+  /* ---- the launch ticket ---- */
+  @keyframes rh-glint {0%,55%{background-position:160% 0,0 0}100%{background-position:-60% 0,0 0}}
+  @keyframes rh-dot {0%{box-shadow:0 0 0 0 rgba(216,154,77,.55)}70%,100%{box-shadow:0 0 0 9px rgba(216,154,77,0)}}
+  @keyframes rh-stamp {0%{opacity:0;transform:scale(1.8) rotate(-18deg)}55%{opacity:1;transform:scale(.92) rotate(3deg)}100%{opacity:1;transform:none}}
+  @keyframes rh-rise {from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .rh-ticket {--mx:50%;--my:50%;position:relative;isolation:isolate;display:grid;grid-template-columns:1fr 0 1.3fr;width:min(100%,780px);background:var(--paper);border:1px solid var(--line-2);box-shadow:0 26px 40px -30px rgba(31,29,27,.4);transition:transform .6s var(--ease),box-shadow .6s var(--ease)}
+  @media(hover:hover) {
+    .rh-ticket:hover {transform:translateY(-3px);box-shadow:0 36px 54px -30px rgba(31,29,27,.5)}
+  }
+  /* the brass edge, with a glint that crosses it every few seconds */
+  .rh-ticket::before {content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:3px;background-image:linear-gradient(100deg,transparent 42%,rgba(255,255,255,.85) 50%,transparent 58%),var(--tri);background-size:260% 100%,100% 100%;background-repeat:no-repeat;animation:rh-glint 7s ease-in-out infinite}
+  /* the light that follows the pointer (set by LaunchTicket) */
+  .rh-ticket::after {content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .5s;background:radial-gradient(340px 210px at var(--mx) var(--my),rgba(197,168,128,.22),transparent 72%)}
+  @media(hover:hover) {
+    .rh-ticket:hover::after {opacity:1}
+  }
+  .rh-ticket__a, .rh-ticket__b {position:relative;z-index:1;padding:clamp(18px,2.6vw,26px) clamp(16px,3vw,32px) clamp(16px,2.4vw,24px)}
+  .rh-ticket__perf {border-left:1px dashed var(--line-2);margin-block:14px}
+  .rh-ticket__eyebrow {display:flex;align-items:center}
+  .rh-ticket__dot {display:inline-block;flex:none;width:6px;height:6px;margin-right:10px;border-radius:50%;background:var(--gilt);animation:rh-dot 2.8s ease-out infinite}
+  .rh-ticket__price {display:flex;align-items:baseline;gap:12px;margin-top:10px;flex-wrap:wrap}
+  .rh-ticket__price b {display:inline-block;text-align:left;font:300 clamp(2.2rem,4.2vw,3.1rem)/1 var(--f-sans);letter-spacing:.01em}
+  .rh-ticket__price s {position:relative;text-decoration:none;font-size:15px;color:var(--ink-3)}
+  .rh-ticket__price s::after {content:"";position:absolute;left:-3px;right:-3px;top:54%;height:1px;background:currentColor;transform-origin:left center;transition:transform .55s var(--ease) 1.35s}
+  .rh-ticket__save {display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13.5px;line-height:1.45;margin-top:2px}
+  .rh-ticket__meter {position:relative;height:5px;margin:14px 0 0;border-radius:99px;background:var(--line);overflow:hidden}
+  .rh-ticket__meter i {position:absolute;inset:0;border-radius:inherit;background:var(--tri);transform-origin:left center;transform:scaleX(var(--p,.33));transition:transform 1.25s var(--ease) .5s}
+  .rh-ticket__chips {display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0;padding:0;list-style:none}
+  .rh-ticket__chips a {display:inline-flex;align-items:baseline;gap:9px;padding:9px 13px 8px;border:1px solid var(--line-2);border-radius:99px;font:400 11px/1 var(--f-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--ink);transition:background .3s,border-color .3s,color .3s,transform .45s var(--ease)}
+  .rh-ticket__chips em {font-style:normal;letter-spacing:.04em;color:var(--ink-3);transition:color .3s}
+  .rh-ticket__chips a:hover, .rh-ticket__chips a:focus-visible {background:var(--ink);border-color:var(--ink);color:var(--paper);transform:translateY(-2px)}
+  .rh-ticket__chips a:hover em, .rh-ticket__chips a:focus-visible em {color:rgba(250,250,247,.72)}
+  .rh-ticket__fine {margin-top:12px;font-size:11px;letter-spacing:0.134em;text-transform:uppercase;color:var(--ink-3);line-height:1.7}
+  .rh-ticket__fine span {display:block}
+  /* the sequence (LaunchTicket sets data-state="pre" before paint, then "in"; without JS or with reduced motion neither is set and this is all final) */
+  .rh-ticket[data-state="pre"] .rh-ticket__price s::after {transform:scaleX(0);transition:none}
+  .rh-ticket[data-state="pre"] .rh-ticket__meter i {transform:scaleX(0);transition:none}
+  .rh-ticket[data-state="pre"] .rh-ticket__save .rh-pill {opacity:0}
+  .rh-ticket[data-state="pre"] .rh-ticket__chips li {opacity:0}
+  .rh-ticket[data-state="in"] .rh-ticket__save .rh-pill {animation:rh-stamp .75s cubic-bezier(.2,1.25,.4,1) .8s both}
+  .rh-ticket[data-state="in"] .rh-ticket__chips li {animation:rh-rise .6s var(--ease) calc(1.15s + var(--i,0)*90ms) both}
+  @media(prefers-reduced-motion:reduce) {
+    .rh-ticket::before, .rh-ticket__dot {animation:none}
+    .rh-ticket, .rh-ticket__chips a {transition:none}
+  }
+  @media(max-width:599px) {
+    .rh-ticket {--n:9px;--ny:92px;grid-template-columns:1fr auto;grid-template-rows:var(--ny) auto auto auto auto}
+    .rh-ticket__a {grid-area:1/1;align-self:center;padding:0 0 0 22px}
+    .rh-ticket__price {margin-top:8px;gap:9px}
+    .rh-ticket__price b {font-size:2.45rem}
+    .rh-ticket__b, .rh-ticket__save {display:contents}
+    .rh-ticket__save .rh-pill {grid-area:1/2;align-self:center;justify-self:end;margin-right:22px;display:grid;place-items:center;width:56px;height:56px;padding:0;border-radius:50%;font-size:12px;letter-spacing:.03em;box-shadow:inset 0 0 0 3px var(--ink),inset 0 0 0 4px rgba(250,250,247,.28)}
+    .rh-ticket__save>span:not(.rh-pill) {grid-area:2/1/3/3;margin:0 22px;padding-top:15px;border-top:1px dashed var(--line-2);font-size:14px;line-height:1.45}
+    .rh-ticket__meter {grid-area:3/1/4/3;margin:13px 22px 0}
+    .rh-ticket__chips {grid-area:4/1/5/3;margin:14px 22px 0;gap:6px}
+    .rh-ticket__chips a {padding:8px 11px 7px;font-size:10.5px;letter-spacing:.13em}
+    .rh-ticket__chips em {display:none}
+    .rh-ticket__fine {grid-area:5/1/6/3;margin:0 22px;padding:12px 0 17px;line-height:1.6}
+    .rh-ticket__fine .rh-ticket__fine-b {display:none}
+    .rh-ticket__perf {position:absolute;inset:0;margin:0;border:0;pointer-events:none;z-index:1}
+    .rh-ticket__perf::before, .rh-ticket__perf::after {content:"";position:absolute;top:calc(var(--ny) - var(--n));box-sizing:border-box;width:calc(var(--n)*2);height:calc(var(--n)*2);border-radius:50%;background:var(--paper);border:1px solid var(--line-2)}
+    .rh-ticket__perf::before {left:calc(-1px - var(--n));clip-path:inset(0 0 0 50%)}
+    .rh-ticket__perf::after {right:calc(-1px - var(--n));clip-path:inset(0 50% 0 0)}
+  }
+
+  /* the second preview bar (hero variants 1-4) sits above the card bar */
+  .rh-cswitch--hero {bottom:calc(76px + 50px + env(safe-area-inset-bottom,0px))}
+  @media(min-width:900px) {
+    .rh-cswitch--hero {bottom:72px}
   }
 
   /* why extrait: the atomizer macro beside the argument (above it on a phone, text first) */

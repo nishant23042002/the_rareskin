@@ -5,12 +5,17 @@ import { useState, type CSSProperties } from "react";
 
 import { Flacon } from "@/components/ui/flacon";
 import { cloudinaryVariant, FRAGRANCE_SLUGS } from "@/lib/catalog";
+import { DEFAULT_HERO_CONCEPT, HERO_FOLLOWS_CARD_CONCEPT } from "@/config/hero.config";
 import {
   getHomeAsset,
   getVariant,
   homeImageSrc,
   isFinal,
+  resolveHeroAsset,
+  type HomeAsset,
 } from "@/lib/home-images";
+import { useCardConcept } from "./card-concept";
+import { useHeroVariant } from "./hero-variant";
 
 /**
  * The picture half of the homepage hero. A real photograph (Site Settings →
@@ -94,8 +99,7 @@ function Trio() {
  * intrinsic width/height give the browser the ratio; the box has a fixed height in
  * CSS, so nothing shifts.
  */
-function ShippedHero({ onError }: { onError: () => void }) {
-  const asset = getHomeAsset("hero");
+function ShippedHero({ asset, onError }: { asset: HomeAsset; onError: () => void }) {
   const desktop = getVariant(asset, "desktop");
   const mobile = getVariant(asset, "mobile");
   const common = {
@@ -140,11 +144,16 @@ function ShippedHero({ onError }: { onError: () => void }) {
 
 export function HeroMedia({ photo }: { photo?: HeroPhotoSource | null }) {
   const [failed, setFailed] = useState(false);
+  // the art direction chosen in the preview bar (src/config/hero.config.ts); the baseline hero until a direction's pictures are final
+  const cardConcept = useCardConcept();
+  // a reference variant (?hero=1..4, or `activeHeroVariant`) beats the card direction; a variant that is still a placeholder falls back to it
+  const heroVariant = useHeroVariant();
+  const heroAsset = resolveHeroAsset(HERO_FOLLOWS_CARD_CONCEPT ? cardConcept : DEFAULT_HERO_CONCEPT, heroVariant);
   // 1. a photograph uploaded in Site Settings wins; 2. the shipped hero from the
   // manifest once it is final; 3. the illustrated trio
   if (!photo?.url || failed) {
     if (!failed && isFinal(getHomeAsset("hero"))) {
-      return <ShippedHero onError={() => setFailed(true)} />;
+      return <ShippedHero key={heroAsset.id} asset={heroAsset} onError={() => setFailed(true)} />;
     }
     return <Trio />;
   }

@@ -196,3 +196,20 @@ The pedestal cards (sections 2-4) stand the flacon on furniture with the ingredi
 2. Set `"status": "final"` for that asset in `public/images/assets-manifest.json` (and fix its `alt` if the final differs) and **bump `assetVersion`** (the optimizer cache cannot be invalidated).
 3. `pnpm home:images check`, then `pnpm build`.
 4. Look at it in the browser at 390, 768 and 1280 px: label legible, safe zones respected, text over images still readable.
+
+## 11. Hero directions (pedestal-free alternatives to the stepped-pedestal hero)
+
+Scaffolded 2026-11-06 (no credits spent yet): `public/images/hero-manifest.json` (4 directions x desktop 16:9 + mobile 4:5 plate prompts, overlay measurements, composite positions), assets `hero-<concept>` in `assets-manifest.json` (tonal placeholders at `hero/<concept>/desktop|mobile.webp`), `src/config/hero.config.ts` (the hero follows the card preview bar by default; a direction whose hero is still a placeholder shows the baseline). The concept ids are the card directions, so one bar drives both. Measured overlay: the LAUNCH OFFER ticket (`.rh-ticket`) covers the bottom 46 px of the picture box (6% of the box at 1440x900, 15% at 375 wide), so the bottom quarter of the 16:9 plate and the bottom third of the 4:5 plate must stay calm. Production route as for the cards: product-free plates (Kling 16:9 and 3:4, 8 plates = about 16 credits), then the three approved flacons composited at the positions in the manifest (`flaconSpec.composite`); the label stays ESSENTIALS | 50ml and the liquid clear, not the brief's EXTRAIT DE PARFUM label / amber liquids.
+
+## 12. Reference-benchmark hero variants (brief of 2026-11-07)
+
+Four more hero directions, built from four mood-board photographs (third-party, never uploaded to a generator or copied). Prompts, plate prompts and production notes: `public/images/hero-manifest.json` → `referenceVariants`; files: `hero/variant_<n>_<name>/{desktop,mobile}.webp` (asset ids `hero-variant_<n>_<name>`). Preview: `?hero=1..4` or the HERO bar; `activeHeroVariant` in `src/config/hero.config.ts` ships one.
+
+| # | id | what it shows | new pixels beyond the approved bottle |
+|---|----|---------------|----------------------------------------|
+| 1 | `variant_1_uncapping` | three flacons in a row, a manicured hand lifts the cap off the centre one | the uncapped flacon's nozzle (drawn), the hand and the cap it holds (generated) |
+| 2 | `variant_2_spraying` | a fingertip presses the right flacon's nozzle, its cap upright on the floor | the nozzle (drawn), the hand (generated); the cap is the approved cap pixels |
+| 3 | `variant_3_cylinders` | three matte-white cylindrical plinths of different heights, one flacon on each | the plinths (generated plate) |
+| 4 | `variant_4_geometric_risers` | geometric off-white steps, a bergamot wheel and a vanilla pod at the lowest step | the steps and the props (generated plate) |
+
+Kept from the earlier decisions: the label is `ESSENTIALS | 50ml` and the liquid is crystal clear (the brief's `EXTRAIT DE PARFUM` label and champagne / amber / cognac liquids are not adopted). Plate prompts never say bottle, label, stool, or *standing places* (the generator draws stools or people); say "nothing stands anywhere in the frame". Mobile = a 4:5 crop of the desktop plate. Tools: `place_bottles.py` options `nocap=1` (cap off, nozzle drawn on the chrome collar) and `caponly=1` (the approved cap alone, for standing on a floor).

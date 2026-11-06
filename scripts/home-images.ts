@@ -15,14 +15,20 @@
  * next's own location rather than added to package.json.
  */
 import { createRequire } from "node:module";
-import { existsSync, mkdirSync, statSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, statSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
 // the few bits of sharp this script uses (its types are not resolvable from the repo root)
-type Sharp = (input: Buffer | string) => {
+type SharpImg = {
   metadata(): Promise<{ width?: number; height?: number; format?: string }>;
   webp(o: { quality: number; effort: number }): { toFile(path: string): Promise<unknown> };
+  resize(w: number, h: number): SharpImg;
+  extract(r: { left: number; top: number; width: number; height: number }): SharpImg;
+  removeAlpha(): SharpImg;
+  raw(): SharpImg;
+  toBuffer(): Promise<Buffer>;
 };
+type Sharp = (input: Buffer | string) => SharpImg;
 
 interface Variant {
   key: string;
@@ -58,6 +64,8 @@ function readManifest(): { basePath: string; assets: Asset[] } {
 
 const CARD_SLUGS = ["aurevan", "orvelis", "vayren"];
 const CARD_CONCEPTS = ["grounded_stone", "chiaroscuro_studio", "mineral_bed", "liquid_caustics"];
+// the reference-benchmark hero variants (src/config/hero.config.ts, public/images/hero-manifest.json → referenceVariants)
+const HERO_VARIANTS = ["variant_1_uncapping", "variant_2_spraying", "variant_3_cylinders", "variant_4_geometric_risers"];
 const REQUIRED_IDS = [
   "hero",
   "aurevan-product",
@@ -65,6 +73,9 @@ const REQUIRED_IDS = [
   "orvelis-product",
   // the pedestal-free card directions: public/images/prompt-manifest.json has a plate prompt for each
   ...CARD_CONCEPTS.flatMap((c) => CARD_SLUGS.map((s) => `${s}-card-${c}`)),
+  // the pedestal-free hero directions (public/images/hero-manifest.json has their plate prompts)
+  ...CARD_CONCEPTS.map((c) => `hero-${c}`),
+  ...HERO_VARIANTS.map((v) => `hero-${v}`),
   "extrait-atomizer-craft",
   "atelier-story",
   "unboxing-experience",
@@ -141,7 +152,11 @@ async function check(): Promise<number> {
       }
     }
   }
+  for (const a of m.assets) {
+    if (a.id.startsWith("hero-") && a.status === "final" && !(a as unknown as { panel?: unknown }).panel) err(`${a.id}: final hero without a \`panel\` (run: pnpm home:images panels)`);
+  }
   errors += checkPrompts(m);
+  errors += checkHeroPrompts(m);
   console.log(errors ? `${errors} error(s)` : `OK: ${m.assets.length} assets, ${files.size} files, 12 card prompts`);
   return errors ? 1 : 0;
 }
@@ -182,6 +197,132 @@ function checkPrompts(m: { assets: Asset[] }): number {
   return errors;
 }
 
+/** public/images/hero-manifest.json: one 16:9 and one 4:5 plate prompt per direction, product-free, each tied to a manifest asset */
+function checkHeroPrompts(m: { assets: Asset[] }): number {
+  let errors = 0;
+  const err = (s: string) => {
+    errors++;
+    console.error("ERROR", s);
+  };
+  const path = join(ROOT, "public", "images", "hero-manifest.json");
+  if (!existsSync(path)) {
+    err("public/images/hero-manifest.json is missing");
+    return errors;
+  }
+  const doc = JSON.parse(readFileSync(path, "utf8")) as {
+    concepts: { concept_id: string; asset_id: string; prompts: Record<string, { aspect_ratio: string; prompt: string }> }[];
+    referenceVariants?: {
+      variant: number;
+      id: string;
+      asset_id: string;
+      brief?: { prompt?: string };
+      aspect_ratios?: { desktop?: string; mobile?: string };
+      files?: { desktop?: string; mobile?: string };
+      plate?: { desktop?: { aspect_ratio: string; prompt: string } };
+      allowsPlinthWords?: boolean;
+    }[];
+  };
+  // a plate prompt that names the product (or a place where something stands) makes the generator draw it (round 1 of the Mineral bed hero drew three stone stools, the Liquid light one three men)
+  const productWords = ["bottle", "flacon", "perfume", "vessel", "vase", "label", "cake", "stool", "podium", "pedestal", "plinth"];
+  const bannedIn = (text: string, allowPlinth = false) =>
+    productWords.filter((w) => !(allowPlinth && (w === "pedestal" || w === "plinth"))).find((w) => text.toLowerCase().includes(w));
+  const seen = new Set(doc.concepts.map((c) => c.concept_id));
+  for (const c of CARD_CONCEPTS) if (!seen.has(c)) err(`hero-manifest: no direction ${c}`);
+  for (const c of doc.concepts) {
+    if (!m.assets.some((a) => a.id === c.asset_id)) err(`hero-manifest: ${c.concept_id} points at "${c.asset_id}", which is not in assets-manifest.json`);
+    for (const [k, want] of [["desktop", "16:9"], ["mobile", "4:5"]] as const) {
+      const p = c.prompts[k];
+      if (!p || !p.prompt) err(`hero-manifest: ${c.concept_id}/${k} has no prompt`);
+      else {
+        if (p.aspect_ratio !== want) err(`hero-manifest: ${c.concept_id}/${k} is ${p.aspect_ratio}, not ${want}`);
+        const hit = bannedIn(p.prompt);
+        if (hit) err(`hero-manifest: ${c.concept_id}/${k} plate prompt mentions "${hit}" (plates are product-free)`);
+        if (/standing places?/i.test(p.prompt)) console.warn("WARN", `hero-manifest: ${c.concept_id}/${k} says "standing place(s)": the generator fills it with stools or people`);
+      }
+    }
+  }
+  // the four reference-benchmark variants: verbatim brief prompt, a product-free plate prompt, 16:9 + 4:5, files under hero/<id>/
+  const variants = doc.referenceVariants ?? [];
+  for (const id of HERO_VARIANTS) if (!variants.some((v) => v.id === id)) err(`hero-manifest: no reference variant ${id}`);
+  for (const v of variants) {
+    const a = m.assets.find((x) => x.id === v.asset_id);
+    if (!a) err(`hero-manifest: variant ${v.id} points at "${v.asset_id}", which is not in assets-manifest.json`);
+    else {
+      for (const [k, file] of [["desktop", v.files?.desktop], ["mobile", v.files?.mobile]] as const) {
+        if (!file || !a.variants.some((x) => x.key === k && x.file === file)) err(`hero-manifest: variant ${v.id}/${k} file "${file}" is not the manifest asset's ${k} file`);
+      }
+    }
+    if (!v.brief?.prompt) err(`hero-manifest: variant ${v.id} has no brief prompt`);
+    if (v.aspect_ratios?.desktop !== "16:9" || v.aspect_ratios?.mobile !== "4:5") err(`hero-manifest: variant ${v.id} aspect ratios must be 16:9 / 4:5`);
+    if (!v.plate?.desktop?.prompt) err(`hero-manifest: variant ${v.id} has no plate prompt`);
+    else {
+      if (v.plate.desktop.aspect_ratio !== "16:9") err(`hero-manifest: variant ${v.id} plate is ${v.plate.desktop.aspect_ratio}, not 16:9`);
+      const hit = bannedIn(v.plate.desktop.prompt, !!v.allowsPlinthWords);
+      if (hit) err(`hero-manifest: variant ${v.id} plate prompt mentions "${hit}" (plates are product-free)`);
+      if (/standing places?/i.test(v.plate.desktop.prompt)) err(`hero-manifest: variant ${v.id} plate prompt says "standing place(s)"`);
+    }
+  }
+  return errors;
+}
+
+/**
+ * `pnpm home:images panels`: sample each FINAL hero picture's own edge and write `panel` into its manifest entry
+ * (the hero's text panel is tinted by it: src/components/home/hero-frame.tsx). Desktop: the picture's left edge as the
+ * hero box shows it at 1440 px (box 713 x 739, `cover`, the manifest's object-position), as 6 stops of a top-to-bottom
+ * gradient. Phone: the top edge of the 376 x 301 box (the panel sits above the picture there), one colour. `tone` says
+ * which type colour the panel needs. The baseline `hero` is skipped: it keeps the warm stone it was designed with.
+ */
+async function panels() {
+  const sharp = loadSharp();
+  const m = JSON.parse(readFileSync(MANIFEST, "utf8")) as { assets: (Asset & { objectPosition: Record<string, string>; panel?: unknown })[] };
+  const hex = (r: number, g: number, b: number) => "#" + [r, g, b].map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, "0")).join("");
+  const pos = (s: string) => s.split(/\s+/).map((t) => parseFloat(t) / 100) as [number, number];
+  let n = 0;
+  for (const a of m.assets) {
+    if (!a.id.startsWith("hero-") || a.status !== "final") continue;
+    const d = a.variants.find((v) => v.key === "desktop")!;
+    const mo = a.variants.find((v) => v.key === "mobile")!;
+    // desktop: the left edge of the visible window
+    const [px] = pos(a.objectPosition.desktop);
+    const BW = 713, BH = 739;
+    const W2 = Math.round((d.width / d.height) * BH);
+    const off = Math.round((W2 - BW) * px);
+    const col = await sharp(join(OUT, d.file)).resize(W2, BH).extract({ left: off + 2, top: 0, width: 28, height: BH }).removeAlpha().raw().toBuffer();
+    const rows: number[][] = [];
+    for (let y = 0; y < BH; y++) {
+      let r = 0, g = 0, b = 0;
+      for (let x = 0; x < 28; x++) { const i = (y * 28 + x) * 3; r += col[i]; g += col[i + 1]; b += col[i + 2]; }
+      rows.push([r / 28, g / 28, b / 28]);
+    }
+    const stops: string[] = [];
+    for (let k = 0; k < 6; k++) {
+      const c = Math.round((k / 5) * (BH - 1));
+      const lo = Math.max(0, c - 40), hi = Math.min(BH - 1, c + 40);
+      let r = 0, g = 0, b = 0;
+      for (let y = lo; y <= hi; y++) { r += rows[y][0]; g += rows[y][1]; b += rows[y][2]; }
+      const cnt = hi - lo + 1;
+      stops.push(hex(r / cnt, g / cnt, b / cnt));
+    }
+    // phone: the top edge of the visible band
+    const [, py] = pos(a.objectPosition.mobile);
+    const MW = 376, MH = 301;
+    const H2 = Math.round((mo.height / mo.width) * MW);
+    const offY = Math.round((H2 - MH) * py);
+    const top = await sharp(join(OUT, mo.file)).resize(MW, H2).extract({ left: Math.round(MW * 0.08), top: offY + 2, width: Math.round(MW * 0.84), height: 12 }).removeAlpha().raw().toBuffer();
+    // the median, not the mean: a hand or a prop that touches the top edge must not tint the panel
+    const px2 = top.length / 3;
+    const med = (ch: number) => { const v: number[] = []; for (let i = 0; i < px2; i++) v.push(top[i * 3 + ch]); v.sort((p, q) => p - q); return v[Math.floor(v.length / 2)]; };
+    const mobile = hex(med(0), med(1), med(2));
+    const lum = stops.map((h) => { const v = parseInt(h.slice(1), 16); return (((v >> 16) & 255) * 299 + ((v >> 8) & 255) * 587 + (v & 255) * 114) / 1000; });
+    const meanLum = lum.reduce((p, c) => p + c, 0) / lum.length;
+    a.panel = { desktop: stops, mobile, tone: meanLum > 140 ? "light" : "dark" };
+    n++;
+    console.log(a.id.padEnd(34), stops.join(" "), mobile, a.panel && (a.panel as { tone: string }).tone, `lum ${meanLum.toFixed(0)}`);
+  }
+  writeFileSync(MANIFEST, JSON.stringify(m, null, 2) + "\n");
+  console.log(`${n} hero panel(s) written to public/images/assets-manifest.json`);
+}
+
 function table() {
   const m = readManifest();
   console.log("id | section | component | files | ratio | status | route");
@@ -195,8 +336,9 @@ function table() {
   if (cmd === "check") process.exit(await check());
   else if (cmd === "placeholders") await placeholders(rest.includes("--force"));
   else if (cmd === "table") table();
+  else if (cmd === "panels") await panels();
   else {
-    console.log("usage: pnpm home:images check | placeholders [--force] | table");
+    console.log("usage: pnpm home:images check | placeholders [--force] | panels | table");
     process.exit(cmd ? 1 : 0);
   }
 })();

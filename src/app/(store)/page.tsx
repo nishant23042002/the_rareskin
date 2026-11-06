@@ -69,11 +69,12 @@ export default async function HomePage() {
 
   return (
     <main id="main" className="rh-main">
-      <Hero photo={settings.heroImage} price={lead.price} mrp={lead.mrp} />
+      <Hero photo={settings.heroImage} price={lead.price} mrp={lead.mrp} fragrances={fragrances} />
       <LaunchOffer
         price={lead.price}
         mrp={lead.mrp}
         volumeMl={lead.volumeMl}
+        items={fragrances.map((f) => ({ slug: f.slug, name: f.name }))}
       />
       <InFocus fragrances={fragrances} />
       <Collection fragrances={fragrances} />

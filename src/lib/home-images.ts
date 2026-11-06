@@ -11,6 +11,7 @@ import manifestJson from "../../public/images/assets-manifest.json";
  * components below read size, ratio and alt from here, so layout never shifts.
  */
 
+import { heroAssetId, heroVariantAssetId, type HeroAssetId, type HeroVariantNumber } from "@/config/hero.config";
 import {
   cardAssetId,
   type CardAssetId,
@@ -19,7 +20,7 @@ import {
 } from "@/config/homepage-assets";
 
 export type HomeAssetId =
-  | "hero"
+  | HeroAssetId
   | CardAssetId
   | "extrait-atomizer-craft"
   | "atelier-story"
@@ -52,6 +53,12 @@ export interface HomeAsset {
   overlayTone?: "light" | "dark";
   /** tile pictures only: the colour of the two dots at the bottom when it must differ from the chevron's (a picture that is dark at the bottom and bright at the right edge, or the reverse); defaults to `overlayTone` */
   dotsTone?: "light" | "dark";
+  /**
+   * hero pictures only: the text panel's colours, sampled from the picture's own edge (`HeroFrame`):
+   * `desktop` = stops of a top-to-bottom gradient that continues the picture's left edge, `mobile` = the colour
+   * of its top edge (the panel sits above the picture there), `tone` = the type colour to use on it
+   */
+  panel?: { desktop: string[]; mobile: string; tone: "light" | "dark" };
 }
 
 const BASE = (manifestJson as { basePath: string }).basePath;
@@ -89,6 +96,21 @@ export function homeImageSrc(file: string): string {
 
 export function isFinal(asset: HomeAsset): boolean {
   return asset.status === "final";
+}
+
+/**
+ * The hero asset for the chosen art direction (`@/config/hero.config`): a reference
+ * variant (1-4) when one is chosen and its pictures are final, else the card
+ * direction's hero when final, else the baseline hero. A placeholder is never shown.
+ */
+export function resolveHeroAsset(concept: CardConceptId, variant: HeroVariantNumber | null = null): HomeAsset {
+  if (variant) {
+    const v = findHomeAsset(heroVariantAssetId(variant));
+    if (v && isFinal(v)) return v;
+  }
+  const wanted = findHomeAsset(heroAssetId(concept));
+  if (wanted && isFinal(wanted)) return wanted;
+  return getHomeAsset("hero");
 }
 
 /**
