@@ -12,7 +12,6 @@ import manifestJson from "../../public/images/assets-manifest.json";
  */
 
 import {
-  CARD_CONCEPT_FALLBACK,
   cardAssetId,
   type CardAssetId,
   type CardConceptId,
@@ -102,8 +101,6 @@ export function resolveCardAsset(slug: CardSlug, concept: CardConceptId): HomeAs
   // the chosen direction, then the direction it falls back to (an alternative plate that
   // exists for some fragrances only), then the current pedestal picture
   const chain: CardConceptId[] = [concept];
-  const fallback = CARD_CONCEPT_FALLBACK[concept];
-  if (fallback) chain.push(fallback);
   if (!chain.includes("current")) chain.push("current");
   for (const c of chain) {
     const a = findHomeAsset(cardAssetId(c, slug));

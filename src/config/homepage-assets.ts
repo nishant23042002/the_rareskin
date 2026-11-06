@@ -38,13 +38,8 @@ export const CARD_CONCEPTS = [
   },
   {
     id: "grounded_stone",
-    label: "Grounded stone",
+    label: "Stone",
     blurb: "Direct earth and stone: limestone, raw oak, basalt, the ingredients beside the base.",
-  },
-  {
-    id: "grounded_stone_v2",
-    label: "Stone v2",
-    blurb: "An alternative plate for grounded stone (limestone table, bergamot front right). Only the pictures that exist replace the grounded-stone ones.",
   },
   {
     id: "chiaroscuro_studio",
@@ -65,15 +60,6 @@ export const CARD_CONCEPTS = [
 
 export type CardConceptId = (typeof CARD_CONCEPTS)[number]["id"];
 export type PlateConceptId = Exclude<CardConceptId, "current">;
-
-/**
- * An alternative that only exists for some fragrances shows the direction it
- * belongs to on the others (so a row is never mixed with the old pedestal cards
- * just because one picture was tried on a second plate).
- */
-export const CARD_CONCEPT_FALLBACK: Partial<Record<CardConceptId, CardConceptId>> = {
-  grounded_stone_v2: "grounded_stone",
-};
 
 /** the direction the tiles show to everyone (switch to a concept once its pictures are final) */
 export const DEFAULT_CARD_CONCEPT: CardConceptId = "current";

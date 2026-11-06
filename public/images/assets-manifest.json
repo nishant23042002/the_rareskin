@@ -1,7 +1,7 @@
 {
   "$comment": "Single source of truth for the homepage image system. Read by src/lib/home-images.ts (components), scripts/home-images.ts (placeholders + checks) and ASSET_PROMPT_SHEET.md (prompts). To ship a real image: replace the file at the same path with the final WebP (same aspect ratio) and set \"status\" to \"final\" in this file. While \"placeholder\", components that already had an illustration keep showing it and the alt text stays empty (a tonal plate is decorative). For a picture that a frame crops (object-fit: cover), `sizes` must describe the scaled picture width, not the frame width (see sizesNote).",
   "version": 1,
-  "assetVersion": 4,
+  "assetVersion": 5,
   "assetVersionNote": "Next's image optimizer caches by URL and has no invalidation: images are requested as <file>?v=<assetVersion> and next.config.ts allows exactly that query string. BUMP THIS NUMBER whenever any file in public/images/homepage is replaced (placeholder -> final, or a new render). v1 = placeholders, v2 = first generated hero + product cards.",
   "updated": "2026-11-06",
   "basePath": "/images/homepage",
@@ -423,51 +423,6 @@
       "objectPosition": {
         "default": "50% 50%"
       },
-      "alt": "AURÉVAN extrait standing in the centre of a pale stone floor in soft morning light, a large halved bergamot in the lower left foreground and a white jasmine flower in the lower right.",
-      "placeholderTone": [
-        "#e9e4da",
-        "#cfc7b8"
-      ],
-      "overlayTone": "dark",
-      "layoutNote": "The tile frame is 4:5 (aspect-ratio in .rh-tile__media). The 'How it unfolds' chevron and the two dots overlay the picture: keep the lower-right 12% and the vertical centre of the right edge quiet. The flacon stands on the ground, never on a pedestal.",
-      "creativeDirection": "Concept 1, grounded stone: the flacon stands directly on honed limestone (AURÉVAN), raw oak (ORVÉLIS) or basalt (VAYRÉN), its ingredients lying beside the base.",
-      "promptRef": "public/images/prompt-manifest.json (AURÉVAN / grounded_stone)",
-      "claimsToVerify": [
-        "regenerated on request so the bottle stands exactly where the ORVÉLIS bottle stands (x 50%, scale 1.04, base line y 1580 in the plate, about 58% of the frame height); the AURÉVAN approved art is cropped 12 px lower at the cap than ORVÉLIS's, so the caps differ by 0.5% of the frame height",
-        "the floor is a pale stone / wood-grain tile with thin joints, not the honed limestone slab of the prompt; the wall is a brushed plaster with a diagonal sun bar from the upper left",
-        "the ingredients are large foreground macro props in the lower corners (a halved bergamot, a white jasmine / gardenia-like bloom, not scattered petals), sharp rather than out of focus",
-        "a tiny white bead sits at the back centre of the plate (x 920, y 1200); it is hidden behind the label",
-        "the plate's own diagonal sun bar comes from the upper left, the same side as the approved bottle's light",
-        "the busy floor lines are blurred inside the bottle outline before compositing (soften_behind_glass, sigma 7)",
-        "the label reads AUREVAN (no accent): approved bottle art; the AUREVAN / AURÉVAN spelling decision is still open",
-        "overlayTone dark was set by eye (light wall at the right edge): confirm on the tile"
-      ],
-      "generation": {
-        "plate": "Kling AS3_nXRBM-3vFJszUI03IRR4sOK0x0HPCveFjQLvjmAisxpwv7sfIFXEM7ljxMAeycsRUDdy (kling-image-v3_0_omni, 3:4, 1760x2368, cropped to 4:5 above the generator logo), the third AURÉVAN plate: v1 AXVReB4Y… put the bottle off-centre (props in the middle), v2 AQusi21p… drew a table corner with the bergamot at the back-centre; both discarded",
-        "notes": "BOTTLE = x 880, y 1580, scale 1.04 shared with ORVÉLIS (card_build.py); plate softened behind the glass (sigma 7); build: design-explorations/packaging-renders/homepage/card_build.py gs_aurevan",
-        "credits": 6
-      }
-    },
-    {
-      "id": "aurevan-card-grounded_stone_v2",
-      "section": "The Collection (product tile, alternative direction)",
-      "component": "src/components/home/collection.tsx (ProductTile, packshot face) via src/config/homepage-assets.ts",
-      "status": "final",
-      "route": "composite",
-      "concept": "grounded_stone_v2",
-      "variants": [
-        {
-          "key": "default",
-          "file": "cards/grounded_stone_v2/aurevan.webp",
-          "width": 1600,
-          "height": 2000,
-          "aspect": "4:5"
-        }
-      ],
-      "sizes": "(min-width: 900px) min(380px, 30vw), (min-width: 620px) 46vw, 80vw",
-      "objectPosition": {
-        "default": "50% 50%"
-      },
       "alt": "AURÉVAN extrait standing in the centre of a pale limestone table in soft morning light, a halved bergamot at the table's front right and jasmine buds scattered beside it.",
       "placeholderTone": [
         "#e9e4da",
@@ -475,10 +430,10 @@
       ],
       "overlayTone": "dark",
       "layoutNote": "The tile frame is 4:5 (aspect-ratio in .rh-tile__media). The 'How it unfolds' chevron and the two dots overlay the picture: keep the lower-right 12% and the vertical centre of the right edge quiet. The flacon stands on the ground, never on a pedestal.",
-      "creativeDirection": "Alternative to the v3 card (kept on request, 2026-11-06): the same bottle position on the second AURÉVAN plate, a glossy pale limestone table seen from slightly above.",
+      "creativeDirection": "Chosen AURÉVAN picture of the stone direction (2026-11-06): the flacon on a glossy pale limestone table, a halved bergamot at the front right and jasmine buds beside it. The other AURÉVAN plate (a full-width floor with macro props) was dropped from the site.",
       "promptRef": "public/images/prompt-manifest.json (AURÉVAN / grounded_stone)",
       "claimsToVerify": [
-        "KEPT AS AN ALTERNATIVE on request next to the v3 card; the preview bar shows it as 'Stone v2' (AURÉVAN only: the other two tiles fall back to the grounded-stone cards)",
+        "chosen by the user over the floor version (2026-11-06)",
         "the plate shows a free-standing TABLE with its thick front edge in the lower 15% of the card: it reads as a surface the bottle stands on, but a console or table is close to the 'no pedestal / no stand' rule of the brief; the v3 floor has no such edge",
         "the bergamot is NOT the plate's own placement: the plate drew it at the back-centre where a centred bottle hides it (it showed through the glass as a pale green orb), so it was cut out by colour mask, lifted away with its reflection, and stood on the table's front right with a new contact shadow and a mirrored reflection clipped at the table lip; a tiny pale sliver remains under its base at 100%",
         "bottle position identical to ORVÉLIS and AURÉVAN v3 (BOTTLE in card_build.py); plate softened behind the glass (sigma 7)",
