@@ -10,6 +10,8 @@
   /* the prototype's audited palette, scoped to the new chrome + homepage so the
      rest of the storefront keeps its existing tokens untouched */
   --paper: #fafaf7;
+  /* the glass header and its dropdown: the card colour in the default theme, a light tint of the theme in the others (themes.css) */
+  --hdr-tint: var(--paper);
   --bg: #f2f1ed;
   --stone: #ebe8df;
   --ink: #1f1d1b;
@@ -92,10 +94,10 @@
     .rh-ann {font-size:11px;letter-spacing:0.145em;gap:11px}
     .rh-ann__d {letter-spacing:.14em}
   }
-  .rh-hdr {position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--paper) 95%,transparent);border-bottom:1px solid transparent;transition:border-color .3s}
+  .rh-hdr {position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--hdr-tint) 95%,transparent);border-bottom:1px solid transparent;transition:border-color .3s}
   /* the frosted bar re-blurs everything under it on every scroll frame: only on a mouse / trackpad machine, and lighter (no saturate, 10px); a phone gets the plain bar */
   @media(hover:hover) and (pointer:fine) {
-    .rh-hdr {background:color-mix(in srgb,var(--paper) 80%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+    .rh-hdr {background:color-mix(in srgb,var(--hdr-tint) 80%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
   }
   .rh-hdr.is-scrolled, .rh-hdr.is-open {border-bottom-color:color-mix(in srgb,var(--ink) 9%,transparent)}
   .rh-hdr__r .rh-nav-btn {padding-inline:6px}
@@ -155,7 +157,7 @@
   @media(min-width:1100px) {
     .rh-hide-sm {display:inline}
   }
-  .rh-mega {position:absolute;left:0;right:0;top:100%;background:color-mix(in srgb,var(--paper) 97%,transparent);border-top:1px solid var(--line);border-bottom:1px solid var(--line);opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity .3s,transform .5s var(--ease),visibility 0s .3s}
+  .rh-mega {position:absolute;left:0;right:0;top:100%;background:color-mix(in srgb,var(--hdr-tint) 97%,transparent);border-top:1px solid var(--line);border-bottom:1px solid var(--line);opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity .3s,transform .5s var(--ease),visibility 0s .3s}
   .rh-mega.is-open {opacity:1;visibility:visible;transform:none;transition-delay:0s}
   .rh-mega__in {display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(16px,3vw,48px);padding-block:30px 22px}
   .rh-mega__item {display:flex;gap:14px;align-items:flex-start;padding:6px 0}

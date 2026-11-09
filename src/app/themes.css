@@ -165,6 +165,10 @@
 :root[data-theme="celestial"],
 :root[data-theme="amethyst"],
 :root[data-theme="titanium"] {
+  /* the glass header and its dropdown: a light tint of the theme (its secondary surface over the canvas), so the bar sits
+     in the page instead of reading as a white strip; ink on it stays well above 4.5:1 in every theme */
+  --hdr-tint: color-mix(in srgb, var(--stone) 55%, var(--bg));
+
   /* a slightly lifted dark for the dark blocks that sit one step above --onyx */
   --onyx-2: color-mix(in srgb, var(--champagne) 4%, var(--onyx));
   /* the brand rule: champagne, the accent, then ink (the default theme keeps its tri-juice) */
