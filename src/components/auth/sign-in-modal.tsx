@@ -176,13 +176,14 @@ export function SignInModal({
       <div
         ref={scrimRef}
         onClick={onClose}
-        className="fixed inset-0 bg-ink/50"
+        // the scrim is the theme's dark ground, not a generic black; a mouse machine also gets a soft blur of the page behind
+        className="fixed inset-0 bg-onyx/55 [@media(hover:hover)_and_(pointer:fine)]:backdrop-blur-[3px]"
       />
 
       <div className="fixed inset-0 flex items-end justify-center sm:items-center sm:p-4">
         <div
           ref={panelRef}
-          className="signin-panel relative w-full overflow-hidden rounded-t-[20px] bg-bg shadow-[0_-30px_80px_-24px_rgba(20,16,12,0.4)] will-change-transform sm:w-[92vw] sm:max-w-[440px] sm:rounded-[12px] sm:shadow-[0_40px_120px_-30px_rgba(20,16,12,0.5)]"
+          className="signin-panel relative w-full overflow-hidden rounded-t-[20px] bg-bg shadow-[0_-30px_80px_-24px_color-mix(in_srgb,var(--color-onyx)_40%,transparent)] will-change-transform sm:w-[92vw] sm:max-w-[440px] sm:rounded-[12px] sm:shadow-[0_40px_120px_-30px_color-mix(in_srgb,var(--color-onyx)_50%,transparent)]"
         >
           {/* crown */}
           <div className="relative bg-w4 px-6 pt-6 pb-7 text-w0 sm:px-8">

@@ -15,6 +15,7 @@ import { CartBar } from "@/components/cart/cart-bar";
 import { CampaignNote } from "@/components/layout/campaign-note";
 import { BackToTop } from "@/components/layout/back-to-top";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
+import { MotionLayer } from "@/components/providers/motion-layer";
 import { DISCOVERY_SET_SLUG } from "@/lib/catalog";
 import { getCatalogNav, getBagSuggestions } from "@/server/data/catalog";
 import { getSiteSettings } from "@/server/data/settings";
@@ -96,6 +97,8 @@ export default async function StoreLayout({
             <BackToTop />
             {/* founder preview: the six colour themes (src/config/themes.ts, app/themes.css) */}
             <ThemeSwitcher />
+            {/* scroll reveals, card tilt, button pull: motion.css + this controller (nothing under reduced motion) */}
+            <MotionLayer />
             <CampaignNote
               campaign={settings.campaign}
               products={bagSuggestions

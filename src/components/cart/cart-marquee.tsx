@@ -31,7 +31,7 @@ function Group({ notes }: { notes: string[] }) {
           <span className="px-5 text-[10.5px] leading-none font-light tracking-[0.16em] whitespace-nowrap uppercase">
             {note}
           </span>
-          <Mark className="w-[9px] shrink-0 text-[#c9a24a]/70" strokeWidth={1.6} />
+          <Mark className="w-[9px] shrink-0 text-gilt/70" strokeWidth={1.6} />
         </span>
       ))}
     </div>
@@ -76,7 +76,7 @@ export function CartMarquee({
     <div
       ref={rootRef}
       aria-hidden
-      className="shrink-0 overflow-hidden border-b border-[rgba(197,168,128,0.2)] bg-[var(--onyx)] text-[#e9e7e0]"
+      className="shrink-0 overflow-hidden border-b border-brass/20 bg-[var(--onyx)] text-champagne"
       style={{ height: "var(--announce-h)" }}
     >
       <div

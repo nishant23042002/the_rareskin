@@ -182,7 +182,7 @@ export async function Footer() {
                             key={c}
                             className="block size-1.5 rounded-full"
                             style={{
-                              backgroundColor: `color-mix(in srgb, ${c} 62%, #f5f2eb)`,
+                              backgroundColor: `color-mix(in srgb, ${c} 62%, var(--color-champagne))`,
                             }}
                           />
                         ))}
@@ -202,7 +202,7 @@ export async function Footer() {
                               aria-hidden
                               className="rs-dot size-2 shrink-0 rounded-full md:size-[7px]"
                               style={{
-                                backgroundColor: `color-mix(in srgb, ${l.accent} 62%, #f5f2eb)`,
+                                backgroundColor: `color-mix(in srgb, ${l.accent} 62%, var(--color-champagne))`,
                               }}
                             />
                           ) : l.ring ? (

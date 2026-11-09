@@ -13,6 +13,7 @@ import { PdpReviews } from "@/components/product/pdp-reviews";
 import { cn } from "@/lib/cn";
 import { formatINR, type Fragrance } from "@/lib/catalog";
 import { pdpCover } from "@/lib/pdp-images";
+import { Ticker } from "@/components/ui/ticker";
 import { SITE, absoluteUrl } from "@/lib/site";
 import { breadcrumbJsonLd } from "@/lib/seo";
 import {
@@ -230,10 +231,10 @@ export default async function FragrancePage({
             </p>
 
             {/* buy box — the page's conversion focus */}
-            <div className="mt-6 rounded-[4px] border border-line-2 bg-surface p-[clamp(18px,3vw,26px)]">
+            <div className="mt-6 rounded-[4px] border border-line-2 bg-surface p-[clamp(18px,3vw,26px)] [box-shadow:var(--sh-card)]">
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
                 <span className="text-[clamp(1.8rem,3.6vw,2.4rem)] leading-none font-light tracking-[0.01em]">
-                  {formatINR(f.price)}
+                  <Ticker text={formatINR(f.price)} />
                 </span>
                 <s className="text-[15px] text-ink-3">{formatINR(f.mrp)}</s>
                 <span className="rounded-full bg-cta px-2.5 py-1 text-[9px] tracking-[0.14em] text-w0 uppercase">
@@ -253,7 +254,7 @@ export default async function FragrancePage({
                   <span className="rounded-[2px] border border-ink-2 bg-bg px-4 py-2.5 text-[12px]">
                     50 ml
                   </span>
-                  <span className="rounded-[2px] border border-line-2 px-4 py-2.5 text-[12px] text-ink-3">
+                  <span className="rounded-[2px] border border-line-2 bg-surface-2 px-4 py-2.5 text-[12px] text-ink-3">
                     100 ml · soon
                   </span>
                 </div>
@@ -372,7 +373,7 @@ export default async function FragrancePage({
             {related.map((r) => (
               <article
                 key={r.slug}
-                className="w-[76%] shrink-0 snap-start overflow-hidden rounded-[3px] border border-line bg-surface sm:w-auto sm:shrink"
+                className="w-[76%] shrink-0 snap-start overflow-hidden rounded-[3px] border border-line bg-surface [box-shadow:var(--sh-card)] sm:w-auto sm:shrink"
               >
                 <RelatedMedia r={r} />
                 <div className="p-3.5">
@@ -421,6 +422,7 @@ function RelatedMedia({ r }: { r: Fragrance }) {
     <Link
       href={`/fragrances/${r.slug}`}
       aria-label={`Open ${r.name}`}
+      data-tilt
       className="group relative grid aspect-square place-items-center overflow-hidden border-b border-line"
       style={{
         background: "linear-gradient(165deg, var(--color-w0), var(--color-w1))",

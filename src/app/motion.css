@@ -1,0 +1,346 @@
+/* ==========================================================================
+   THE RARESKIN: tactile motion
+
+   The site's "feel" layer. It is deliberately separate from the look (home.css,
+   themes.css), reads only the existing colour tokens (so every theme gets it for
+   free) and follows five rules:
+
+     1. Only `transform`, `translate`, `scale` and `opacity` are animated. Nothing
+        that changes layout (width, height, margins, top / left) ever moves, so
+        CLS stays 0; the few paint-only transitions (a ring, a shadow) are one-off
+        hover / focus changes, never continuous.
+     2. `will-change` is set only while something is actually moving (`.is-tilt`).
+     3. Anything that follows a mouse is behind `(hover: hover) and (pointer: fine)`
+        and a 900px minimum, so a phone or tablet never sees a phantom hover.
+     4. Everything is behind `prefers-reduced-motion: no-preference`; with reduce
+        you get the final state, instantly, and the JS (components/providers/
+        motion-layer.tsx) does not run at all.
+     5. No scroll listeners: reveals use an IntersectionObserver, parallax uses a
+        CSS scroll-driven timeline (`animation-timeline: view()`), the header uses
+        the existing rAF-throttled `useScrolled`.
+   ========================================================================== */
+
+:root {
+  /* a quick overshoot (buttons, chips, the bag count) and a long, soft settle (reveals, cards) */
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --expo: cubic-bezier(0.16, 1, 0.3, 1);
+  /* materials: a hairline, and ambient shadows (a tight contact shadow plus a wide, faint one; never a muddy drop) */
+  --hairline: color-mix(in srgb, var(--ink) 9%, transparent);
+  --sh-ambient:
+    0 1px 2px color-mix(in srgb, var(--ink) 6%, transparent),
+    0 16px 34px -20px color-mix(in srgb, var(--ink) 38%, transparent);
+  /* a card resting on the page: a long, faint, ink-tinted shadow (never a black drop) */
+  --sh-card: 0 20px 40px -15px color-mix(in srgb, var(--ink) 8%, transparent);
+  --sh-lift:
+    0 2px 4px color-mix(in srgb, var(--ink) 8%, transparent),
+    0 30px 50px -26px color-mix(in srgb, var(--ink) 52%, transparent);
+}
+
+/* ---- number ticker (components/ui/ticker.tsx): pure CSS, the final price is in the markup ---- */
+.rh-odo {
+  display: inline-flex;
+  align-items: flex-start;
+  font-variant-numeric: tabular-nums;
+}
+.rh-odo__c,
+.rh-odo__d {
+  display: block;
+  height: 1lh;
+}
+.rh-odo__d {
+  width: 1ch;
+  overflow: hidden;
+  text-align: center;
+}
+.rh-odo__s {
+  display: block;
+  transform: translate3d(0, calc(var(--n, 0) * -1lh), 0);
+}
+/* the column of digits, one per line, as generated content: not in the DOM, so not in the page's text */
+.rh-odo__s::before {
+  content: "0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9";
+  display: block;
+  white-space: pre;
+}
+@keyframes rh-odo {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes rh-bump {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.6);
+  }
+  62% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes rh-pop {
+  0% {
+    transform: scale(1);
+  }
+  34% {
+    transform: scale(0.93);
+  }
+  70% {
+    transform: scale(1.045);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ---- header: the nav's gliding underline, a condensing wordmark, a frosted dock once the page moves ---- */
+.rh-hdr__nav {
+  position: relative;
+}
+.rh-hdr__nav .rh-nav-btn::after {
+  display: none;
+}
+.rh-glide {
+  position: absolute;
+  left: 0;
+  bottom: 9px;
+  width: 1px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(var(--gx, 0px), 0, 0) scaleX(var(--gw, 0));
+  transform-origin: 0 50%;
+}
+.rh-glide.is-on {
+  opacity: 1;
+}
+.rh-hdr__logo {
+  transform: translate(-50%, -50%) scale(var(--logo-s, 1));
+}
+.rh-hdr.is-scrolled {
+  --logo-s: 0.9;
+  box-shadow:
+    0 1px 0 var(--hairline),
+    0 18px 28px -24px color-mix(in srgb, var(--ink) 40%, transparent);
+}
+@media (hover: hover) and (pointer: fine) {
+  .rh-hdr.is-scrolled {
+    background: color-mix(in srgb, var(--hdr-tint) 78%, transparent);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+}
+.rh-bagcount {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rh-odo__s {
+    animation: rh-odo 1.25s var(--expo) calc(var(--k, 0) * 70ms + 180ms) backwards;
+  }
+  .rh-glide {
+    transition:
+      transform 0.55s var(--expo),
+      opacity 0.3s;
+  }
+  .rh-hdr {
+    transition:
+      border-color 0.3s,
+      box-shadow 0.45s var(--expo),
+      background-color 0.4s;
+  }
+  .rh-hdr__logo {
+    transition: transform 0.55s var(--expo);
+  }
+  .rh-bagcount.is-bump {
+    animation: rh-bump 0.62s var(--spring);
+  }
+
+  /* ---- buttons: a spring lift, a press, a sheen that crosses the face, an arrow that leans forward ---- */
+  .rh-btn {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    translate: var(--bx, 0px) var(--by, 0px);
+    transition:
+      background-color 0.35s var(--ease),
+      color 0.35s var(--ease),
+      border-color 0.35s var(--ease),
+      transform 0.5s var(--spring),
+      translate 0.3s var(--expo),
+      scale 0.3s var(--spring),
+      box-shadow 0.5s var(--expo);
+  }
+  .rh-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 46%;
+    pointer-events: none;
+    background: linear-gradient(
+      100deg,
+      transparent,
+      color-mix(in srgb, currentColor 16%, transparent),
+      transparent
+    );
+    transform: translate3d(-130%, 0, 0) skewX(-18deg);
+  }
+  .rh-btn:active {
+    scale: 0.98;
+    transition-duration: 0.12s;
+  }
+
+  /* ---- chips, tabs, swatches: a press, a spring, a soft pulse when chosen (class set by motion-layer), a glowing ring ---- */
+  :is(.rh-q-opt, .rh-ticket__chips a, [role="tab"], [role="radio"]) {
+    transition:
+      transform 0.4s var(--spring),
+      scale 0.3s var(--spring),
+      background-color 0.3s var(--ease),
+      border-color 0.3s var(--ease),
+      color 0.3s var(--ease),
+      box-shadow 0.4s var(--expo),
+      opacity 0.3s;
+  }
+  :is(.rh-q-opt, .rh-ticket__chips a, [role="tab"], [role="radio"]):active {
+    scale: 0.96;
+    transition-duration: 0.12s;
+  }
+  .is-pop {
+    animation: rh-pop 0.55s var(--expo);
+  }
+
+  /* ---- scroll reveal: eyebrow, headline, lede, buttons and cards rise in, staggered (motion-layer adds .rv / .is-in) ---- */
+  .rv {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+    transition:
+      opacity 0.8s var(--expo) var(--rv-d, 0ms),
+      transform 1s var(--expo) var(--rv-d, 0ms);
+  }
+  .rv.is-in {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* glowing focus ring on chips (keyboard only) */
+:is(.rh-q-opt, .rh-ticket__chips a, [role="tab"], [role="radio"]):focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 7px color-mix(in srgb, var(--brass) 20%, transparent);
+}
+
+/* ---- mouse only: lift, sheen, and cards that tilt toward the pointer ---- */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .rh-btn:hover {
+    transform: translateY(-2px);
+  }
+  .rh-btn--solid:hover {
+    box-shadow: 0 14px 26px -14px color-mix(in srgb, var(--ink) 60%, transparent);
+  }
+  .rh-btn:hover::after {
+    transform: translate3d(330%, 0, 0) skewX(-18deg);
+    transition: transform 0.95s var(--expo);
+  }
+  :is(.rh-q-opt, .rh-ticket__chips a):hover {
+    transform: translateY(-1px);
+  }
+
+  .rh-ig__tile img {
+    transition: transform 0.9s var(--expo);
+  }
+  .rh-ig__tile:hover img {
+    transform: scale(1.04);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+  /* the list here and TILT in components/providers/motion-layer.tsx are the same list */
+  :is(.rh-tile__media, .rh-offer__tile, .rh-ig__tile, [data-tilt]) {
+    transform: perspective(900px) translate3d(0, var(--lift, 0px), 0) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition:
+      transform 0.7s var(--expo),
+      box-shadow 0.6s var(--expo);
+  }
+  :is(.rh-tile__media, .rh-offer__tile, .rh-ig__tile, [data-tilt]).is-tilt {
+    transition-duration: 0.16s, 0.6s;
+    will-change: transform;
+  }
+  :is(.rh-tile__media, .rh-ig__tile, [data-tilt]).is-tilt {
+    box-shadow: var(--sh-lift);
+  }
+  .rh-offer__tile.is-tilt {
+    --lift: -3px;
+  }
+  /* the soft light that follows the pointer across the card (an element injected by motion-layer; it moves by transform) */
+  .rh-glow {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 5;
+    width: 340px;
+    height: 340px;
+    margin: -170px 0 0 -170px;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--paper) 36%, transparent), transparent);
+    transform: translate3d(var(--gx, 0px), var(--gy, 0px), 0);
+    transition: opacity 0.45s var(--expo);
+  }
+  .is-tilt > .rh-glow {
+    opacity: 1;
+    will-change: transform;
+  }
+}
+
+/* ---- parallax: a slow vertical drift of the pictures, on the compositor, no JS (scroll-driven animation; no support = no drift) ---- */
+@media (hover: hover) and (pointer: fine) and (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    @keyframes rh-px {
+      from {
+        transform: translate3d(0, -7%, 0) scale(1.14);
+      }
+      to {
+        transform: translate3d(0, 7%, 0) scale(1.14);
+      }
+    }
+    @keyframes rh-px-hero {
+      from {
+        transform: translate3d(0, -4%, 0) scale(1.09);
+      }
+      to {
+        transform: translate3d(0, 4%, 0) scale(1.09);
+      }
+    }
+    /* A view timeline measures against the nearest scroll container, and `overflow: hidden` makes one
+       (it never scrolls, so the drift would sit frozen at 50%). `clip` crops exactly the same but is not
+       a scroll container, so every box around a drifting picture is switched to it here. */
+    .rh-hero__media,
+    .rh-dset,
+    .rh-dset__scene,
+    .rh-founder,
+    .rh-founder__photo,
+    .rh-frame {
+      overflow: clip;
+    }
+    .rh-dset__scene .rh-dset__art,
+    .rh-founder__photo img,
+    .rh-unbox__media img,
+    .rh-why__macro img {
+      animation: rh-px linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+    /* the hero picture drifts less: it is the one the product shots are framed in */
+    .rh-hero__media picture {
+      animation: rh-px-hero linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+  }
+}

@@ -5,8 +5,8 @@ import { cn } from "@/lib/cn";
 /** Order status as a small hairline pill, coloured by where the order stands. */
 const TONE: Record<OrderStatus, string> = {
   pending: "border-line-2 text-ink-3",
-  confirmed: "border-gilt/50 text-[#8f6118]",
-  processing: "border-gilt/50 text-[#8f6118]",
+  confirmed: "border-gilt/50 text-warn",
+  processing: "border-gilt/50 text-warn",
   shipped: "border-ink text-ink",
   delivered: "border-ok/50 text-ok",
   cancelled: "border-error/40 text-error",

@@ -175,7 +175,7 @@
      it, with no per-component dark variants. (The menu drawer sets the
      homepage's own `--ink`, `--line` ... variables the same way, below.)
      ------------------------------------------------------------------ */
-  .rh-dk {color-scheme:dark;--color-w0:var(--onyx);--color-w1:color-mix(in srgb,var(--brass) 5%,var(--onyx));--color-w2:color-mix(in srgb,var(--champagne) 24%,var(--onyx));--color-w3:color-mix(in srgb,var(--champagne) 60%,var(--onyx));--color-w4:color-mix(in srgb,var(--brass) 5%,var(--onyx));--color-bg:color-mix(in srgb,var(--brass) 5%,var(--onyx));--color-surface:var(--onyx);--color-surface-2:color-mix(in srgb,var(--brass) 9%,var(--onyx));--color-ink:var(--champagne);--color-ink-2:color-mix(in srgb,var(--champagne) 76%,var(--onyx));--color-ink-3:color-mix(in srgb,var(--champagne) 62%,var(--onyx));--color-line:color-mix(in srgb,var(--champagne) 13%,var(--onyx));--color-line-2:color-mix(in srgb,var(--champagne) 22%,var(--onyx));--color-cta:var(--champagne);--color-cta-hover:color-mix(in srgb,var(--champagne) 82%,#fff);--color-error:#e58573;--color-ok:#7fb392;--color-warn:#dba64e}
+  .rh-dk {color-scheme:dark;--color-w0:var(--onyx);--color-w1:color-mix(in srgb,var(--brass) 5%,var(--onyx));--color-w2:color-mix(in srgb,var(--champagne) 24%,var(--onyx));--color-w3:color-mix(in srgb,var(--champagne) 60%,var(--onyx));--color-w4:color-mix(in srgb,var(--brass) 5%,var(--onyx));--color-bg:color-mix(in srgb,var(--brass) 5%,var(--onyx));--color-surface:var(--onyx);--color-surface-2:color-mix(in srgb,var(--brass) 9%,var(--onyx));--color-ink:var(--champagne);--color-ink-2:color-mix(in srgb,var(--champagne) 76%,var(--onyx));--color-ink-3:color-mix(in srgb,var(--champagne) 62%,var(--onyx));--color-line:color-mix(in srgb,var(--champagne) 13%,var(--onyx));--color-line-2:color-mix(in srgb,var(--champagne) 22%,var(--onyx));--color-cta:var(--champagne);--color-cta-hover:color-mix(in srgb,var(--champagne) 82%,var(--paper));--color-error:#e58573;--color-ok:#7fb392;--color-warn:#dba64e}
   .rh-dk :focus-visible {outline-color:var(--champagne)}
 
   /* ------------------------------------------------------------------
@@ -524,7 +524,7 @@
     .rh-fslide__nl, .rh-fslide__buy {display:none}
     .rh-fslide__poem {max-width:31ch;font-size:14px;line-height:1.7;text-wrap:balance}
     .rh-fslide__cta {display:flex;width:100%;max-width:420px;min-height:54px;align-items:center;justify-content:space-between;gap:16px;margin-top:12px;padding:0 22px;background:var(--champagne);color:var(--onyx);font:400 11.5px/1 var(--f-sans);letter-spacing:.24em;text-transform:uppercase;transition:background-color .3s,transform .3s var(--ease)}
-    .rh-fslide__cta:hover {background:#fff}
+    .rh-fslide__cta:hover {background:var(--paper)}
     .rh-fslide__cta:active {transform:scale(.99)}
     .rh-fslide__cta span:last-child {font:400 15px/1 var(--f-sans);letter-spacing:.04em}
     .rh-fslide__cta s {margin-left:8px;font-size:12px;opacity:.7;letter-spacing:.04em}
@@ -547,7 +547,7 @@
     .rh-dset__detail {order:6;margin-top:26px;align-self:center;max-width:36ch;font-size:14.5px}
     .rh-dset__price, .rh-dset__in>.rh-btn {display:none}
     .rh-dset__cta {order:7;display:flex;align-self:center;width:calc(100% - 2*var(--gutter));max-width:420px;min-height:54px;align-items:center;justify-content:space-between;gap:16px;margin-top:26px;padding:0 22px;background:var(--champagne);color:var(--onyx);font:400 11.5px/1 var(--f-sans);letter-spacing:.24em;text-transform:uppercase;transition:background-color .3s,transform .3s var(--ease)}
-    .rh-dset__cta:hover {background:#fff}
+    .rh-dset__cta:hover {background:var(--paper)}
     .rh-dset__cta:active {transform:scale(.99)}
     .rh-dset__cta span:last-child {font:400 15px/1 var(--f-sans);letter-spacing:.04em}
     .rh-dset__cta s {margin-left:8px;font-size:12px;opacity:.7;letter-spacing:.04em}
@@ -567,7 +567,7 @@
     .rh-dset__h2 {margin-top:12px;max-width:30ch}
     .rh-dset__detail {margin-top:26px;max-width:46ch}
     .rh-dset__cta {display:flex;width:100%;max-width:420px;min-height:54px;margin-top:30px;align-items:center;justify-content:space-between;gap:16px;padding:0 22px;background:var(--champagne);color:var(--onyx);font:400 11.5px/1 var(--f-sans);letter-spacing:.24em;text-transform:uppercase;transition:background-color .3s,transform .3s var(--ease)}
-    .rh-dset__cta:hover {background:#fff}
+    .rh-dset__cta:hover {background:var(--paper)}
     .rh-dset__cta:active {transform:scale(.99)}
     .rh-dset__cta span:last-child {font:400 15px/1 var(--f-sans);letter-spacing:.04em}
     .rh-dset__cta s {margin-left:8px;font-size:12px;opacity:.7;letter-spacing:.04em}
@@ -756,7 +756,7 @@
      the picture's own edge); the ticket is the one live element of the first screen.
      ========================================================================== */
   .rh-hero[data-panel] .rh-hero__text {background:var(--hp-m);color:var(--ink)}
-  .rh-hero[data-panel="dark"] .rh-hero__text {--ink:#f5f2eb;--ink-2:rgba(245,242,235,.84);--ink-3:rgba(245,242,235,.64);--line:rgba(245,242,235,.16);--line-2:rgba(245,242,235,.3);--paper:#100e0c}
+  .rh-hero[data-panel="dark"] .rh-hero__text {--ink:var(--champagne);--ink-2:color-mix(in srgb,var(--champagne) 84%,transparent);--ink-3:color-mix(in srgb,var(--champagne) 64%,transparent);--line:color-mix(in srgb,var(--champagne) 16%,transparent);--line-2:color-mix(in srgb,var(--champagne) 30%,transparent);--paper:var(--onyx)}
   @media(min-width:900px) {
     .rh-hero[data-panel] .rh-hero__text {background:var(--hp-grad)}
   }
@@ -784,7 +784,7 @@
     .rh-ticket:hover {transform:translateY(-3px);box-shadow:0 36px 54px -30px color-mix(in srgb,var(--ink) 50%,transparent)}
   }
   /* the brass edge, with a glint that crosses it every few seconds */
-  .rh-ticket::before {content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:3px;background-image:linear-gradient(100deg,transparent 42%,rgba(255,255,255,.85) 50%,transparent 58%),var(--tri);background-size:260% 100%,100% 100%;background-repeat:no-repeat;animation:rh-glint 7s ease-in-out infinite}
+  .rh-ticket::before {content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:3px;background-image:linear-gradient(100deg,transparent 42%,color-mix(in srgb,var(--paper) 85%,transparent) 50%,transparent 58%),var(--tri);background-size:260% 100%,100% 100%;background-repeat:no-repeat;animation:rh-glint 7s ease-in-out infinite}
   /* the light that follows the pointer (set by LaunchTicket) */
   .rh-ticket::after {content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .5s;background:radial-gradient(340px 210px at var(--mx) var(--my),color-mix(in srgb,var(--brass) 22%,transparent),transparent 72%)}
   @media(hover:hover) {

@@ -67,6 +67,14 @@ export const THEMES = [
     accent: "#94A3B8",
     canvas: "#F8FAFC",
   },
+  {
+    id: "emerald",
+    name: "Emerald",
+    archetype: "Deep Forest & Mint Mist",
+    swatch: ["#0F3D2E", "#166534", "#4C956C", "#A8D5BA", "#E6F2EA", "#F9FCF8"],
+    accent: "#4C956C",
+    canvas: "#F9FCF8",
+  },
 ] as const satisfies readonly ThemeDef[];
 
 export type ThemeId = (typeof THEMES)[number]["id"];

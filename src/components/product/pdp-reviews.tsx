@@ -108,7 +108,7 @@ export function PdpReviews({
         ) : (
           <>
             {/* summary */}
-            <div className="grid gap-8 rounded-[4px] border border-line bg-surface p-[clamp(22px,4vw,40px)] sm:grid-cols-[220px_1fr] sm:items-center">
+            <div className="grid gap-8 rounded-[4px] border border-line bg-surface [box-shadow:var(--sh-card)] p-[clamp(22px,4vw,40px)] sm:grid-cols-[220px_1fr] sm:items-center">
               <div className="text-center sm:text-left">
                 <p className="serif text-[clamp(2.6rem,5vw,3.4rem)] leading-none">
                   {formatRating(summary.average)}
@@ -195,7 +195,7 @@ export function PdpReviews({
               {items.slice(0, 8).map((r) => (
                 <article
                   key={r.id}
-                  className="rounded-[4px] border border-line bg-surface p-[clamp(18px,3vw,26px)]"
+                  className="rounded-[4px] border border-line bg-surface p-[clamp(18px,3vw,26px)] [box-shadow:var(--sh-card)]"
                 >
                   <div className="flex items-start gap-3">
                     <Avatar src={r.avatarUrl} initials={r.initials} size={40} />

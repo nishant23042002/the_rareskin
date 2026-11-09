@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { RhIcon } from "@/components/ui/rh-icon";
+import { Ticker } from "@/components/ui/ticker";
 import { formatINR, type Fragrance } from "@/lib/catalog";
 import { HeroFrame } from "./hero-frame";
 import { HeroMedia, type HeroPhotoSource } from "./hero-media";
@@ -48,7 +49,9 @@ export function Hero({
             <p className="rh-hero__offer">
               <span className="rh-pill">Launch offer</span>
               <span className="rh-tnum">
-                <b>{formatINR(price)}</b>
+                <b>
+                  <Ticker text={formatINR(price)} />
+                </b>
                 <s>{formatINR(mrp)}</s>
               </span>
             </p>

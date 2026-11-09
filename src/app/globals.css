@@ -3,6 +3,8 @@
 @import "./home.css";
 /* the colour themes (re-point the tokens below and in home.css under :root[data-theme]) */
 @import "./themes.css";
+/* the tactile layer: button physics, card tilt, reveals, parallax, ticker (read only the tokens above) */
+@import "./motion.css";
 
 /* ==========================================================================
    THE RARESKIN — design tokens
@@ -253,13 +255,9 @@
   .signin-panel {
     opacity: 0;
   }
+  /* the brand rule under the crown: the theme's own (--tri is the original tri-juice in the default theme) */
   .signin-juice {
-    background-image: linear-gradient(
-      90deg,
-      #e0d7bf 0%,
-      #c5872f 52%,
-      #3d2712 100%
-    );
+    background-image: var(--tri);
   }
 
   /* route transition — parked from first paint; GSAP drives it via inline style */
