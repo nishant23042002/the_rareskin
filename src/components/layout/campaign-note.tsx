@@ -1,24 +1,30 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import { Mark } from "@/components/ui/mark";
 import { Icon } from "@/components/ui/icon";
 import { Flacon } from "@/components/ui/flacon";
+import { useCardConcept } from "@/components/home/card-concept";
 import { useCart } from "@/components/providers/cart-provider";
 import { useScrolled } from "@/hooks/use-scrolled";
 import { cloudinaryVariant, isFragranceSlug } from "@/lib/catalog";
 import { cn } from "@/lib/cn";
 import type { FragranceSlug } from "@/lib/catalog";
+import { getVariant, homeImageSrc, resolveCardAsset } from "@/lib/home-images";
 import type { SiteSettingsInput } from "@/lib/validation/site-settings";
 
 type Campaign = SiteSettingsInput["campaign"];
 
 export interface CampaignProduct {
   name: string;
+  /** the product page's first photograph: the fallback when a direction has no picture for it */
   image: string | null;
   fragrance?: FragranceSlug;
+  /** the product page (`/fragrances/<slug>`) this tile links to */
+  href?: string;
 }
 
 /**
@@ -59,6 +65,8 @@ export function CampaignNote({
 }) {
   const { count, isOpen } = useCart();
   const scrolled = useScrolled(64);
+  // the art direction chosen in the Preview panel (or the default): the tiles below follow it
+  const concept = useCardConcept();
   // SSR + the first client render both paint nothing, so hydration matches; the
   // card only appears after mount (rAF, so the setState isn't an effect-body
   // statement — matches the pattern in site-menu.tsx).
@@ -142,37 +150,77 @@ export function CampaignNote({
           )}
 
           {products.length > 0 && (
-            <div className="mt-3 flex gap-1.5">
-              {products.slice(0, 3).map((p) => {
-                const url = cloudinaryVariant(p.image ?? undefined, {
-                  w: 120,
-                  h: 150,
+            <ul className="rh-offer__tiles">
+              {products.slice(0, 3).map((p, i) => {
+                // The picture is the one the homepage tiles show for this perfume in the
+                // art direction chosen in the Preview panel (`useCardConcept`), so the
+                // card follows the switches. If that direction has no final picture for
+                // it, the same fallbacks as the tiles apply, then the product page's
+                // first photograph, then the drawn flacon.
+                const asset = p.fragrance ? resolveCardAsset(p.fragrance, concept) : null;
+                const variant = asset ? getVariant(asset) : null;
+                const src = asset && variant ? homeImageSrc(variant.file) : null;
+                const fallback = cloudinaryVariant(p.image ?? undefined, {
+                  w: 160,
+                  h: 200,
                   fill: true,
                 });
+                const href =
+                  p.href ?? (p.fragrance ? `/fragrances/${p.fragrance}` : "/#collection");
                 return (
-                  <span
-                    key={p.name}
-                    className="grid aspect-[4/5] w-full place-items-center overflow-hidden rounded-[3px] border border-line bg-surface-2"
-                    title={p.name}
-                  >
-                    {url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={url}
-                        alt={p.name}
-                        loading="lazy"
-                        decoding="async"
-                        className="size-full object-cover"
-                      />
-                    ) : p.fragrance && isFragranceSlug(p.fragrance) ? (
-                      <Flacon fragrance={p.fragrance} className="w-7" />
-                    ) : (
-                      <Mark className="w-4 text-ink-3" />
-                    )}
-                  </span>
+                  <li key={p.name} className="min-w-0">
+                    <Link
+                      href={href}
+                      onClick={() => setOpen(false)}
+                      aria-label={`${p.name}: view the product`}
+                      className="rh-offer__tile"
+                      style={{ "--i": i } as CSSProperties}
+                    >
+                      {src && asset ? (
+                        <Image
+                          key={src}
+                          src={src}
+                          alt=""
+                          fill
+                          sizes="110px"
+                          quality={85}
+                          className="rh-offer__img"
+                          style={{
+                            objectPosition:
+                              asset.objectPosition.default ?? "50% 50%",
+                          }}
+                        />
+                      ) : fallback ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={fallback}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                          className="rh-offer__img"
+                        />
+                      ) : (
+                        <span className="absolute inset-0 grid place-items-center">
+                          {p.fragrance && isFragranceSlug(p.fragrance) ? (
+                            <Flacon fragrance={p.fragrance} className="w-7" />
+                          ) : (
+                            <Mark className="w-4 text-ink-3" />
+                          )}
+                        </span>
+                      )}
+                      <span className="rh-offer__veil" aria-hidden="true" />
+                      <span className="rh-offer__cap">
+                        <span className="rh-offer__name">{p.name}</span>
+                        <span className="rh-offer__view" aria-hidden="true">
+                          View
+                          <Icon name="arrowRight" className="size-2.5" />
+                        </span>
+                      </span>
+                    </Link>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           )}
 
           <div className="mt-3 flex items-center justify-between gap-3">

@@ -4,53 +4,57 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { useLenis } from "lenis/react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
-import { lockScroll, unlockScroll } from "@/lib/scroll-lock";
+import { useSlideDialog } from "@/hooks/use-slide-dialog";
 import { Logo } from "@/components/ui/logo";
-import { Flacon } from "@/components/ui/flacon";
 import { RhIcon } from "@/components/ui/rh-icon";
 import { MenuFooter } from "./menu-footer";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useCart } from "@/components/providers/cart-provider";
 import { formatINR, type CatalogNavItem } from "@/lib/catalog";
 
-// Kept tight on purpose — the routes a shopper actually needs before buying.
+// Kept tight on purpose: the routes a shopper actually needs before buying.
+// (The fourth line, Concierge & FAQ, is rendered separately: it carries a
+// second link, Contact.)
 const LINKS = [
   { label: "Our Story", href: "/the-idea" },
-  { label: "Why Extrait", href: "/#why" },
+  { label: "The Craft & Concentration", href: "/#why" },
   { label: "Shipping & Returns", href: "/shipping" },
-  { label: "FAQ", href: "/faq" },
-  { label: "Contact", href: "/contact" },
 ];
 
-const SLIDE_MS = 660;
-
 /**
- * Left sidebar opened by the header's burger (every breakpoint): the three
- * fragrances (each row washes in its own colour on hover), a dark Discovery Set
- * card with fanning vials, Bag / Sign in rows, a few quiet links and a compact
- * trust + payment base.
+ * Left drawer opened by the header's burger (every breakpoint), dark like the
+ * announcement bar: the three
+ * fragrances as quiet rows (colour dot, name, volume; the row slides 6px to the
+ * right on hover), a bordered Discovery Set card, four brand links, Bag and
+ * Account pills, and a one-line reassurance footer.
  *
  * A native <dialog> + showModal() hosts it, which gives the focus trap, ESC and
- * an inert background for free. The slide is plain CSS (`.is-open` on the panel);
- * on close the dialog stays open just long enough for the slide-out to play.
+ * an inert background for free. The slide is plain CSS (`.is-open` on the panel),
+ * driven by `useSlideDialog`, the same hook the bag drawer uses.
  */
 export function SiteMenu({
   open,
   onClose,
   nav,
   setPrice = null,
+  whatsapp = null,
+  freeShippingAbove = 0,
 }: {
   open: boolean;
   onClose: () => void;
   nav: CatalogNavItem[];
   setPrice?: number | null;
+  /** concierge number (WhatsApp, else phone) for the footer's "speak with a specialist" link */
+  whatsapp?: string | null;
+  /** order value (rupees) from which delivery is free; 0 = always free */
+  freeShippingAbove?: number;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const reduced = useReducedMotion();
   const lenis = useLenis();
   const { status, openSignIn } = useAuth();
   const { count, openCart } = useCart();
-  const [shown, setShown] = useState(false);
+  const shown = useSlideDialog(dialogRef, open, "menu", reduced);
 
   // Match SSR (no session) on first paint — see the note in header.tsx.
   const [mounted, setMounted] = useState(false);
@@ -65,42 +69,6 @@ export function SiteMenu({
     else lenis?.start();
   }, [open, lenis]);
 
-  useEffect(() => {
-    const dlg = dialogRef.current;
-    if (!dlg) return;
-    let t = 0;
-    let r1 = 0;
-    let r2 = 0;
-
-    if (open) {
-      if (!dlg.open) dlg.showModal();
-      lockScroll("menu");
-      // two frames: let the browser paint the parked state first, so the
-      // class change below is a real transition and not a jump
-      r1 = requestAnimationFrame(() => {
-        r2 = requestAnimationFrame(() => setShown(true));
-      });
-    } else if (dlg.open) {
-      r1 = requestAnimationFrame(() => setShown(false));
-      t = window.setTimeout(
-        () => {
-          dlg.close();
-          unlockScroll("menu");
-        },
-        reduced ? 0 : SLIDE_MS,
-      );
-    }
-
-    return () => {
-      cancelAnimationFrame(r1);
-      cancelAnimationFrame(r2);
-      window.clearTimeout(t);
-    };
-  }, [open, reduced]);
-
-  // never leave the page locked if the header unmounts with the menu open
-  useEffect(() => () => unlockScroll("menu"), []);
-
   // animate out on native ESC instead of snapping shut
   useEffect(() => {
     const dlg = dialogRef.current;
@@ -114,6 +82,7 @@ export function SiteMenu({
   }, [onClose]);
 
   const rise = (i: number) => ({ "--i": i }) as CSSProperties;
+  const afterNav = nav.length + 1;
 
   return (
     <dialog
@@ -124,11 +93,10 @@ export function SiteMenu({
       <div className="rh-scrim" onClick={onClose} aria-hidden="true" />
       <aside
         className={`rh-sb${shown ? " is-open" : ""}`}
-        data-theme="dark"
         aria-label="Menu"
       >
         <div className="rh-sb__top">
-          <Logo style={{ width: "clamp(112px, 32vw, 132px)", maxWidth: "132px" }} />
+          <Logo style={{ width: "clamp(108px, 30vw, 132px)", maxWidth: "132px" }} />
           <button
             type="button"
             className="rh-sb__close"
@@ -140,7 +108,7 @@ export function SiteMenu({
         </div>
 
         <div className="rh-sb__scroll" data-lenis-prevent>
-          <p className="rh-eyebrow rh-sb__eye rh-rise" style={rise(0)}>
+          <p className="rh-sb__eye rh-rise" style={rise(0)}>
             The Collection
           </p>
           <ul className="rh-sb__list">
@@ -150,24 +118,13 @@ export function SiteMenu({
                   href={`/fragrances/${f.slug}`}
                   className="rh-sb__frag"
                   onClick={onClose}
-                  style={
-                    { "--ground": f.ground, "--on": f.onGround } as CSSProperties
-                  }
+                  style={{ "--c": f.accent } as CSSProperties}
                 >
-                  <span className="rh-sb__thumb" aria-hidden="true">
-                    <span
-                      className="mx-auto mt-[6%] block"
-                      style={{ width: "50%" }}
-                    >
-                      <Flacon fragrance={f.slug} />
-                    </span>
+                  <span className="rh-sb__frag-in">
+                    <span className="rh-sb__dot" aria-hidden="true" />
+                    <span className="rh-sb__name">{f.name}</span>
+                    <span className="rh-sb__meta">{f.volumeMl} ml Extrait</span>
                   </span>
-                  <span className="rh-sb__txt">
-                    <b>{f.name}</b>
-                    <em>{f.title}</em>
-                    <small>{f.mood.join(" · ")}</small>
-                  </span>
-                  <RhIcon name="arrow" className="rh-sb__arr" />
                 </Link>
               </li>
             ))}
@@ -176,74 +133,65 @@ export function SiteMenu({
           <Link
             href="/discovery-set"
             className="rh-sb__set rh-rise"
-            style={rise(4)}
+            style={rise(afterNav)}
             onClick={onClose}
           >
-            <span>
-              <small>The Discovery Set</small>
-              <span className="rh-sb__set-t rh-serif">Meet all three</span>
-              <em>
-                Three 10 ml
-                {setPrice ? ` · ${formatINR(setPrice)}` : ""} · credited to your
-                first bottle
-              </em>
-            </span>
-            <span className="rh-sb__vials" aria-hidden="true">
-              {nav.map((f) => (
-                <span key={f.slug}>
-                  <Flacon fragrance={f.slug} />
-                </span>
-              ))}
-            </span>
+            <span className="rh-sb__set-t">The Discovery Set</span>
+            <span className="rh-sb__set-badge">3 × 10 ml</span>
+            {setPrice ? (
+              <span className="rh-sb__set-price">{formatINR(setPrice)}</span>
+            ) : null}
           </Link>
 
-          <ul className="rh-sb__rows rh-rise" style={rise(5)}>
-            <li>
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  openCart();
-                }}
-              >
-                <RhIcon name="bag" />
-                Bag <b className="rh-bagcount">{count}</b>
-                <RhIcon name="chevR" />
-              </button>
-            </li>
-            <li>
-              {authed ? (
-                <Link href="/account" onClick={onClose}>
-                  <RhIcon name="user" />
-                  Account
-                  <RhIcon name="chevR" />
+          <ul className="rh-sb__links rh-rise" style={rise(afterNav + 1)}>
+            {LINKS.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} onClick={onClose}>
+                  {l.label}
                 </Link>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    openSignIn();
-                  }}
-                >
-                  <RhIcon name="user" />
-                  Sign in
-                  <RhIcon name="chevR" />
-                </button>
-              )}
+              </li>
+            ))}
+            <li>
+              <Link href="/faq" onClick={onClose}>
+                Concierge &amp; FAQ
+              </Link>
+              <Link href="/contact" className="rh-sb__sub" onClick={onClose}>
+                Contact
+              </Link>
             </li>
           </ul>
 
-          <p className="rh-sb__links rh-rise" style={rise(6)}>
-            {LINKS.map((l) => (
-              <Link key={l.href} href={l.href} onClick={onClose}>
-                {l.label}
+          <div className="rh-sb__pills rh-rise" style={rise(afterNav + 2)}>
+            <button
+              type="button"
+              className="rh-sb__pill"
+              onClick={() => {
+                onClose();
+                openCart();
+              }}
+            >
+              Bag (<span className="rh-bagcount">{count}</span>)
+            </button>
+            {authed ? (
+              <Link href="/account" className="rh-sb__pill" onClick={onClose}>
+                Account
               </Link>
-            ))}
-          </p>
+            ) : (
+              <button
+                type="button"
+                className="rh-sb__pill"
+                onClick={() => {
+                  onClose();
+                  openSignIn();
+                }}
+              >
+                Sign in
+              </button>
+            )}
+          </div>
         </div>
 
-        <MenuFooter />
+        <MenuFooter whatsapp={whatsapp} freeShippingAbove={freeShippingAbove} />
       </aside>
     </dialog>
   );

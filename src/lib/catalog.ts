@@ -162,6 +162,8 @@ export interface CatalogNavItem {
   /** launch price + MRP, rupees (drives the announcement bar's first message) */
   price: number;
   mrp: number;
+  /** bottle size, ml (the drawer's "50 ml Extrait" line) */
+  volumeMl: number;
 }
 
 /**
@@ -174,7 +176,7 @@ export interface BagSuggestion {
   name: string;
   /** a fragrance slug drives the vector `<Flacon>` fallback; absent for the set */
   fragrance?: FragranceSlug;
-  /** real packshot URL when one exists, else null → draw the vector flacon */
+  /** the product page's FIRST picture (`pdpCover` in lib/pdp-images), else null → draw the vector flacon */
   image: string | null;
   /** short line under the name — "Extrait · 50 ml" / "3 × 10 ml" */
   meta: string;

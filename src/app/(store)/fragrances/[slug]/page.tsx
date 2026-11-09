@@ -11,7 +11,8 @@ import { Accordion } from "@/components/ui/accordion";
 import { Stars } from "@/components/ui/stars";
 import { PdpReviews } from "@/components/product/pdp-reviews";
 import { cn } from "@/lib/cn";
-import { formatINR } from "@/lib/catalog";
+import { formatINR, type Fragrance } from "@/lib/catalog";
+import { pdpCover } from "@/lib/pdp-images";
 import { SITE, absoluteUrl } from "@/lib/site";
 import { breadcrumbJsonLd } from "@/lib/seo";
 import {
@@ -373,23 +374,7 @@ export default async function FragrancePage({
                 key={r.slug}
                 className="w-[76%] shrink-0 snap-start overflow-hidden rounded-[3px] border border-line bg-surface sm:w-auto sm:shrink"
               >
-                <Link
-                  href={`/fragrances/${r.slug}`}
-                  aria-label={`Open ${r.name}`}
-                  className="relative grid aspect-[4/3.4] place-items-center border-b border-line"
-                  style={{
-                    background:
-                      "linear-gradient(165deg, var(--color-w0), var(--color-w1))",
-                  }}
-                >
-                  <span
-                    className="absolute top-3 right-3 size-2.5 rounded-full ring-[3px] ring-w1"
-                    style={{ background: r.juice }}
-                  />
-                  <span className="block w-[34%]">
-                    <Flacon fragrance={r.slug} />
-                  </span>
-                </Link>
+                <RelatedMedia r={r} />
                 <div className="p-3.5">
                   <p className="text-[1.15rem] tracking-[0.1em]">{r.name}</p>
                   <p className="mt-1 text-[10px] tracking-[0.14em] text-ink-3 uppercase">
@@ -422,6 +407,49 @@ export default async function FragrancePage({
         </section>
       </Container>
     </main>
+  );
+}
+
+/**
+ * The picture of a "You might also like" card: the product page's own first
+ * photograph (`pdpCover`, the same one that page opens with), in a square frame
+ * that keeps the whole flacon in view. Without a photograph, the vector flacon.
+ */
+function RelatedMedia({ r }: { r: Fragrance }) {
+  const cover = pdpCover(r.slug, r.images, r.name);
+  return (
+    <Link
+      href={`/fragrances/${r.slug}`}
+      aria-label={`Open ${r.name}`}
+      className="group relative grid aspect-square place-items-center overflow-hidden border-b border-line"
+      style={{
+        background: "linear-gradient(165deg, var(--color-w0), var(--color-w1))",
+      }}
+    >
+      {cover ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={cover.thumb}
+          srcSet={cover.srcSet}
+          sizes={cover.srcSet ? "(min-width: 640px) 45vw, 76vw" : undefined}
+          alt={cover.alt}
+          width={cover.thumbWidth}
+          height={cover.thumbHeight}
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 size-full object-cover object-[50%_55%] transition-transform duration-[900ms] ease-[var(--ease-out-strong)] group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+        />
+      ) : (
+        <span className="block w-[34%]">
+          <Flacon fragrance={r.slug} />
+        </span>
+      )}
+      <span
+        aria-hidden
+        className="absolute top-3 right-3 size-2.5 rounded-full ring-[3px] ring-w1"
+        style={{ background: r.juice }}
+      />
+    </Link>
   );
 }
 

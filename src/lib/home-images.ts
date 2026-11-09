@@ -23,10 +23,8 @@ export type HomeAssetId =
   | HeroAssetId
   | CardAssetId
   | "extrait-atomizer-craft"
-  | "atelier-story"
   | "unboxing-experience"
-  | "discovery-set-10ml"
-  | "scent-on-skin";
+  | "discovery-set-10ml";
 
 export interface HomeVariant {
   key: string;

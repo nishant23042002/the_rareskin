@@ -1,8 +1,8 @@
 # THE RARESKIN: homepage asset prompt sheet
 
-Production prompts for the nine homepage pictures in `public/images/assets-manifest.json`. The manifest is the source of truth for file names, pixel sizes, aspect ratios, focal points and alt text; this sheet is how to produce the pixels.
+Production prompts for the seven homepage pictures in `public/images/assets-manifest.json`. The manifest is the source of truth for file names, pixel sizes, aspect ratios, focal points and alt text; this sheet is how to produce the pixels.
 
-**Status (2026-11-06):** the hero (16:9 + native 4:5) and the three product cards are **final** (generated plates + the approved flacon pixels composited; see "Results" under sections 1-4). The other five files are still tonal placeholders at the exact final size. To ship a picture: replace the file at the same path (same aspect ratio), set its `status` to `"final"` in the manifest, **and bump `assetVersion` in the manifest** (Next's image optimizer caches by URL and cannot be invalidated; the components request `<file>?v=<assetVersion>`). `pnpm home:images check` verifies size, ratio and weight.
+**Status (2026-11-06):** the hero (16:9 + native 4:5) and the three product cards are **final** (generated plates + the approved flacon pixels composited; see "Results" under sections 1-4). The other three files are still tonal placeholders at the exact final size. To ship a picture: replace the file at the same path (same aspect ratio), set its `status` to `"final"` in the manifest, **and bump `assetVersion` in the manifest** (Next's image optimizer caches by URL and cannot be invalidated; the components request `<file>?v=<assetVersion>`). `pnpm home:images check` verifies size, ratio and weight.
 
 ## 0. Ground rules (read first)
 
@@ -109,18 +109,6 @@ Production prompts for the nine homepage pictures in `public/images/assets-manif
 
 ---
 
-## 6. Atelier story
-
-`atelier-story.webp` 2000×1500 (4:3) · **route: generative** · `atelier-story.tsx`
-
-*Prose / FLUX:* A perfumer's oak workbench seen from 35 degrees above in soft northern daylight from a window at the left: an open cotton-rag formulation journal with unreadable handwritten formulas in brown ink, paper blotter strips (mouillettes) fanned beside it, a row of small amber glass laboratory vials, a brass pipette, a few unlabelled prototype glass flacons with black caps. Quiet, intimate, slightly worn; shallow depth of field on the journal. 50 mm, f/5.6, 5600 K. The handwriting is illegible cursive; no printed labels, no readable words, no logos, no people.
-
-*Midjourney:* `perfumer's oak workbench from above, open handwritten journal with illegible cursive, paper blotter strips fanned, amber glass vials, brass pipette, unlabelled prototype glassware, soft northern window light from the left, 50mm f/5.6 --ar 4:3 --style raw --v 6 --s 60 --no readable text, labels, logo, people, face, brand`
-
-**QA:** zoom into the journal at 200% — no readable words; no bottle label that could be mistaken for the product.
-
----
-
 ## 7. Unboxing
 
 `unboxing-experience.webp` 2400×1600 (3:2) · **route: composite** · `unboxing-ritual.tsx`
@@ -149,20 +137,6 @@ Frame: half-width column at ≥ 900 px, 4:3 band below, so keep the three atomiz
 
 ---
 
-## 9. Scent on skin
-
-`scent-on-skin-lifestyle.webp` 2560×1440 (16:9) · **route: generative** · `scent-on-skin.tsx`
-
-The words sit over the picture (scrim: left on desktop, bottom on a phone where the frame is 4:5): **subject in the right half**, left half soft and dark; the subject must also fit the central 4:5 band. No face.
-
-*Prose / FLUX:* High-fashion editorial detail of a neck and collarbone, a single fingertip or a fine atomizer mist at the pulse point, warm natural window light from the right at about 3800 K falling off softly to the left, fine peach-fuzz and a trace of mist caught in the light, a soft linen or cashmere neckline at the edge. Tonal, unretouched, quiet and intimate. 85 mm, f/2.8, eye level with the collarbone. Cropped below the jaw: no face, no eyes, no logo, no bottle, no text.
-
-*Midjourney:* `editorial detail of a neck and collarbone, fine mist at the pulse point, warm window light from the right falling off to the left, soft cashmere neckline, tonal, unretouched, 85mm f/2.8 --ar 16:9 --style raw --v 6 --s 80 --no face, eyes, lips, logo, text, bottle, jewelry`
-
-**QA:** generated skin must not resemble an identifiable person; model release for any real-person reference (`claimsToVerify`).
-
----
-
 ## 10. Card directions without a pedestal ("The Three", alternatives)
 
 The pedestal cards (sections 2-4) stand the flacon on furniture with the ingredients on the floor below: the bottle shrinks to about 45% of the frame and the picture is busy. Four alternative directions put the flacon **directly on the ground** (never a pedestal, stool, block or stand) at about 62-64% of the frame height:
@@ -176,7 +150,7 @@ The pedestal cards (sections 2-4) stand the flacon on furniture with the ingredi
 
 - **Prompts:** `public/images/prompt-manifest.json` holds all 12 (4 concepts x 3 fragrances): `prompt` (product-free plate prompt for FLUX / Kling), `midjourney` (v6 string with `--ar 4:5 --no ...`), `negative`, `composite` (where and how the approved flacon goes on), `verify`. `pnpm home:images check` rejects a plate prompt that mentions a bottle, stand, label or similar (a generator told about one draws one).
 - **Files:** `public/images/homepage/cards/<concept_id>/<slug>.webp`, 1600x2000, manifest ids `<slug>-card-<concept_id>` (tonal placeholders today).
-- **Switching:** `src/config/homepage-assets.ts` (`DEFAULT_CARD_CONCEPT`). In development, or with `NEXT_PUBLIC_CARD_SWITCHER=1` at build time, a bar at the bottom of the homepage switches live (and `/?concept=<id>` opens one); it shows how many of the three pictures of each direction are final. A tile whose concept picture is still a placeholder shows the current picture.
+- **Switching:** `src/config/homepage-assets.ts` (`DEFAULT_CARD_CONCEPT`). In development, or with `NEXT_PUBLIC_CARD_SWITCHER=1` at build time, a slim "Preview" tab on the left edge of the homepage opens a panel that switches live (and `/?concept=<id>` opens one); it shows how many of the three pictures of each direction are final. A tile whose concept picture is still a placeholder shows the current picture.
 - **Decisions kept from the first brief:** label stays `ESSENTIALS | 50ml` (not the brief's `EXTRAIT DE PARFUM · 50 ML / 1.7 FL. OZ.`) and the liquid stays crystal clear (not amber); concept 4's gold is sunlight, painted by the plate, not refracted through the approved bottle.
 - **Results so far (2026-11-06, one picture at a time):** `grounded_stone` / AURÉVAN is **final** (plate `AXVReB4Y…`, 2 credits). The generator drew a diagonal limestone slab, a real pebbled bergamot half back-left and one tight group of six petals back-right (not the asked wide empty stretch), light from the RIGHT. The flacon (scale 1.08, about 60% of the frame height) stands at the slab's front; the plate's own petals were cleaned out (they showed through the clear glass like petals inside the bottle) and three were re-placed beside the base. Build: `design-explorations/packaging-renders/homepage/card_build.py gs_aurevan`. `grounded_stone` / ORVÉLIS is **final** too (plate `ATTs1Qbz…`, 2 credits): a wide dark oak tabletop with a deep crack, terracotta wall, vanilla cut by the left frame edge and cinnamon by the right (pushed there with 'partly cut by the frame edge'), but small and far behind the flacon (it reads as depth, not as 'at the base'); flacon scale 1.04 (about 58% of the frame height). New lesson: a busy surface (oak grain, a crack) shows through the clear glass pin-sharp like a hologram, so the plate is blurred inside the bottle silhouette before compositing (`soften_behind_glass` in `card_build.py`), and dark sets need glass edges at posk 1.0 / rim 0.7 / negk 0.5. Earlier lessons: the compositor ignores the target at scale exactly 1.0 (use 0.999 or 1.001); measure the slab's front lip from a gridded close-up of the CONTACT crop (a first estimate was 50-90 px off and hung the left foot over the edge); a pasted prop patch needs a per-channel gain match to its destination (the source was in sun) or it shows as a pale box.
 - **Alignment rule (2026-11-06, the user asked for it):** every card of a direction has the bottle at the same place: `BOTTLE = x 880, base y 1580, scale 1.04` in the 1760-px plate (centre of the frame, about 58% of the frame height), shared by all jobs in `card_build.py`. Measured on the exported WebPs: the ORVÉLIS and AURÉVAN labels span x 596-1003 of 1600 (centres 800.5 / 799.5) and start at y 686. So the plate must give a full-width, corner-free surface with the middle empty and the ingredients at the lower corners / frame edges; a plate that puts props or a table corner where the bottle goes cannot be used (AURÉVAN needed three plates: a diagonal slab with props in the middle, then a free-standing table corner, then the full-width floor that shipped; 6 credits for that card).

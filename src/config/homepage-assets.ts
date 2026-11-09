@@ -15,8 +15,8 @@
  * `final` in the manifest, its tile falls back to the current picture, so a
  * half-generated set never shows a grey placeholder.
  *
- * HOW TO COMPARE: a small bar at the bottom of the homepage switches concepts
- * live, and `/?concept=<id>` opens the page on one. It is on in development, in a
+ * HOW TO COMPARE: a slim "Preview" tab on the left edge of the homepage opens a
+ * panel that switches concepts live, and `/?concept=<id>` opens the page on one. It is on in development, in a
  * build made with NEXT_PUBLIC_CARD_SWITCHER=1, and (SHOWCASE) in every build while
  * `CARD_SWITCHER_PUBLIC` below is true, so the founder can pick a direction on the
  * deployed site. When a direction is chosen: set `DEFAULT_CARD_CONCEPT`, set

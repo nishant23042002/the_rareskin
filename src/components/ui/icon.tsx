@@ -52,7 +52,8 @@ export type IconName =
   | "sun"
   | "moon"
   | "star"
-  | "bell";
+  | "bell"
+  | "trash";
 
 const PATHS: Record<IconName, ReactElement> = {
   bag: (
@@ -214,6 +215,13 @@ const PATHS: Record<IconName, ReactElement> = {
     <>
       <path d="M6 9a6 6 0 0 1 12 0c0 4.5 1.2 6 1.8 6.6.3.3.1.9-.4.9H4.6c-.5 0-.7-.6-.4-.9C4.8 15 6 13.5 6 9Z" />
       <path d="M9.5 20a2.5 2.5 0 0 0 5 0" />
+    </>
+  ),
+  trash: (
+    <>
+      <path d="M4.5 7h15M9.5 7V4.8h5V7" />
+      <path d="M6.5 7l.9 12.2a1.5 1.5 0 0 0 1.5 1.3h6.2a1.5 1.5 0 0 0 1.5-1.3L17.5 7" />
+      <path d="M10 11v5.5M14 11v5.5" />
     </>
   ),
 };

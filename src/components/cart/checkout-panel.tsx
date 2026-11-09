@@ -740,7 +740,14 @@ export function CheckoutPanel() {
 
           {/* trust row */}
           <div className="mt-4 grid grid-cols-3 gap-2 border-t border-line pt-3.5 text-center">
-            <Trust icon="truck" label="Free delivery" />
+            <Trust
+              icon="truck"
+              label={
+                quote && quote.pricing.shippingPaise > 0
+                  ? "Tracked delivery"
+                  : "Free delivery"
+              }
+            />
             <Trust icon="receipt" label="No hidden fees" />
             <Trust icon="shield" label="Secure checkout" />
           </div>

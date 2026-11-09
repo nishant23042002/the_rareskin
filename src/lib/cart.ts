@@ -31,7 +31,8 @@ export type CartAction =
   | { type: "remove"; sku: string }
   | { type: "clear" };
 
-const MAX_QTY = 12;
+/** most of one product a bag line can hold (the stepper disables "+" here) */
+export const MAX_QTY = 12;
 const MAX_LINES = 20;
 const STORAGE_KEY = "rareskin:cart:v1";
 

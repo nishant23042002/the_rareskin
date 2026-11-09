@@ -5,8 +5,10 @@ import { unstable_cache } from "next/cache";
 import { dbConnect } from "@/server/db";
 import { Product, type ProductDoc } from "@/server/models";
 import { toRupees } from "@/lib/money";
+import { pdpCover } from "@/lib/pdp-images";
 import {
   DISCOVERY_SET_SLUG,
+  cloudinaryVariant,
   isFragranceSlug,
   type BagSuggestion,
   type CatalogNavItem,
@@ -194,6 +196,7 @@ export async function getCatalogNav(): Promise<CatalogNavItem[]> {
     onGround: f.onGround,
     price: f.price,
     mrp: f.mrp,
+    volumeMl: f.volumeMl,
   }));
 }
 
@@ -212,7 +215,9 @@ export async function getBagSuggestions(): Promise<BagSuggestion[]> {
       slug: f.slug,
       name: f.name,
       fragrance: f.slug,
-      image: f.images.flat ?? f.images.hero,
+      // the PDP's first picture (lib/pdp-images), so the bag, the sticky bar and
+      // the product page always agree
+      image: pdpCover(f.slug, f.images, f.name)?.thumb ?? null,
       meta: `Extrait · ${f.volumeMl} ml`,
       price: f.price,
       mrp: f.mrp,
@@ -224,7 +229,9 @@ export async function getBagSuggestions(): Promise<BagSuggestion[]> {
       sku: discoverySet.sku,
       slug: discoverySet.slug,
       name: discoverySet.name,
-      image: null,
+      // the set's own page opens with its catalogue photograph when it has one;
+      // without it the bag draws the three flacons
+      image: cloudinaryVariant(discoverySet.image, { w: 400 }),
       meta: `${discoverySet.vialCount} × ${discoverySet.perVialMl} ml`,
       price: discoverySet.price,
       mrp: discoverySet.mrp,

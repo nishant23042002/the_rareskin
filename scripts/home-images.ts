@@ -77,10 +77,8 @@ const REQUIRED_IDS = [
   ...CARD_CONCEPTS.map((c) => `hero-${c}`),
   ...HERO_VARIANTS.map((v) => `hero-${v}`),
   "extrait-atomizer-craft",
-  "atelier-story",
   "unboxing-experience",
   "discovery-set-10ml",
-  "scent-on-skin",
 ];
 
 function ratio(a: string): number {

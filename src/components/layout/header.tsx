@@ -20,10 +20,16 @@ import { SiteMenu } from "./site-menu";
 export function Header({
   nav,
   setPrice = null,
+  whatsapp = null,
+  freeShippingAbove = 0,
 }: {
   nav: CatalogNavItem[];
   /** Discovery Set price, rupees — shown in the dropdown and the sidebar card */
   setPrice?: number | null;
+  /** concierge number (WhatsApp, else phone) for the sidebar footer link */
+  whatsapp?: string | null;
+  /** order value (rupees) from which delivery is free; 0 = always free (the sidebar footer line) */
+  freeShippingAbove?: number;
 }) {
   const scrolled = useScrolled(8);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -65,6 +71,24 @@ export function Header({
     setMenuOpen(true);
   };
 
+  // The menu button leans a few pixels toward a mouse pointer (the ring and the
+  // glyph read `--mx` / `--my`, see `.rh-hdr__burger` in home.css). Mouse only,
+  // and not under reduced motion; the 44px hit box itself never moves.
+  const leanToward = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (e.pointerType !== "mouse") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+    const y = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+    el.style.setProperty("--mx", (x * 3.5).toFixed(2));
+    el.style.setProperty("--my", (y * 3.5).toFixed(2));
+  };
+  const leanAway = (e: React.PointerEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.removeProperty("--mx");
+    e.currentTarget.style.removeProperty("--my");
+  };
+
   return (
     <>
       <header
@@ -77,12 +101,23 @@ export function Header({
               type="button"
               className="rh-hdr__burger"
               onClick={openMenu}
+              onPointerMove={leanToward}
+              onPointerLeave={leanAway}
               aria-haspopup="dialog"
               aria-expanded={menuOpen}
               aria-label="Open menu"
               title="Menu"
             >
-              <RhIcon name="menu" />
+              {/* four dots, the diagonal pair larger: not the stock hamburger (styles: .rh-hdr__burger in home.css) */}
+              <span className="rh-burger" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+                <i />
+              </span>
+              <span className="rh-burger__label" aria-hidden="true">
+                Menu
+              </span>
             </button>
             <nav className="rh-hdr__nav" aria-label="Primary">
               <button
@@ -205,6 +240,8 @@ export function Header({
         onClose={() => setMenuOpen(false)}
         nav={nav}
         setPrice={setPrice}
+        whatsapp={whatsapp}
+        freeShippingAbove={freeShippingAbove}
       />
     </>
   );

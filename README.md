@@ -112,9 +112,9 @@ src/
     layout/    AnnouncementBar  Header (glass + Fragrances dropdown)  SiteMenu (dark
                left sidebar)  MenuFooter  BackToTop  Footer  PageIntro  LegalDoc
     home/      Hero (+HeroMedia)  LaunchOffer (ticket + promises)  InFocus
-               Collection (tiles)  Quiz  DiscoverySet  WhyExtrait  AtelierStory
-               FounderNote  UnboxingRitual  ScentOnSkin  MadeDeliberately
-               InstagramStrip  HomeImage (manifest-driven <Image>)
+               Collection (tiles)  Quiz  DiscoverySet  WhyExtrait  FounderNote
+               UnboxingRitual  MadeDeliberately  InstagramStrip
+               HomeImage (manifest-driven <Image>)
     app/home.css   the homepage + chrome stylesheet, classes namespaced `rh-`
     product/   PdpGallery  PdpReviews
     cart/      CartProvider(*)  CartDrawer("The Counter")  CheckoutPanel  CartBar
@@ -318,13 +318,13 @@ before going live:
 - **Stock** — every product seeds at `stock: 0`; set real levels in
   `/admin/catalogue/<slug>/edit` (or `pnpm catalog set <slug> stock <n>`) before
   launch.
-- **Homepage pictures** — nine pictures (hero 16:9 + 4:5, the three product
-  cards, atomizer macro, atelier, unboxing, discovery set, scent on skin) are
+- **Homepage pictures** — seven pictures (hero 16:9 + 4:5, the three product
+  cards, atomizer macro, unboxing, discovery set) are
   described in [`public/images/assets-manifest.json`](public/images/assets-manifest.json)
   (file, pixel size, ratio, `sizes`, focal point, alt, creative direction,
   `claimsToVerify`) and produced with [`ASSET_PROMPT_SHEET.md`](ASSET_PROMPT_SHEET.md).
   The hero (16:9 + 4:5) and the three product cards are **final** (generated
-  plates + the approved flacon pixels); the other five files are **tonal
+  plates + the approved flacon pixels); the other three files are **tonal
   placeholders** until you replace them at the same path, set their `status` to
   `"final"` **and bump `assetVersion`** in the manifest (Next's image cache cannot
   be invalidated, so URLs carry `?v=<assetVersion>`); existing sections keep their
@@ -333,8 +333,9 @@ before going live:
   light, three fragrances each, plus a "Stone v2" AURÉVAN alternative), next to the
   original pedestal cards; plate prompts in `public/images/prompt-manifest.json`,
   files in `public/images/homepage/cards/<direction>/`, choice in
-  `src/config/homepage-assets.ts`. For the founder showcase a **preview bar at the
-  bottom of the homepage switches the direction live** (`/?concept=<id>` opens one),
+  `src/config/homepage-assets.ts`. For the founder showcase a **slim "Preview" tab on
+  the left edge of the homepage opens a panel that switches the direction live**
+  (`/?concept=<id>` opens one),
   and it is on in every build while `CARD_SWITCHER_PUBLIC` is true. When a direction
   is chosen: set `DEFAULT_CARD_CONCEPT`, set `CARD_SWITCHER_PUBLIC = false`, delete
   the losing pictures and the pedestal cards. Every card has the bottle at the same
@@ -350,8 +351,8 @@ before going live:
   to the three product pages; it shows its final state without JavaScript or with
   reduced motion.
   Before launch, confirm the `claimsToVerify` items (the unboxing box is not
-  approved packaging; no "30% extrait" figure is printed; the atelier and ritual
-  copy is a draft).
+  approved packaging; no "30% extrait" figure is printed; the ritual copy is a
+  draft).
 - **Contact & newsletter** — the contact form now saves every enquiry to
   **`/admin/messages`** and raises a notification; wiring a real ESP for the
   newsletter list still goes in `/api/newsletter`.

@@ -774,46 +774,6 @@
       ]
     },
     {
-      "id": "atelier-story",
-      "section": "Brand narrative / Atelier story (new section)",
-      "component": "src/components/home/atelier-story.tsx",
-      "status": "placeholder",
-      "route": "generative",
-      "variants": [
-        {
-          "key": "default",
-          "file": "atelier-story.webp",
-          "width": 2000,
-          "height": 1500,
-          "aspect": "4:3"
-        }
-      ],
-      "sizes": "(min-width: 900px) 52vw, 100vw",
-      "objectPosition": {
-        "default": "50% 50%"
-      },
-      "alt": "A perfumer's workbench in northern daylight: a handwritten formulation journal, paper blotter strips, amber glass vials and prototype glassware.",
-      "placeholderTone": [
-        "#dcd6c8",
-        "#a39a86"
-      ],
-      "layoutNote": "Handwriting in the journal must be unreadable cursive or out of focus (generators garble text, and nothing on the page may read as a claim). No bottles with labels, no faces, no hands showing a face.",
-      "creativeDirection": "The perfumer's workbench seen from slightly above: open journal with unreadable handwritten formulas, mouillettes fanned beside it, amber laboratory vials, a few prototype flacons without labels, a brass pipette; northern daylight from a window at left, quiet and intimate.",
-      "materials": [
-        "cotton-rag journal pages",
-        "paper blotter strips",
-        "amber glass vials",
-        "unlabelled prototype glassware",
-        "oak workbench"
-      ],
-      "lighting": "soft northern daylight from the left, 5600 K, gentle shadows",
-      "camera": "50 mm, f/5.6, 35 degrees above the bench",
-      "promptRef": "ASSET_PROMPT_SHEET.md#6-atelier-story",
-      "claimsToVerify": [
-        "the picture shows a perfumer's bench in general; the founder letter does not describe the process, so no caption states how the juice is actually made"
-      ]
-    },
-    {
       "id": "unboxing-experience",
       "section": "Unboxing ritual & gifting (new section)",
       "component": "src/components/home/unboxing-ritual.tsx",
@@ -890,45 +850,6 @@
       "claimsToVerify": [
         "there is no approved 10 ml label art: keep the vials unlabelled or confirm the label with the founder before showing one"
       ]
-    },
-    {
-      "id": "scent-on-skin",
-      "section": "Scent on skin (new lifestyle break)",
-      "component": "src/components/home/scent-on-skin.tsx",
-      "status": "placeholder",
-      "route": "generative",
-      "variants": [
-        {
-          "key": "default",
-          "file": "scent-on-skin-lifestyle.webp",
-          "width": 2560,
-          "height": 1440,
-          "aspect": "16:9"
-        }
-      ],
-      "sizes": "(min-width: 900px) 100vw, calc(100vw * 2.22)",
-      "objectPosition": {
-        "default": "70% 50%"
-      },
-      "alt": "A close, warm-lit detail of a neck and collarbone as fragrance is applied to the skin; no face is visible.",
-      "placeholderTone": [
-        "#d3a98a",
-        "#6e4a36"
-      ],
-      "layoutNote": "Full-bleed with the text over it: keep the pulse-point subject in the RIGHT half (the copy sits left on desktop, bottom on phones), the left half soft and dark enough for a scrim. Below 900px the frame is 4:5, so the subject must also sit inside the central 4:5 band. No face, no logo, no bottle label.",
-      "creativeDirection": "High-fashion editorial of the neck and collarbone, a single fingertip or atomizer mist at the pulse point; warm natural window light, intimate skin sillage, fine peach-fuzz and a trace of mist in the light; tonal, unretouched, quiet.",
-      "materials": [
-        "human skin (neck and collarbone only)",
-        "fine mist",
-        "linen or cashmere neckline"
-      ],
-      "lighting": "warm 3800 K window light from the right, soft falloff to the left",
-      "camera": "85 mm, f/2.8, eye level with the collarbone",
-      "promptRef": "ASSET_PROMPT_SHEET.md#9-scent-on-skin",
-      "claimsToVerify": [
-        "model release / consent and usage rights for any real-person reference; generated skin must not resemble an identifiable person"
-      ],
-      "sizesNote": "Below 900px the frame is 4:5 and the 16:9 picture is scaled to the frame's height, so it is about 2.22 x the viewport width wide."
     },
     {
       "id": "aurevan-card-grounded_stone",

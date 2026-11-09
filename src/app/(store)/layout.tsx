@@ -52,6 +52,14 @@ export default async function StoreLayout({
   const setPrice =
     bagSuggestions.find((s) => s.slug === DISCOVERY_SET_SLUG)?.price ?? null;
 
+  // Delivery is free from `shipping.freeAbovePaise` (₹999 today; 0 = always
+  // free) and costs `shipping.flatRatePaise` below it. In rupees for the bag
+  // drawer, the sticky bag bar and the menu footer, so all three follow the
+  // admin setting instead of repeating the number.
+  const { freeAbovePaise, flatRatePaise } = settings.shipping;
+  const freeShippingAbove = freeAbovePaise / 100;
+  const shippingFlat = flatRatePaise / 100;
+
   return (
     <AuthProvider>
       <CartProvider suggestions={bagSuggestions}>
@@ -67,14 +75,23 @@ export default async function StoreLayout({
                   launch={launch}
                   setPrice={setPrice}
                 />
-                <Header nav={nav} setPrice={setPrice} />
+                <Header
+                  nav={nav}
+                  setPrice={setPrice}
+                  whatsapp={settings.contact.whatsapp ?? settings.contact.phone}
+                  freeShippingAbove={freeShippingAbove}
+                />
               </div>
               {children}
               <Footer />
             </NavToneProvider>
-            <CartDrawer />
+            <CartDrawer
+              freeShippingAbove={freeShippingAbove}
+              shippingFlat={shippingFlat}
+              codEnabled={settings.cod.enabled}
+            />
             <CartToast />
-            <CartBar />
+            <CartBar freeShippingAbove={freeShippingAbove} />
             <BackToTop />
             <CampaignNote
               campaign={settings.campaign}
@@ -85,6 +102,7 @@ export default async function StoreLayout({
                   name: s.name,
                   image: s.image,
                   fragrance: s.fragrance,
+                  href: s.href,
                 }))}
             />
             <SignInModalMount />

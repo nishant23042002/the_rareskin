@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Flacon } from "@/components/ui/flacon";
 import { Carousel } from "@/components/ui/carousel";
 import { cn } from "@/lib/cn";
-import { cloudinaryVariant, type FragranceImages, type FragranceSlug } from "@/lib/catalog";
-import { PDP_GALLERY, pdpPhotoSrc } from "@/config/pdp-gallery";
+import type { FragranceImages, FragranceSlug } from "@/lib/catalog";
+import { pdpSlides } from "@/lib/pdp-images";
 
 /**
  * PDP gallery — a draggable frame with dots, plus a thumbnail strip.
@@ -37,26 +37,9 @@ export function PdpGallery({
 }) {
   const [active, setActive] = useState(0);
 
-  const official = (PDP_GALLERY[slug] ?? []).map((p, i) => ({
-    key: `official-${i}`,
-    full: pdpPhotoSrc(slug, p, "full"),
-    thumb: pdpPhotoSrc(slug, p, "small"),
-    srcSet: `${pdpPhotoSrc(slug, p, "small")} ${p.small}w, ${pdpPhotoSrc(slug, p, "full")} ${p.width}w`,
-    alt: p.alt,
-  }));
-
-  const uploaded = (["flat", "hero", "box"] as const)
-    .map((k) => images[k])
-    .filter((url): url is string => Boolean(url))
-    .map((url, i) => ({
-      key: `photo-${i}`,
-      full: cloudinaryVariant(url, { w: 1000 }) ?? url,
-      thumb: cloudinaryVariant(url, { w: 200 }) ?? url,
-      srcSet: undefined as string | undefined,
-      alt: name,
-    }));
-
-  const all = [...official, ...uploaded];
+  // the order lives in `@/lib/pdp-images`, shared with every other surface that
+  // shows this product's first picture
+  const all = pdpSlides(slug, images, name);
   const slides = all.length > 0 ? all : null;
 
   return (
