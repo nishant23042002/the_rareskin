@@ -1,6 +1,8 @@
 @import "tailwindcss";
 /* homepage + global chrome (announcement bar, glass header, sidebar) */
 @import "./home.css";
+/* the colour themes (re-point the tokens below and in home.css under :root[data-theme]) */
+@import "./themes.css";
 
 /* ==========================================================================
    THE RARESKIN — design tokens
@@ -86,8 +88,10 @@
     font-family: var(--font-sans);
     font-weight: 300;
     font-size: 1rem;
-    line-height: 1.62;
+    line-height: 1.7;
+    letter-spacing: 0.01em;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
   }
@@ -192,11 +196,12 @@
 @layer components {
   /* small uppercase kicker used across the site */
   .eyebrow {
-    font-size: 0.656rem;
-    letter-spacing: 0.26em;
+    font-size: 11px;
+    line-height: 1.5;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
     color: var(--color-ink-3);
-    font-weight: 400;
+    font-weight: 500;
   }
 
   /* ---- functional UI surfaces: checkout, account, forms ----

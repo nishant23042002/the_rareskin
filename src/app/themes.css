@@ -1,0 +1,225 @@
+/* ==========================================================================
+   THE RARESKIN: colour themes
+
+   The default theme is the baseline in `globals.css` (`@theme`) and `home.css`
+   (`:root`); it is left exactly as it was. Every other theme is declared here and
+   only here, under `:root[data-theme="<id>"]`, by re-pointing the same custom
+   properties the components already read, so no component changes to switch:
+
+     - the Tailwind tokens        --color-bg / -surface / -surface-2 / -ink / -ink-2 /
+                                  -ink-3 / -line / -line-2 / -cta / -cta-hover /
+                                  -onyx / -champagne / -brass / -gilt / -w0 .. -w4
+     - the homepage + chrome set  --bg / --paper / --stone / --ink / --ink-2 / --ink-3 /
+                                  --line / --line-2 / --onyx / --champagne / --brass /
+                                  --gilt (+ --onyx-2, --tri, --brass-d, --gilt-d)
+
+   `data-theme` is set on <html> by the Theme Switcher dock and, before first paint,
+   by the inline script in `app/layout.tsx` (zero flash). `[data-theme="default"]`
+   (or no attribute) is the original look.
+
+   60-30-10 in every theme
+     60%  canvas + surfaces   --bg / --paper / --stone
+     30%  structure           --ink / --ink-2 / --ink-3, --line / --line-2, and the dark
+                              grounds (--onyx: announcement bar, footer, dark blocks, the
+                              menu and bag drawers) with --champagne as the text on them
+     10%  focal accents       --brass / --gilt, --cta
+
+   WCAG 2.1 AA, measured, not assumed (ratios against the grounds each token sits on):
+     - Every palette hex is used exactly as specified EXCEPT five same-hue nudges where
+       the specified value cannot meet AA for the job it does here:
+         azure     ink-3  #3B82B8 -> #316C99   (3.4:1 on --stone  -> 4.6:1)
+         titanium  ink-3  #64748B -> #59677C   (3.9:1 on --stone  -> 4.7:1)
+         azure     line-2 #93C5FD -> #6D92BB   (1.7:1 -> 3.1:1, interactive borders)
+         titanium  line-2 #94A3B8 -> #8491A4   (2.5:1 -> 3.1:1)
+         celestial line-2 #D97706 -> #D57506   (2.98:1 -> 3.08:1)
+       The specified hex stays in the theme where it is decorative (the accent role and
+       the swatches in the dock).
+     - --brass-d / --gilt-d are the accents as TEXT on a dark ground. Where the specified
+       accent is below 4.5:1 on that theme's --onyx (botanical brass 3.95 / gilt 2.23,
+       azure brass 4.05, amethyst gilt 2.68, titanium gilt 3.75) it is lifted toward
+       --champagne to 5.4:1 (so it also holds 4.5:1 on the lifted card surfaces inside the
+       drawers); elsewhere it equals the accent. The dark scopes below
+       (.rh-announce, .rh-dark, .rs-dark, .rh-dk, .rh-sb) read these instead.
+   ========================================================================== */
+
+/* dark grounds read the accents in their on-dark form (equal to the accent in the default theme) */
+.rh-announce,
+.rh-dark,
+.rs-dark,
+.rh-dk,
+.rh-sb {
+  --brass: var(--brass-d);
+  --gilt: var(--gilt-d);
+  --color-brass: var(--brass-d);
+  --color-gilt: var(--gilt-d);
+}
+
+/* ---- botanical: Forest & Linen ------------------------------------------ */
+:root[data-theme="botanical"] {
+  --bg: #f4f5f0;
+  --paper: #fafbf9;
+  --stone: #c7cbb8;
+  --ink: #0f1f17;
+  --ink-2: #3d4337;
+  --ink-3: #3e5a3f;
+  --line: rgba(62, 90, 63, 0.22);
+  --line-2: #6b7f67;
+  --onyx: #0f1f17;
+  --champagne: #c7cbb8;
+  --brass: #6b7f67;
+  --gilt: #3e5a3f;
+  --brass-d: #87967f;
+  --gilt-d: #87967f;
+  --cta: #0f1f17;
+  --cta-hover: #1e3a2e;
+  --w1: #f4f5f0;
+}
+
+/* ---- azure: Glacial & Royal Navy ---------------------------------------- */
+:root[data-theme="azure"] {
+  --bg: #f8fafc;
+  --paper: #ffffff;
+  --stone: #dbeafe;
+  --ink: #0b1d3a;
+  --ink-2: #1e3a8a;
+  --ink-3: #316c99;
+  --line: #dbeafe;
+  --line-2: #6d92bb;
+  --onyx: #0b1d3a;
+  --champagne: #f8fafc;
+  --brass: #3b82b8;
+  --gilt: #93c5fd;
+  --brass-d: #5f99c5;
+  --gilt-d: #93c5fd;
+  --cta: #0b1d3a;
+  --cta-hover: #1e3a8a;
+  --w1: #f8fafc;
+}
+
+/* ---- celestial: Midnight Indigo & Amber --------------------------------- */
+:root[data-theme="celestial"] {
+  --bg: #faf7f2;
+  --paper: #fffdf9;
+  --stone: #f4d6b0;
+  --ink: #0b132b;
+  --ink-2: #1c2541;
+  --ink-3: #3a506b;
+  --line: rgba(58, 80, 107, 0.2);
+  --line-2: #d57506;
+  --onyx: #0b132b;
+  --champagne: #f4d6b0;
+  --brass: #d97706;
+  --gilt: #5bc0de;
+  --brass-d: #d97706;
+  --gilt-d: #5bc0de;
+  --cta: #0b132b;
+  --cta-hover: #1c2541;
+  --w1: #faf7f2;
+}
+
+/* ---- amethyst: Royal Violet & Lilac Fog --------------------------------- */
+:root[data-theme="amethyst"] {
+  --bg: #faf8fd;
+  --paper: #ffffff;
+  --stone: #f2e9ff;
+  --ink: #0b0720;
+  --ink-2: #25134d;
+  --ink-3: #6a2fc8;
+  --line: #d1b8ff;
+  --line-2: #9d71e8;
+  --onyx: #0b0720;
+  --champagne: #f2e9ff;
+  --brass: #9d71e8;
+  --gilt: #6a2fc8;
+  --brass-d: #9d71e8;
+  --gilt-d: #9b72dc;
+  --cta: #0b0720;
+  --cta-hover: #25134d;
+  --w1: #faf8fd;
+}
+
+/* ---- titanium: Slate & Cool Platinum ------------------------------------ */
+:root[data-theme="titanium"] {
+  --bg: #f8fafc;
+  --paper: #ffffff;
+  --stone: #e2e8f0;
+  --ink: #0f172a;
+  --ink-2: #334155;
+  --ink-3: #59677c;
+  --line: #e2e8f0;
+  --line-2: #8491a4;
+  --onyx: #0f172a;
+  --champagne: #f8fafc;
+  --brass: #94a3b8;
+  --gilt: #64748b;
+  --brass-d: #94a3b8;
+  --gilt-d: #828fa2;
+  --cta: #0f172a;
+  --cta-hover: #000000;
+  --w1: #f8fafc;
+}
+
+/* ---- shared by every non-default theme ---------------------------------- */
+:root[data-theme="botanical"],
+:root[data-theme="azure"],
+:root[data-theme="celestial"],
+:root[data-theme="amethyst"],
+:root[data-theme="titanium"] {
+  /* a slightly lifted dark for the dark blocks that sit one step above --onyx */
+  --onyx-2: color-mix(in srgb, var(--champagne) 4%, var(--onyx));
+  /* the brand rule: champagne, the accent, then ink (the default theme keeps its tri-juice) */
+  --tri: linear-gradient(90deg, var(--champagne) 0%, var(--brass) 52%, var(--ink) 100%);
+
+  /* the Tailwind tokens follow the set above, one source per theme */
+  --color-bg: var(--bg);
+  --color-surface: var(--paper);
+  --color-surface-2: var(--stone);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --color-cta: var(--cta);
+  --color-cta-hover: var(--cta-hover);
+  --color-onyx: var(--onyx);
+  --color-champagne: var(--champagne);
+  --color-brass: var(--brass);
+  --color-gilt: var(--gilt);
+  /* the greyscale ramp the buttons and badges use: w0 = surface, w4 = ink */
+  --color-w0: var(--paper);
+  --color-w1: var(--w1);
+  --color-w2: var(--line-2);
+  --color-w3: var(--ink-3);
+  --color-w4: var(--ink);
+}
+
+/* the theme dock's panel eases in (components/ui/theme-switcher.tsx) */
+.theme-dock-in {
+  animation: rh-rise 0.35s var(--ease-brand) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-dock-in {
+    animation: none;
+  }
+}
+
+/* Secondary text on a dark ground that is set as an alpha of --champagne (or on the champagne band as an alpha of
+   --onyx) was tuned for the default's light champagne. The other themes' champagnes are darker or cooler, so these
+   few are given a little more weight there to hold 4.5:1. The default theme is not touched. */
+:root[data-theme]:not([data-theme="default"]) .rh-focus__tabs button:not([aria-selected="true"]):not(:hover) {
+  color: color-mix(in srgb, var(--champagne) 66%, transparent);
+}
+:root[data-theme]:not([data-theme="default"]) .rh-dset__fine {
+  color: color-mix(in srgb, var(--champagne) 68%, transparent);
+}
+:root[data-theme]:not([data-theme="default"]) .rs-dark [class*="text-champagne/55"] {
+  color: color-mix(in srgb, var(--color-champagne) 68%, transparent);
+}
+:root[data-theme]:not([data-theme="default"]) footer [class*="text-onyx/65"] {
+  color: color-mix(in srgb, var(--color-onyx) 80%, transparent);
+}
+
+/* the drawers' quiet text (ink-3) sits on lifted card surfaces as well as on --onyx: a little more weight in the darker champagnes */
+:root[data-theme]:not([data-theme="default"]) .rh-dk {
+  --color-ink-3: color-mix(in srgb, var(--champagne) 74%, var(--onyx));
+}

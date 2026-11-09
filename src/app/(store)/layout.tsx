@@ -14,6 +14,7 @@ import { CartToast } from "@/components/cart/cart-toast";
 import { CartBar } from "@/components/cart/cart-bar";
 import { CampaignNote } from "@/components/layout/campaign-note";
 import { BackToTop } from "@/components/layout/back-to-top";
+import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { DISCOVERY_SET_SLUG } from "@/lib/catalog";
 import { getCatalogNav, getBagSuggestions } from "@/server/data/catalog";
 import { getSiteSettings } from "@/server/data/settings";
@@ -93,6 +94,8 @@ export default async function StoreLayout({
             <CartToast />
             <CartBar freeShippingAbove={freeShippingAbove} />
             <BackToTop />
+            {/* founder preview: the six colour themes (src/config/themes.ts, app/themes.css) */}
+            <ThemeSwitcher />
             <CampaignNote
               campaign={settings.campaign}
               products={bagSuggestions

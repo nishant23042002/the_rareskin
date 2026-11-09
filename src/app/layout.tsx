@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Jost, Newsreader } from "next/font/google";
 import { ScrollbarVar } from "@/components/providers/scrollbar-var";
 import { SvgDefs } from "@/components/ui/svg-defs";
+import { THEME_BOOT_SCRIPT } from "@/config/themes";
 import { DEV_CLIENT_BEACON } from "@/lib/dev-client-beacon";
 import { SITE } from "@/lib/site";
 import { organizationJsonLd } from "@/lib/seo";
@@ -59,13 +60,20 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en-IN" className={`${jost.variable} ${newsreader.variable}`}>
-      {process.env.NODE_ENV !== "production" && (
-        <head>
-          {/* dev only: reports what a phone's browser does with this page (src/lib/dev-client-beacon.ts) */}
+    // suppressHydrationWarning: the boot script below sets `data-theme` on <html> before React hydrates
+    <html
+      lang="en-IN"
+      className={`${jost.variable} ${newsreader.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        {/* applies a previewed colour theme before the first paint (src/config/themes.ts, app/themes.css) */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+        {process.env.NODE_ENV !== "production" && (
+          // dev only: reports what a phone's browser does with this page (src/lib/dev-client-beacon.ts)
           <script dangerouslySetInnerHTML={{ __html: DEV_CLIENT_BEACON }} />
-        </head>
-      )}
+        )}
+      </head>
       <body>
         <script
           type="application/ld+json"
