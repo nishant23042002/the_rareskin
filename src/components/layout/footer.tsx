@@ -142,7 +142,10 @@ export async function Footer() {
   const liveSocials = SOCIALS.filter((s) => social[s.key]);
 
   return (
-    <footer role="contentinfo" className="relative isolate">
+    // bg-champagne: the dark block's rounded bottom corners are cut out of it, and what shows through them
+    // must be the wordmark band's colour (the band starts below the block), not the page canvas: in the
+    // themes the canvas is much lighter than the band, and the corners read as white
+    <footer role="contentinfo" className="relative isolate bg-champagne">
       {/* ── the footer proper — slides up over the pinned wordmark ─────── */}
       <div className="rs-dark relative z-10 rounded-b-[clamp(28px,4vw,48px)] bg-onyx text-champagne">
         <Container className="pt-[clamp(56px,7vw,96px)] pb-[clamp(36px,5vw,64px)]">
