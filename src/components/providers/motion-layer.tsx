@@ -34,8 +34,13 @@ const REVEAL_ROOT = ".rh-main > *:not(.rh-hero), [data-reveal]";
 /** what rises in inside them */
 const REVEAL_ITEM =
   ".rh-eyebrow, .rh-display, .rh-h2, .rh-sub, .rh-lede, .rh-btn, .rh-link-u, .rh-tile, [data-rv]";
-/** never touched: the ticket runs its own sequence, drawers and dialogs are not page content */
-const REVEAL_SKIP = ".rh-ticket, dialog, [data-no-motion]";
+/**
+ * never touched: the ticket runs its own sequence, drawers and dialogs are not page content, and anything inside a
+ * sideways-scrolling row (the collection rail, the In Focus carousel, the @therareskin strip) is already "on screen" as
+ * far as its own scroller is concerned: revealing a card that is merely scrolled out of view made it rise 24px into
+ * place as it was swiped in, out of line with its neighbours
+ */
+const REVEAL_SKIP = ".rh-ticket, .rh-rail, .rh-focus, .rh-ig__row, dialog, [data-no-motion]";
 
 const MAX_TILT = 4; // degrees
 const MAX_PULL = 3; // px

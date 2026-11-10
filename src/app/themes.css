@@ -37,13 +37,15 @@
      10%  focal accents       --brass / --gilt, --cta
 
    WCAG 2.1 AA, measured, not assumed (ratios against the grounds each token sits on):
-     - Botanical uses every palette hex exactly as specified. Verdant uses its specified hex
-       except four same-hue nudges where the specified value cannot meet AA for the job it does:
-         ink-3  #586354 -> #4C584A   (3.8:1 on --stone, where the hero's quiet text sits -> 4.5:1)
+     - No dark green anywhere. The dark grounds, the display ink, the buttons and the quiet text are the
+       announcement bar's warm obsidian (#100E0C, the Original theme's --onyx) and warm greys of it; the sage
+       stays the LIGHT, atmospheric colour (the hero plate, the lines, the accent), never a dark.
+         --ink / --onyx / --cta  #100E0C      --cta-hover  #2A2623 (a lifted obsidian)
+         --ink-2  #3B3834  (7.0:1 on the sage plate)      --ink-3  #56534D  (4.6:1 on the sage plate, the header tint, the oat)
+         --gilt   #56534D  (the star / bar / filled-digit accent on a light ground; the sage is --gilt-d on dark grounds)
+     - Verdant keeps two same-hue nudges where its specified value cannot meet AA for the job it does:
          line-2 #B8BCAB -> #878E80   (1.75:1 -> 3.05:1: it is the underline of an input, a boundary)
          brass  #8E997C -> #859075   (2.7:1 -> 3.0:1: it is the focus ring on a light ground)
-         gilt   #C7CBB8 -> #5E6B56   (1.5:1 -> 5.1:1: on a light ground gilt is the star / bar / filled-digit
-                                      accent; the specified sage is kept as --gilt-d, the gilt on dark grounds)
        The specified hex stays where it is decorative (the swatches in the dock, the accent dot).
      - --brass-d / --gilt-d are the accents as TEXT on a dark ground. The specified brass
        (3.95:1 on Botanical's --onyx) and gilt (2.23:1) are below 4.5:1 there, so they are
@@ -93,24 +95,24 @@
   --color-w4: var(--ink);
 }
 
-/* ---- botanical: Forest & Linen ------------------------------------------ */
+/* ---- botanical: Forest & Linen: sage and linen, set on the announcement bar's obsidian ---- */
 :root[data-theme="botanical"] {
   --bg: #f4f5f0;
   --paper: color-mix(in srgb, var(--stone) 14%, var(--bg));
   --stone: #c7cbb8;
-  --ink: #0f1f17;
-  --ink-2: #3d4337;
-  --ink-3: #3e5a3f;
-  --line: rgba(62, 90, 63, 0.22);
+  --ink: #100e0c;
+  --ink-2: #3b3834;
+  --ink-3: #56534d;
+  --line: rgba(16, 14, 12, 0.14);
   --line-2: #6b7f67;
-  --onyx: #0f1f17;
+  --onyx: #100e0c;
   --champagne: #c7cbb8;
   --brass: #6b7f67;
-  --gilt: #3e5a3f;
+  --gilt: #56534d;
   --brass-d: #87967f;
   --gilt-d: #87967f;
-  --cta: #0f1f17;
-  --cta-hover: #1e3a2e;
+  --cta: #100e0c;
+  --cta-hover: #2a2623;
   --w1: #f4f5f0;
 
   /* the glass header and its dropdown: a light tint of the theme (its secondary surface over the canvas), so the bar sits
@@ -118,7 +120,7 @@
   --hdr-tint: color-mix(in srgb, var(--stone) 55%, var(--bg));
 }
 
-/* ---- verdant: Verdant Atelier, Mineral Sage, Linen & Forest Obsidian ------- */
+/* ---- verdant: Verdant Atelier, mineral sage and linen, set on the announcement bar's obsidian ---- */
 :root[data-theme="verdant"] {
   /* canvas: an airy linen mist; cards: alabaster cardstock (never #fff); the sage is the hero plate, not the page */
   --bg: #f2f4ee;
@@ -126,19 +128,19 @@
   --stone: #c7cbb8;
   /* warm oat: the recessed wells (input wells, pills, quantity stepper, bar tracks) so the sage never reads cold */
   --stone-warm: #e9e7df;
-  --ink: #0f1f17;
-  --ink-2: #3e453b;
-  --ink-3: #4c584a;
-  --line: rgba(15, 31, 23, 0.12);
+  --ink: #100e0c;
+  --ink-2: #3b3834;
+  --ink-3: #56534d;
+  --line: rgba(16, 14, 12, 0.12);
   --line-2: #878e80;
-  --onyx: #0f1f17;
+  --onyx: #100e0c;
   --champagne: #ebe8df;
   --brass: #859075;
-  --gilt: #5e6b56;
+  --gilt: #56534d;
   --brass-d: #a4b092;
   --gilt-d: #c7cbb8;
-  --cta: #0f1f17;
-  --cta-hover: #1e3527;
+  --cta: #100e0c;
+  --cta-hover: #2a2623;
   --w1: #f2f4ee;
 
   --hdr-tint: color-mix(in srgb, var(--stone) 40%, var(--bg));

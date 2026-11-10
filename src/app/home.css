@@ -361,12 +361,17 @@
   .rh-dots {display:inline-flex;gap:5px;align-items:center;margin-right:8px;vertical-align:middle}
   .rh-dots i {width:6px;height:6px;border-radius:50%;border:1px solid currentColor}
   .rh-dots i.rh-on {background:currentColor}
-  .rh-tile__body {display:grid;justify-items:center;text-align:center;gap:9px;padding:24px 8px 8px}
+  /* the body fills the tile (the tiles in a row are stretched to the tallest) and the price + button sit at its foot, so those rows line up across the three tiles however many lines a label above them takes */
+  .rh-tile__body {flex:1 1 auto;display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px;padding:24px 8px 8px}
   .rh-tile__name {font:400 clamp(1rem,1.25vw,1.15rem)/1 var(--f-label);letter-spacing:.26em;text-transform:uppercase}
   .rh-tile__title {font:italic 400 15.5px/1.3 var(--f-serif);color:var(--ink-2)}
-  .rh-tile__mood {font-size:11px;letter-spacing:0.182em;text-transform:uppercase;color:var(--ink-3);font-family:var(--f-label)}
+  .rh-tile__mood {font-size:11px;letter-spacing:0.182em;text-transform:uppercase;color:var(--ink-3);font-family:var(--f-label);text-wrap:balance}
+  /* the mono label is wide: where a card is narrow (a phone's 80vw card, and the first widths of the 3-up grid at 900px+) the longest mood line needs a touch less size and tracking to stay on one line, so the tiles' rules line up too */
+  @media(max-width:379px), (min-width:900px) and (max-width:1079px) {
+    .rh-tile__mood {font-size:10.5px;letter-spacing:.12em}
+  }
   .rh-tile__rule {width:26px;height:1px;background:var(--line-2);margin-block:3px}
-  .rh-tile__price {font:400 15px/1 var(--f-sans);letter-spacing:.06em;display:flex;align-items:baseline;gap:9px;margin-bottom:6px}
+  .rh-tile__price {font:400 15px/1 var(--f-sans);letter-spacing:.06em;display:flex;align-items:baseline;gap:9px;margin-top:auto;margin-bottom:6px}
   .rh-tile__price s {color:var(--ink-3);font-size:13px}
   .rh-tile .rh-btn {min-width:min(100%,210px)}
   .rh-quiz {background:var(--stone);padding-block:clamp(64px,9vw,120px);scroll-margin-top:var(--hh)}
