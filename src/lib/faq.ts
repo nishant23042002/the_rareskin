@@ -1,4 +1,4 @@
-export type Faq = { q: string; a: string };
+type Faq = { q: string; a: string };
 
 /**
  * Real FAQ content — grounded in the actual product model and stated policies,

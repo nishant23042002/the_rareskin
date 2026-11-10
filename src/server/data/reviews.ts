@@ -37,7 +37,7 @@ const REVALIDATE_SECONDS = 60 * 60 * 24;
 
 // ── shapes ─────────────────────────────────────────────────────────────
 
-export interface ReviewSummary {
+interface ReviewSummary {
   average: number;
   count: number;
   /** [5★, 4★, 3★, 2★, 1★] counts */
@@ -53,7 +53,7 @@ export interface ReviewPhoto {
   alt: string;
 }
 
-export interface PublicReview {
+interface PublicReview {
   id: string;
   authorName: string;
   /** monogram for the avatar placeholder, e.g. "NS" */
@@ -72,7 +72,7 @@ export interface ProductReviews {
   items: PublicReview[];
 }
 
-export interface FeaturedReview extends PublicReview {
+interface FeaturedReview extends PublicReview {
   productName: string;
   productSlug: string;
   href: string | null;

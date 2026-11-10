@@ -33,7 +33,7 @@ const IST = new Intl.DateTimeFormat("en-IN", {
 const fmtIST = (d: Date | null | undefined): string | null =>
   d ? IST.format(d) : null;
 
-export interface OrderEmailContext {
+interface OrderEmailContext {
   /** the recipient address — the order's snapshotted contact email */
   to: string;
   base: OrderEmailBase;

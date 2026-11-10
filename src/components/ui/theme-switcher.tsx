@@ -21,8 +21,8 @@ import { cn } from "@/lib/cn";
 
 /**
  * Theme preview dock (bottom-right, above the back-to-top button): a small pill
- * that opens a frosted panel listing the six themes, each with its six-colour
- * palette, name and archetype, and a "Reset to Original". Choosing one sets
+ * that opens a frosted panel listing the themes (Original and Botanical), each with
+ * its six-colour palette, name and archetype, and a "Reset to Original". Choosing one sets
  * `data-theme` on <html> at once (the tokens in `app/themes.css` re-point, nothing
  * re-renders) and remembers it in `localStorage` (`rareskin_theme_preview`); the
  * inline script in `app/layout.tsx` re-applies it before first paint on the next

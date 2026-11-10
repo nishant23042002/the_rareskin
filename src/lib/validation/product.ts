@@ -27,7 +27,6 @@ export const CONCENTRATIONS = [
   "eau_de_toilette",
 ] as const;
 
-export type ProductKind = (typeof PRODUCT_KINDS)[number];
 export type ProductStatus = (typeof PRODUCT_STATUSES)[number];
 
 const notesByPhase = z.object({

@@ -12,7 +12,7 @@ import type { FragranceSlug } from "@/lib/catalog";
  * (`images.flat | hero | box`) follows them. The bottle is the approved flacon
  * (label `ESSENTIALS | 50ml`); nothing here is generated at runtime.
  */
-export interface PdpPhoto {
+interface PdpPhoto {
   /** file stem under /images/pdp/<slug>/ (`<stem>-<width>.webp`) */
   stem: string;
   /** width of the large file; its height is `height` */

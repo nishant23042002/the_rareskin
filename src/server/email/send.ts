@@ -11,7 +11,7 @@ import { isSuppressed } from "./suppression";
 import { renderElement, renderHtml } from "./render";
 import type { EmailPropsFor } from "./types";
 
-export type SendOutcome =
+type SendOutcome =
   | { kind: "ok"; providerId: string }
   | { kind: "suppressed" }
   | { kind: "retryable"; error: string }

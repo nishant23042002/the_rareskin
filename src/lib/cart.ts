@@ -16,7 +16,7 @@ export interface CartLine {
   meta?: string;
 }
 
-export interface CartState {
+interface CartState {
   lines: CartLine[];
   /** false until localStorage has been read (drives the drawer's empty state) */
   hydrated: boolean;
@@ -24,7 +24,7 @@ export interface CartState {
 
 export const initialCartState: CartState = { lines: [], hydrated: false };
 
-export type CartAction =
+type CartAction =
   | { type: "hydrate"; lines: CartLine[] }
   | { type: "add"; line: Omit<CartLine, "qty"> & { qty?: number } }
   | { type: "setQty"; sku: string; qty: number }

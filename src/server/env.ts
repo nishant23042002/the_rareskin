@@ -97,7 +97,7 @@ const schema = z.object({
   SEED_SUPERADMIN_NAME: z.string().min(1).optional(),
 });
 
-export type ServerEnv = z.infer<typeof schema>;
+type ServerEnv = z.infer<typeof schema>;
 
 let cached: ServerEnv | null = null;
 

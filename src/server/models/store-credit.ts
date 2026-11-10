@@ -12,7 +12,7 @@ import {
  * spend appends a `ledger[]` entry and decrements the remainder inside the
  * order transaction, so it can never be double-spent.
  */
-export interface StoreCreditLedgerSub {
+interface StoreCreditLedgerSub {
   at: Date;
   /** signed paise — negative on spend, positive on reversal */
   deltaPaise: number;

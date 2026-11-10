@@ -24,11 +24,8 @@
   /* a quick overshoot (buttons, chips, the bag count) and a long, soft settle (reveals, cards) */
   --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --expo: cubic-bezier(0.16, 1, 0.3, 1);
-  /* materials: a hairline, and ambient shadows (a tight contact shadow plus a wide, faint one; never a muddy drop) */
+  /* materials: a hairline, and shadows that are a tight contact shadow plus a wide, faint one (never a muddy drop) */
   --hairline: color-mix(in srgb, var(--ink) 9%, transparent);
-  --sh-ambient:
-    0 1px 2px color-mix(in srgb, var(--ink) 6%, transparent),
-    0 16px 34px -20px color-mix(in srgb, var(--ink) 38%, transparent);
   /* a card resting on the page: a long, faint, ink-tinted shadow (never a black drop) */
   --sh-card: 0 20px 40px -15px color-mix(in srgb, var(--ink) 8%, transparent);
   --sh-lift:

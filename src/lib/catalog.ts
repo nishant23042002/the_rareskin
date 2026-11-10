@@ -47,11 +47,6 @@ export interface FragranceImages {
   box: string | null;
 }
 
-/** Any real Fragrance/Set image is present. */
-export function hasPhotography(images: FragranceImages): boolean {
-  return Boolean(images.hero || images.flat || images.box);
-}
-
 /**
  * Rewrite a Cloudinary delivery URL to request an on-the-fly variant
  * (`f_auto,q_auto` + an optional width/height cap). Non-Cloudinary URLs and

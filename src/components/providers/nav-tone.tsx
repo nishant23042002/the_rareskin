@@ -16,7 +16,7 @@ import {
  *
  * Default "dark" so every non-hero page just works.
  */
-export type NavTone = "dark" | "light";
+type NavTone = "dark" | "light";
 
 interface NavToneContextValue {
   tone: NavTone;

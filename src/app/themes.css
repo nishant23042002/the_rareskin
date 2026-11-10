@@ -1,10 +1,11 @@
 /* ==========================================================================
    THE RARESKIN: colour themes
 
-   The default theme is the baseline in `globals.css` (`@theme`) and `home.css`
-   (`:root`); it is left exactly as it was. Every other theme is declared here and
-   only here, under `:root[data-theme="<id>"]`, by re-pointing the same custom
-   properties the components already read, so no component changes to switch:
+   The default theme ("Original") is the baseline in `globals.css` (`@theme`) and
+   `home.css` (`:root`); it is left exactly as it was. The one other theme,
+   Botanical, is declared here and only here, under `:root[data-theme="botanical"]`,
+   by re-pointing the same custom properties the components already read, so no
+   component changes to switch:
 
      - the Tailwind tokens        --color-bg / -surface / -surface-2 / -ink / -ink-2 /
                                   -ink-3 / -line / -line-2 / -cta / -cta-hover /
@@ -15,11 +16,12 @@
 
    `data-theme` is set on <html> by the Theme Switcher dock and, before first paint,
    by the inline script in `app/layout.tsx` (zero flash). `[data-theme="default"]`
-   (or no attribute) is the original look.
+   (or no attribute) is the original look. The list of themes is `config/themes.ts`:
+   a theme added there needs a block here, and nothing else.
 
    Three surface tiers, and never pure white (#fff leaks read as clinical, wrong for a
-   perfume): every theme's --paper is a tint of that theme's own --stone over its --bg,
-   so cards, modals and the buy box feel like tinted cardstock, not a white sheet.
+   perfume): a theme's --paper is a tint of its own --stone over its --bg, so cards,
+   modals and the buy box feel like tinted cardstock, not a white sheet.
      1  canvas    --bg / --color-bg           the page
      2  elevated  --paper / --color-surface   cards, modals, dropdowns, the buy box (+ --color-w0, the
                                              "light" text on dark buttons, which follows it)
@@ -27,7 +29,7 @@
    Pure white survives only where it is a fact, not a surface: the payment-method tiles, and
    the specular glints painted on the bottle art.
 
-   60-30-10 in every theme
+   60-30-10
      60%  canvas + surfaces   --bg / --paper / --stone
      30%  structure           --ink / --ink-2 / --ink-3, --line / --line-2, and the dark
                               grounds (--onyx: announcement bar, footer, dark blocks, the
@@ -35,22 +37,11 @@
      10%  focal accents       --brass / --gilt, --cta
 
    WCAG 2.1 AA, measured, not assumed (ratios against the grounds each token sits on):
-     - Every palette hex is used exactly as specified EXCEPT five same-hue nudges where
-       the specified value cannot meet AA for the job it does here:
-         azure     ink-3  #3B82B8 -> #316C99   (3.4:1 on --stone  -> 4.6:1)
-         titanium  ink-3  #64748B -> #59677C   (3.9:1 on --stone  -> 4.7:1)
-         azure     line-2 #93C5FD -> #6D92BB   (1.7:1 -> 3.1:1, interactive borders)
-         titanium  line-2 #94A3B8 -> #8491A4   (2.5:1 -> 3.1:1)
-         celestial line-2 #D97706 -> #D57506   (2.98:1 -> 3.08:1)
-         emerald   ink-3  #4C956C -> #387958   (3.1:1 on --stone  -> 4.5:1)
-       The specified hex stays in the theme where it is decorative (the accent role and
-       the swatches in the dock).
-     - --brass-d / --gilt-d are the accents as TEXT on a dark ground. Where the specified
-       accent is below 4.5:1 on that theme's --onyx (botanical brass 3.95 / gilt 2.23,
-       azure brass 4.05, amethyst gilt 2.68, titanium gilt 3.75, emerald brass 3.37 /
-       gilt 1.71) it is lifted toward
-       --champagne to 5.4:1 (so it also holds 4.5:1 on the lifted card surfaces inside the
-       drawers); elsewhere it equals the accent. The dark scopes below
+     - Every palette hex is used exactly as specified.
+     - --brass-d / --gilt-d are the accents as TEXT on a dark ground. The specified brass
+       (3.95:1 on Botanical's --onyx) and gilt (2.23:1) are below 4.5:1 there, so they are
+       lifted toward --champagne to 5.4:1 (so they also hold 4.5:1 on the lifted card
+       surfaces inside the drawers). The dark scopes below
        (.rh-announce, .rh-dark, .rs-dark, .rh-dk, .rh-sb) read these instead.
    ========================================================================== */
 
@@ -85,122 +76,9 @@
   --cta: #0f1f17;
   --cta-hover: #1e3a2e;
   --w1: #f4f5f0;
-}
 
-/* ---- azure: Glacial & Royal Navy ---------------------------------------- */
-:root[data-theme="azure"] {
-  --bg: #f8fafc;
-  --paper: color-mix(in srgb, var(--stone) 30%, var(--bg));
-  --stone: #dbeafe;
-  --ink: #0b1d3a;
-  --ink-2: #1e3a8a;
-  --ink-3: #316c99;
-  --line: #dbeafe;
-  --line-2: #6d92bb;
-  --onyx: #0b1d3a;
-  --champagne: #f8fafc;
-  --brass: #3b82b8;
-  --gilt: #93c5fd;
-  --brass-d: #5f99c5;
-  --gilt-d: #93c5fd;
-  --cta: #0b1d3a;
-  --cta-hover: #1e3a8a;
-  --w1: #f8fafc;
-}
-
-/* ---- celestial: Midnight Indigo & Amber --------------------------------- */
-:root[data-theme="celestial"] {
-  --bg: #faf7f2;
-  --paper: color-mix(in srgb, var(--stone) 20%, var(--bg));
-  --stone: #f4d6b0;
-  --ink: #0b132b;
-  --ink-2: #1c2541;
-  --ink-3: #3a506b;
-  --line: rgba(58, 80, 107, 0.2);
-  --line-2: #d57506;
-  --onyx: #0b132b;
-  --champagne: #f4d6b0;
-  --brass: #d97706;
-  --gilt: #5bc0de;
-  --brass-d: #d97706;
-  --gilt-d: #5bc0de;
-  --cta: #0b132b;
-  --cta-hover: #1c2541;
-  --w1: #faf7f2;
-}
-
-/* ---- amethyst: Royal Violet & Lilac Fog --------------------------------- */
-:root[data-theme="amethyst"] {
-  --bg: #faf8fd;
-  --paper: color-mix(in srgb, var(--stone) 45%, var(--bg));
-  --stone: #f2e9ff;
-  --ink: #0b0720;
-  --ink-2: #25134d;
-  --ink-3: #6a2fc8;
-  --line: #d1b8ff;
-  --line-2: #9d71e8;
-  --onyx: #0b0720;
-  --champagne: #f2e9ff;
-  --brass: #9d71e8;
-  --gilt: #6a2fc8;
-  --brass-d: #9d71e8;
-  --gilt-d: #9b72dc;
-  --cta: #0b0720;
-  --cta-hover: #25134d;
-  --w1: #faf8fd;
-}
-
-/* ---- titanium: Slate & Cool Platinum ------------------------------------ */
-:root[data-theme="titanium"] {
-  --bg: #f8fafc;
-  --paper: color-mix(in srgb, var(--stone) 40%, var(--bg));
-  --stone: #e2e8f0;
-  --ink: #0f172a;
-  --ink-2: #334155;
-  --ink-3: #59677c;
-  --line: #e2e8f0;
-  --line-2: #8491a4;
-  --onyx: #0f172a;
-  --champagne: #f8fafc;
-  --brass: #94a3b8;
-  --gilt: #64748b;
-  --brass-d: #94a3b8;
-  --gilt-d: #828fa2;
-  --cta: #0f172a;
-  --cta-hover: #000000;
-  --w1: #f8fafc;
-}
-
-/* ---- emerald: Deep Forest & Mint Mist ------------------------------------ */
-:root[data-theme="emerald"] {
-  --bg: #f9fcf8;
-  --paper: color-mix(in srgb, var(--stone) 45%, var(--bg));
-  --stone: #e6f2ea;
-  --ink: #0f3d2e;
-  --ink-2: #166534;
-  --ink-3: #387958;
-  --line: rgba(76, 149, 108, 0.3);
-  --line-2: #4c956c;
-  --onyx: #0f3d2e;
-  --champagne: #e6f2ea;
-  --brass: #4c956c;
-  --gilt: #166534;
-  --brass-d: #87b89c;
-  --gilt-d: #a8d5ba;
-  --cta: #0f3d2e;
-  --cta-hover: #166534;
-  --w1: #f9fcf8;
-}
-
-/* ---- shared by every non-default theme ---------------------------------- */
-:root[data-theme="botanical"],
-:root[data-theme="azure"],
-:root[data-theme="celestial"],
-:root[data-theme="amethyst"],
-:root[data-theme="titanium"],
-:root[data-theme="emerald"] {
   /* the glass header and its dropdown: a light tint of the theme (its secondary surface over the canvas), so the bar sits
-     in the page instead of reading as a white strip; ink on it stays well above 4.5:1 in every theme */
+     in the page instead of reading as a white strip; ink on it stays well above 4.5:1 */
   --hdr-tint: color-mix(in srgb, var(--stone) 55%, var(--bg));
 
   /* a slightly lifted dark for the dark blocks that sit one step above --onyx */
@@ -227,7 +105,6 @@
   --color-w0: var(--paper);
   --color-w1: var(--w1);
   --color-w2: var(--line-2);
-  --color-w3: var(--ink-3);
   --color-w4: var(--ink);
 }
 
@@ -242,38 +119,26 @@
 }
 
 /* Secondary text on a dark ground that is set as an alpha of --champagne (or on the champagne band as an alpha of
-   --onyx) was tuned for the default's light champagne. The other themes' champagnes are darker or cooler, so these
-   few are given a little more weight there to hold 4.5:1. The default theme is not touched. */
-:root[data-theme]:not([data-theme="default"]) .rh-focus__tabs button:not([aria-selected="true"]):not(:hover) {
+   --onyx) was tuned for the default's light champagne. Botanical's champagne is darker, so these few are given a
+   little more weight there to hold 4.5:1. The default theme is not touched. */
+:root[data-theme="botanical"] .rh-focus__tabs button:not([aria-selected="true"]):not(:hover) {
   color: color-mix(in srgb, var(--champagne) 66%, transparent);
 }
-:root[data-theme]:not([data-theme="default"]) .rh-fslide__notes {
+:root[data-theme="botanical"] .rh-fslide__notes {
   color: color-mix(in srgb, var(--champagne) 66%, transparent);
 }
-:root[data-theme]:not([data-theme="default"]) .rh-dset__fine {
+:root[data-theme="botanical"] .rh-dset__fine {
   color: color-mix(in srgb, var(--champagne) 68%, transparent);
 }
-/* the bag's "Save ₹…" chip: ok green on a 15% ok tint of the drawer (emerald's --onyx is the lightest of the dark grounds: 3.9:1) */
-:root[data-theme]:not([data-theme="default"]) .rh-dk .bg-ok\/15 {
-  background-color: color-mix(in srgb, var(--color-ok) 5%, transparent);
-}
-/* the struck-through list prices: champagne at .55 on the In Focus slides, ink at .7 on the Discovery Set button
-   (emerald, the lightest dark ground and the lightest champagne: 4.1:1 both) */
-:root[data-theme]:not([data-theme="default"]) .rh-fslide__price s {
-  opacity: 0.7;
-}
-:root[data-theme]:not([data-theme="default"]) .rh-dset__cta s {
-  opacity: 0.8;
-}
-:root[data-theme]:not([data-theme="default"]) .rs-dark [class*="text-champagne/55"] {
+:root[data-theme="botanical"] .rs-dark [class*="text-champagne/55"] {
   color: color-mix(in srgb, var(--color-champagne) 68%, transparent);
 }
-:root[data-theme]:not([data-theme="default"]) footer [class*="text-onyx/65"] {
+:root[data-theme="botanical"] footer [class*="text-onyx/65"] {
   color: color-mix(in srgb, var(--color-onyx) 80%, transparent);
 }
 
-/* the drawers' quiet text (ink-3) sits on lifted card surfaces as well as on --onyx: a little more weight in the darker champagnes */
-:root[data-theme]:not([data-theme="default"]) .rh-dk {
+/* the drawers' quiet text (ink-3) sits on lifted card surfaces as well as on --onyx: a little more weight in the darker champagne */
+:root[data-theme="botanical"] .rh-dk {
   --color-ink-3: color-mix(in srgb, var(--champagne) 74%, var(--onyx));
 }
 
@@ -300,11 +165,11 @@ select optgroup {
 }
 
 /* the dark hero panel (a picture with a dark edge) reads its quiet text from the theme's champagne, a little firmer than the default's */
-:root[data-theme]:not([data-theme="default"]) .rh-hero[data-panel="dark"] .rh-hero__text {
+:root[data-theme="botanical"] .rh-hero[data-panel="dark"] .rh-hero__text {
   --ink-3: color-mix(in srgb, var(--champagne) 72%, transparent);
 }
 
 /* the sign-in card is an elevated surface (tier 2), not the bare canvas */
-:root[data-theme]:not([data-theme="default"]) .signin-panel {
+:root[data-theme="botanical"] .signin-panel {
   background-color: var(--paper);
 }

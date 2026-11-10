@@ -19,14 +19,14 @@ import {
   type CardSlug,
 } from "@/config/homepage-assets";
 
-export type HomeAssetId =
+type HomeAssetId =
   | HeroAssetId
   | CardAssetId
   | "extrait-atomizer-craft"
   | "unboxing-experience"
   | "discovery-set-10ml";
 
-export interface HomeVariant {
+interface HomeVariant {
   key: string;
   file: string;
   width: number;

@@ -18,7 +18,7 @@ import type { SiteSettingsInput } from "@/lib/validation/site-settings";
 
 type Campaign = SiteSettingsInput["campaign"];
 
-export interface CampaignProduct {
+interface CampaignProduct {
   name: string;
   /** the product page's first photograph: the fallback when a direction has no picture for it */
   image: string | null;

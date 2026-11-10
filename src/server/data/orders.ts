@@ -97,7 +97,7 @@ export interface OrderSummary {
   thumbs: OrderThumb[];
 }
 
-export interface OrderItemView {
+interface OrderItemView {
   name: string;
   slug: string;
   sku: string;
@@ -110,7 +110,7 @@ export interface OrderItemView {
   lineTotal: number;
 }
 
-export interface OrderDetail extends OrderSummary {
+interface OrderDetail extends OrderSummary {
   items: OrderItemView[];
   pricing: {
     itemsSubtotal: number;

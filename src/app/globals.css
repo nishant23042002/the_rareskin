@@ -17,7 +17,6 @@
   --color-w0: #fafaf7;
   --color-w1: #efeeea;
   --color-w2: #cfcdc6;
-  --color-w3: #7c7a74;
   --color-w4: #2c2a26;
 
   /* surfaces + ink */
@@ -55,6 +54,11 @@
   /* type */
   --font-sans: var(--font-jost), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-serif: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  /* the label voice (eyebrows, buttons, nav, micro-caps, product names, counters). "Platonic Label" is another
+     house's own typeface and is NOT bundled: it only applies on a machine that already has it installed, so the
+     face people see is JetBrains Mono (open licence, loaded in layout.tsx). A licensed copy could be added later
+     as an @font-face named "Platonic Label" and nothing else would change. */
+  --font-label: "Platonic Label", var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
 
   /* motion */
   --ease-brand: cubic-bezier(0.16, 1, 0.3, 1);
@@ -153,7 +157,6 @@
     --color-w0: #fafaf7;
     --color-w1: #efeeea;
     --color-w2: #cfcdc6;
-    --color-w3: #7c7a74;
     --color-w4: #2c2a26;
     --color-bg: #f2f1ed;
     --color-surface: #fafaf7;
@@ -175,7 +178,6 @@
     --color-w0: #1c1b19;
     --color-w1: #26241f;
     --color-w2: #4c4941;
-    --color-w3: #948f86;
     --color-w4: #ede9e2;
 
     --color-bg: #161512;
@@ -203,8 +205,7 @@
     letter-spacing: 0.28em;
     text-transform: uppercase;
     color: var(--color-ink-3);
-    font-weight: 500;
-  }
+    font-weight: 500;font-family:var(--f-label)}
 
   /* ---- functional UI surfaces: checkout, account, forms ----
      The editorial body runs light (300). Dense, information-carrying UI needs
@@ -231,17 +232,6 @@
     font-family: var(--font-serif);
     font-style: italic;
     font-weight: 300;
-  }
-
-  /* ---- overlays: parked off-screen from first paint so they can never flash
-     at rest before JS runs. GSAP overrides these via inline style. ---- */
-  .drawer-scrim {
-    opacity: 0;
-    visibility: hidden;
-  }
-  .drawer-panel {
-    transform: translateX(101%);
-    box-shadow: -28px 0 70px -20px rgba(20, 16, 12, 0.22);
   }
 
   /* ---- sign-in modal: centred card ≥ 640px, bottom sheet below. The dialog +
@@ -568,4 +558,10 @@ html.lenis body {
 /* taps respond at once (no double-tap-zoom wait) on every control */
 a, button, summary, label, [role="button"], input, select, textarea {
   touch-action: manipulation;
+}
+
+/* Tailwind's `uppercase` is always a small label in this codebase (never a display heading), so it is set in the
+   label voice too. The storefront only: the admin keeps its own type. Unlayered, so it wins over the utilities. */
+.uppercase:not([data-admin-theme] *) {
+  font-family: var(--font-label);
 }

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Jost, Newsreader } from "next/font/google";
+import { JetBrains_Mono, Jost, Newsreader } from "next/font/google";
 import { ScrollbarVar } from "@/components/providers/scrollbar-var";
 import { SvgDefs } from "@/components/ui/svg-defs";
 import { THEME_BOOT_SCRIPT } from "@/config/themes";
@@ -25,6 +25,14 @@ const newsreader = Newsreader({
   subsets: ["latin"],
   style: ["normal", "italic"],
   variable: "--font-newsreader",
+  display: "swap",
+});
+
+// The label voice: eyebrows, buttons, navigation, micro-caps, product names and counters are set in
+// this (see `--font-label` in globals.css). A variable font, so one file covers every weight.
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains",
   display: "swap",
 });
 
@@ -63,7 +71,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // suppressHydrationWarning: the boot script below sets `data-theme` on <html> before React hydrates
     <html
       lang="en-IN"
-      className={`${jost.variable} ${newsreader.variable}`}
+      className={`${jost.variable} ${newsreader.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
       <head>

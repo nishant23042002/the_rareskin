@@ -36,7 +36,7 @@ export function folderPath(folder: SignUploadInput["folder"], sub?: string) {
   return sub ? `${ROOT_FOLDER}/${folder}/${sub}` : `${ROOT_FOLDER}/${folder}`;
 }
 
-export interface SignedUpload {
+interface SignedUpload {
   cloudName: string;
   apiKey: string;
   timestamp: number;

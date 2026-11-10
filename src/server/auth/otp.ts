@@ -17,7 +17,7 @@ import { OTP_LENGTH, OTP_MAX_ATTEMPTS } from "@/lib/auth";
  *  staff re-auth that elevates the admin session for a short window. Twilio
  *  Verify itself is per-phone and purpose-agnostic — this only scopes our own
  *  challenge row + attempt counter. */
-export type OtpPurpose = "login" | "sudo";
+type OtpPurpose = "login" | "sudo";
 
 /**
  * OTP send / check — wired to Twilio Verify.
@@ -201,7 +201,7 @@ export async function sendOtp(
 
 // ── check ───────────────────────────────────────────────────────────────
 
-export interface CheckResult {
+interface CheckResult {
   ok: boolean;
   /** true when the challenge is spent (too many attempts / expired) */
   burned?: boolean;

@@ -27,7 +27,6 @@ export const accountUploadInput = z.object({
 });
 export type AccountUploadInput = z.infer<typeof accountUploadInput>;
 
-export type MediaFormat = (typeof MEDIA_FORMATS)[number];
 export type MediaFolder = (typeof MEDIA_FOLDERS)[number];
 
 /** Payload the client sends to register an upload it has just completed. */
@@ -42,14 +41,12 @@ export const mediaConfirmInput = z.object({
   alt: shortText(200).optional(),
   tags: z.array(shortText(40)).max(24).default([]),
 });
-export type MediaConfirmInput = z.infer<typeof mediaConfirmInput>;
 
 /** Editable fields once an asset exists. */
 export const mediaUpdateInput = z.object({
   alt: shortText(200).nullable().optional(),
   tags: z.array(shortText(40)).max(24).optional(),
 });
-export type MediaUpdateInput = z.infer<typeof mediaUpdateInput>;
 
 /** Params the browser needs from the server to run a signed direct upload. */
 export const signUploadInput = z.object({

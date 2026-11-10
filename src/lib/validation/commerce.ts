@@ -42,7 +42,6 @@ export const PAYMENT_STATUSES = [
   "refunded",
   "partially_refunded",
 ] as const;
-export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
 
 /** Rows in the immutable `payments` audit log. */
 export const PAYMENT_EVENTS = [
@@ -55,7 +54,6 @@ export const PAYMENT_EVENTS = [
   "refund_failed",
   "disputed",
 ] as const;
-export type PaymentEvent = (typeof PAYMENT_EVENTS)[number];
 
 export const PAYMENT_EVENT_SOURCES = [
   "server",
@@ -66,14 +64,7 @@ export const PAYMENT_EVENT_SOURCES = [
   "dev-simulate",
 ] as const;
 
-export const REFUND_STATUSES = [
-  "created",
-  "processed",
-  "failed",
-] as const;
-
 export const COUPON_TYPES = ["percent", "fixed", "free_shipping"] as const;
-export type CouponType = (typeof COUPON_TYPES)[number];
 
 export const COUPON_STATUSES = ["active", "paused", "expired"] as const;
 
@@ -115,7 +106,6 @@ export type CartItemInput = z.infer<typeof cartItemInput>;
 export const cartItemsInput = z.object({
   items: z.array(cartItemInput).max(MAX_CART_LINES),
 });
-export type CartItemsInput = z.infer<typeof cartItemsInput>;
 
 /** Coupon code — 3–24 chars, letters/digits/dash, normalised upper-case. */
 export const couponCodeInput = z
@@ -180,7 +170,6 @@ export const razorpayCallbackInput = z.object({
   razorpay_payment_id: z.string().min(6).max(64),
   razorpay_signature: z.string().min(16).max(256),
 });
-export type RazorpayCallbackInput = z.infer<typeof razorpayCallbackInput>;
 
 /** Dev-only: simulate a payment outcome when Razorpay isn't configured. */
 export const devPaymentSimulateInput = z.object({
@@ -194,7 +183,6 @@ export const refundInput = z.object({
   amountPaise: paise.optional(),
   reason: shortText(240),
 });
-export type RefundInput = z.infer<typeof refundInput>;
 
 // ── admin: order management (Phase G1) ──────────────────────────────────
 
@@ -208,14 +196,12 @@ export const orderStatusAdvanceInput = z.object({
   trackingUrl: httpUrl.max(500).optional(),
   eta: shortText(60).optional(),
 });
-export type OrderStatusAdvanceInput = z.infer<typeof orderStatusAdvanceInput>;
 
 /** `PATCH /api/admin/orders/[orderNumber]` — add an internal (staff-only) note. */
 export const orderNoteInput = z.object({
   action: z.literal("note"),
   text: shortText(1000),
 });
-export type OrderNoteInput = z.infer<typeof orderNoteInput>;
 
 export const orderPatchInput = z.discriminatedUnion("action", [
   orderStatusAdvanceInput,
@@ -226,7 +212,6 @@ export const orderPatchInput = z.discriminatedUnion("action", [
 export const orderCancelInput = z.object({
   reason: shortText(240),
 });
-export type OrderCancelInput = z.infer<typeof orderCancelInput>;
 
 // ── admin: coupon CRUD (schema lives here; UI is Phase H) ────────────────
 

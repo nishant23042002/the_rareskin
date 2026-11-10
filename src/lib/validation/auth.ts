@@ -8,7 +8,6 @@ export const otpStartInput = z.object({
   // client sends `null` when Turnstile isn't rendered
   turnstileToken: z.string().max(4000).nullish(),
 });
-export type OtpStartInput = z.infer<typeof otpStartInput>;
 
 /** Body of `POST /api/auth/otp/verify`. */
 export const otpVerifyInput = z.object({
@@ -18,7 +17,6 @@ export const otpVerifyInput = z.object({
     .trim()
     .regex(new RegExp(`^\\d{${OTP_LENGTH}}$`), `Enter the ${OTP_LENGTH}-digit code`),
 });
-export type OtpVerifyInput = z.infer<typeof otpVerifyInput>;
 
 /** Body of `POST /api/admin/sudo/confirm` — the staff re-auth code. The phone
  *  is the signed-in staff member's own, so it isn't taken from the client. */
@@ -28,7 +26,6 @@ export const sudoConfirmInput = z.object({
     .trim()
     .regex(new RegExp(`^\\d{${OTP_LENGTH}}$`), `Enter the ${OTP_LENGTH}-digit code`),
 });
-export type SudoConfirmInput = z.infer<typeof sudoConfirmInput>;
 
 /** Query of `GET /api/auth/google/start`. `next` is sanitised again server-side
  *  via `safeNextPath`; the callback trusts only its own signed cookies. */
@@ -36,4 +33,3 @@ export const googleStartQuery = z.object({
   mode: z.enum(["link", "signin"]).default("signin"),
   next: z.string().max(512).optional(),
 });
-export type GoogleStartQuery = z.infer<typeof googleStartQuery>;

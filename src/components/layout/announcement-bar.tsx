@@ -28,7 +28,7 @@ import { formatINR } from "@/lib/catalog";
  * With none configured the built-in `fallback` set is used.
  */
 
-export interface AnnouncementItem {
+interface AnnouncementItem {
   text: string;
   href?: string;
 }

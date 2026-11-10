@@ -3,7 +3,7 @@
 import { useId, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-export type AccordionItem = { q: string; a: ReactNode };
+type AccordionItem = { q: string; a: ReactNode };
 
 /**
  * One panel open at a time. Height animates via `grid-template-rows: 0fr -> 1fr`

@@ -40,7 +40,7 @@ function metaFrom(ctx: AuthContext, ip: string | null, ua: string | null): Actor
 
 // ── advance status / fulfil ────────────────────────────────────────────
 
-export interface AdvanceStatusInput {
+interface AdvanceStatusInput {
   to: OrderStatus;
   carrier?: string | null;
   trackingNumber?: string | null;
@@ -158,7 +158,7 @@ export async function addInternalNote(
 
 // ── refund (sudo) ──────────────────────────────────────────────────────
 
-export interface RefundOrderInput {
+interface RefundOrderInput {
   amountPaise?: number;
   reason: string;
 }

@@ -5,12 +5,12 @@ import { ORDER, type FragranceSlug } from "./catalog";
  * fragrance, majority wins (ties break by canonical `ORDER`). Content ported
  * from the "Campaign" prototype.
  */
-export interface QuizOption {
+interface QuizOption {
   label: string;
   key: FragranceSlug;
 }
 
-export interface QuizQuestion {
+interface QuizQuestion {
   prompt: string;
   options: QuizOption[];
 }

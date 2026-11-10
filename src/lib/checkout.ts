@@ -29,7 +29,7 @@ export interface QuoteWarning {
   message: string;
 }
 
-export interface QuotePricing {
+interface QuotePricing {
   itemsSubtotalPaise: number;
   discountPaise: number;
   creditAppliedPaise: number;
@@ -48,7 +48,7 @@ export interface QuotePricing {
   freeShipping: boolean;
 }
 
-export interface Serviceability {
+interface Serviceability {
   pincode: string;
   serviceable: boolean;
   reason: "ok" | "malformed" | "blocked" | "out-of-area";
@@ -73,12 +73,6 @@ export interface CheckoutQuoteResponse {
     | { applied: false; code: string; reason: string }
     | null;
   shipStateCode: string | null;
-}
-
-export interface CheckoutQuoteErrorResponse {
-  ok: false;
-  code: "empty-cart";
-  message: string;
 }
 
 /** How the client should collect payment. */

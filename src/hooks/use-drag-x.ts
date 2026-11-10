@@ -15,7 +15,7 @@ import { useEffect, useRef, type RefObject } from "react";
  *
  * Options may change every render (they are read through a ref).
  */
-export interface DragXOptions {
+interface DragXOptions {
   mouseOnly?: boolean;
   /** return false to ignore a gesture (e.g. layout does not scroll sideways) */
   enabled?: () => boolean;

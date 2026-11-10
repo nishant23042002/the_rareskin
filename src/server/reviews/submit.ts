@@ -65,7 +65,7 @@ async function tagAssets(
   );
 }
 
-export type SubmitResult =
+type SubmitResult =
   | { ok: true; id: string }
   | {
       ok: false;
@@ -136,7 +136,7 @@ export async function submitReview(
   }
 }
 
-export type EditResult =
+type EditResult =
   | { ok: true }
   | { ok: false; error: "not-found" | "not-editable" };
 

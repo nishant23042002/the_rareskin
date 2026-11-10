@@ -13,13 +13,12 @@ the footer so each mark's white backing plate drops into the ground.
 | `gpay.svg` | canonical Google "G" mark — stands in for "pay with Google Pay" |
 | `phonepe.svg` | PhonePe brand mark |
 | `paytm.svg` | Paytm brand logotype |
-| `india.svg` | flagcdn `in.svg` — the region flag, **not** blended |
 
 `gpay` / `phonepe` / `paytm` are UPI-app marks (`UPI_APP_MARKS` in
 `payment-marks.tsx`), shown on white tiles beside the checkout's online-payment
 option and in the CTA badge row — every UPI app settles over UPI.
 
-COD is a first-party glyph in `src/components/ui/payment-marks.tsx` (not a
+COD is a first-party glyph in `src/components/layout/footer-icons.tsx` (not a
 network). To add a card network (`amex`, `diners`, `discover`, `jcb`, `maestro`):
 
 ```
@@ -28,4 +27,4 @@ curl -o public/pay/<name>.svg \
 ```
 
 then strip its `<rect width="128" height="128" fill="white"/>` and add it to
-`MARKS` in `payment-marks.tsx`.
+the list in `PaymentBadges` (`payment-marks.tsx`), and in `footer-icons.tsx` for the footer.

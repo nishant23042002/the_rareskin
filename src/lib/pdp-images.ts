@@ -18,7 +18,7 @@ import {
  *
  * Isomorphic: no server-only imports, safe in client components.
  */
-export interface PdpSlide {
+interface PdpSlide {
   key: string;
   /** the large file (the gallery's main frame) */
   full: string;

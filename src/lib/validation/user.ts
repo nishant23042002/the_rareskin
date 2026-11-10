@@ -66,7 +66,6 @@ export const profileUpdateInput = z.object({
   /** a stored Cloudinary URL from `/api/account/media/confirm`, or null to clear */
   avatarUrl: httpUrl.nullable().optional(),
 });
-export type ProfileUpdateInput = z.infer<typeof profileUpdateInput>;
 
 /** Payload to create / promote a staff member (superadmin only). */
 export const staffInviteInput = z.object({

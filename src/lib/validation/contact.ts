@@ -20,7 +20,6 @@ export const contactMessageInput = z.object({
   subject: shortText(120).optional(),
   phone: shortText(24).optional(),
 });
-export type ContactMessageInput = z.infer<typeof contactMessageInput>;
 
 /** `PATCH /api/admin/messages/[id]`. */
 export const contactMessageActionInput = z.object({

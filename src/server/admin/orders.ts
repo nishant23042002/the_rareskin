@@ -37,7 +37,7 @@ function istDayStart(daysAgo = 0): Date {
 
 // ── live catalogue visuals (mirrors src/server/data/orders.ts) ──────────
 
-export interface ItemVisual {
+interface ItemVisual {
   image: string | null;
   href: string | null;
   isFragrance: boolean;
@@ -173,7 +173,7 @@ export async function listOrders(
 
 // ── detail ─────────────────────────────────────────────────────────────
 
-export interface AdminOrderItem {
+interface AdminOrderItem {
   name: string;
   slug: string;
   sku: string;
@@ -186,7 +186,7 @@ export interface AdminOrderItem {
   isFragrance: boolean;
 }
 
-export interface AdminTimelineEntry {
+interface AdminTimelineEntry {
   at: string;
   status: OrderStatus;
   actor: OrderDoc["timeline"][number]["actor"];
@@ -194,7 +194,7 @@ export interface AdminTimelineEntry {
   note?: string;
 }
 
-export interface AdminPaymentEntry {
+interface AdminPaymentEntry {
   at: string;
   event: PaymentDoc["event"];
   provider: PaymentDoc["provider"];
@@ -207,13 +207,13 @@ export interface AdminPaymentEntry {
   note: string | null;
 }
 
-export interface AdminInternalNote {
+interface AdminInternalNote {
   at: string;
   actorName: string | null;
   text: string;
 }
 
-export interface AdminRefundEntry {
+interface AdminRefundEntry {
   at: string;
   amountPaise: number;
   reason: string;

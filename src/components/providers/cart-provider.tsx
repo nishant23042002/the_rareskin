@@ -26,9 +26,9 @@ import { useAuth } from "@/components/providers/auth-provider";
 import { isFragranceSlug, type BagSuggestion } from "@/lib/catalog";
 
 /** The drawer is one panel that slides between three views. */
-export type CartView = "bag" | "checkout" | "done";
+type CartView = "bag" | "checkout" | "done";
 
-export interface PlacedOrder {
+interface PlacedOrder {
   orderNumber: string;
   method: "razorpay" | "cod";
   /** true once payment is confirmed (Razorpay) — COD stays false */

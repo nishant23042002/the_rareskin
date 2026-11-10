@@ -272,7 +272,7 @@ export interface HydratedCartLine {
   maxQty: number;
 }
 
-export interface HydratedCart {
+interface HydratedCart {
   lines: HydratedCartLine[];
   /** SKUs that were in the cart but no longer sellable — dropped from `lines` */
   removed: string[];

@@ -57,7 +57,7 @@ function loadScript(): Promise<void> {
   return loader;
 }
 
-export interface OpenCheckoutInput {
+interface OpenCheckoutInput {
   keyId: string;
   razorpayOrderId: string;
   amountPaise: number;
@@ -66,7 +66,7 @@ export interface OpenCheckoutInput {
   reference: string;
 }
 
-export type CheckoutOutcome =
+type CheckoutOutcome =
   | { status: "success"; payload: RazorpaySuccess }
   | { status: "dismissed" }
   | { status: "failed"; message: string };

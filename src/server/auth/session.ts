@@ -69,7 +69,7 @@ function toSessionUser(user: UserDoc): SessionUser {
 
 // ── create / cookie ─────────────────────────────────────────────────────
 
-export interface CreateSessionCtx {
+interface CreateSessionCtx {
   ip: string | null;
   userAgent: string | null;
 }

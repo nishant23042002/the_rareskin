@@ -50,7 +50,7 @@ function b64url(buf: Buffer): string {
     .replace(/=+$/, "");
 }
 
-export interface OAuthStart {
+interface OAuthStart {
   url: string;
   state: string;
   codeVerifier: string;

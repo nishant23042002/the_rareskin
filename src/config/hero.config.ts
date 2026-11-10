@@ -45,7 +45,7 @@ export const HERO_VARIANTS = [
 ] as const;
 
 export type HeroVariantNumber = (typeof HERO_VARIANTS)[number]["n"];
-export type HeroVariantId = (typeof HERO_VARIANTS)[number]["id"];
+type HeroVariantId = (typeof HERO_VARIANTS)[number]["id"];
 
 export const activeHeroVariant: HeroVariantNumber | null = null;
 
