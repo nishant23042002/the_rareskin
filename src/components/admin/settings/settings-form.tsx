@@ -84,6 +84,30 @@ export function SettingsForm({ settings }: { settings: S }) {
     s.flags.storeLive !== settings.flags.storeLive ||
     s.flags.maintenanceMode !== settings.flags.maintenanceMode;
 
+  // Mirrors `(store)/layout.tsx`: maintenance mode OR !storeLive → holding page.
+  const persisted = settings.flags;
+  const visitorView = persisted.maintenanceMode
+    ? {
+        public: false,
+        title: "the “Back shortly” maintenance page",
+        detail: persisted.storeLive
+          ? "Maintenance mode is ON, and it overrides Store live — turn Maintenance mode off to open the store."
+          : "Maintenance mode is ON (and Store live is off). Turn Maintenance mode off, then Store live on, to open the store.",
+      }
+    : !persisted.storeLive
+      ? {
+          public: false,
+          title: "the “Opening soon” holding page",
+          detail: "Store live is off. Turn it on to open the store to everyone.",
+        }
+      : {
+          public: true,
+          title: "the real store",
+          detail: persisted.checkoutEnabled
+            ? "Open to everyone, and shoppers can place orders."
+            : "Open to everyone, but Checkout enabled is off — the bag says “opens with launch” and no orders go through.",
+        };
+
   function patch<K extends keyof S>(k: K, v: S[K]) {
     setS((p) => ({ ...p, [k]: v }));
     setSaved(false);
@@ -94,7 +118,7 @@ export function SettingsForm({ settings }: { settings: S }) {
   }
 
   function buildBody() {
-    return siteSettingsUpdateInput.parse({
+    return siteSettingsUpdateInput.safeParse({
       announcements: s.announcements.filter((a) => a.text.trim()),
       announcementRotateSeconds: s.announcementRotateSeconds,
       campaign: s.campaign,
@@ -113,24 +137,43 @@ export function SettingsForm({ settings }: { settings: S }) {
     setBusy(true);
     setError(null);
     try {
+      // Say *which* value is wrong instead of failing with a generic message.
+      const body = buildBody();
+      if (!body.success) {
+        const issue = body.error.issues[0];
+        const where = issue?.path.join(" › ") || "a setting";
+        setError(`Not saved — ${where}: ${issue?.message ?? "invalid value"}.`);
+        return;
+      }
       const res = await fetch("/api/admin/settings", {
         method: "PATCH",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(buildBody()),
+        body: JSON.stringify(body.data),
       });
-      const json = await res.json();
-      if (res.status === 409 && json.error === "sudo-required") {
+      const json = (await res.json().catch(() => null)) as {
+        ok?: boolean;
+        error?: string;
+      } | null;
+      if (res.status === 409 && json?.error === "sudo-required") {
         setSudoOpen(true);
         return;
       }
-      if (!json.ok) {
-        setError("Couldn't save. Check the highlighted fields and try again.");
+      if (res.status === 401 || res.status === 403) {
+        setError(
+          "Not saved — your admin session expired or this account can't change settings. Sign in again, then retry.",
+        );
+        return;
+      }
+      if (!json?.ok) {
+        setError(
+          `Not saved (server answered ${res.status}). Check the highlighted fields and try again.`,
+        );
         return;
       }
       setSaved(true);
       router.refresh();
     } catch {
-      setError("Something went wrong saving. Try again.");
+      setError("Not saved — couldn't reach the server. Check your connection and try again.");
     } finally {
       setBusy(false);
     }
@@ -170,6 +213,24 @@ export function SettingsForm({ settings }: { settings: S }) {
           title="Launch switches"
           description="Each switch flips one behaviour on the storefront. The bold line is what it does right now."
         >
+          {/* What a visitor actually gets — from the SAVED settings, so it can't
+              disagree with the live site. Maintenance mode beats Store live. */}
+          <div
+            className={cn(
+              "rounded-[4px] border px-3 py-2.5 text-[12px] leading-snug",
+              visitorView.public ? "border-ok/40 bg-ok/5" : "border-warn/50 bg-warn/5",
+            )}
+          >
+            <p className="font-medium text-ink">
+              Visitors see right now: {visitorView.title}
+            </p>
+            <p className="mt-0.5 text-ink-2">{visitorView.detail}</p>
+            <p className="mt-1 text-[11px] text-ink-3">
+              Staff only see the real site after signing in on the address they
+              are visiting — a sign-in on another address (for example the
+              *.vercel.app one) doesn’t carry over.
+            </p>
+          </div>
           <div className="grid gap-2.5 sm:grid-cols-2">
             {(Object.keys(FLAG_LABELS) as (keyof S["flags"])[]).map((f) => {
               const on = s.flags[f];
