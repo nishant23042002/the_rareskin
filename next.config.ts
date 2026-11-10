@@ -58,6 +58,36 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/account/orders/[orderNumber]/invoice": ["./public/fonts/**"],
   },
+  // The previous therareskin.com (a separate project) used other paths. Anything
+  // Google has indexed, a customer bookmarked, or a Razorpay "business website"
+  // entry still points at them, so each old URL 308s to its closest equivalent
+  // here. Keep these for at least a year after the cutover.
+  async redirects() {
+    const to = (source: string, destination: string) => ({
+      source,
+      destination,
+      permanent: true,
+    });
+    return [
+      // products — the old slugs had the accents stripped with a hyphen left behind
+      to("/product/aurevan", "/fragrances/aurevan"),
+      to("/product/vayr-n", "/fragrances/vayren"),
+      to("/product/orv-lis", "/fragrances/orvelis"),
+      to("/product/discovery-set", "/discovery-set"),
+      // collections / listings — the range now lives on the homepage
+      to("/perfumes/gift-sets", "/discovery-set"),
+      to("/perfumes", "/"),
+      to("/collections/bestsellers", "/"),
+      // pages that were renamed or split
+      to("/about", "/the-idea"),
+      to("/shipping-returns", "/shipping"),
+      to("/privacy-terms", "/privacy"),
+      // old app routes that no longer exist as pages
+      to("/login", "/?signin=1"),
+      to("/checkout", "/"),
+      to("/search", "/"),
+    ];
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

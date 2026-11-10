@@ -3,8 +3,10 @@
  * JSON-LD all read from one place — set NEXT_PUBLIC_SITE_URL in the env to
  * override the default domain.
  */
+// Canonical host is `www` — it is the host the previous site was indexed under
+// (the bare domain 308s to it), so keeping it means no canonical change for Google.
 const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || "https://therareskin.com"
+  process.env.NEXT_PUBLIC_SITE_URL || "https://www.therareskin.com"
 ).replace(/\/+$/, "");
 
 export const SITE = {

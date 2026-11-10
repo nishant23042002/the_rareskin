@@ -9,6 +9,7 @@ import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { HoldingPage } from "@/components/layout/holding-page";
+import { GoogleTagManager } from "@/components/analytics/google-tag-manager";
 import { CartDrawer } from "@/components/cart/cart-drawer";
 import { CartToast } from "@/components/cart/cart-toast";
 import { CartBar } from "@/components/cart/cart-bar";
@@ -44,7 +45,12 @@ export default async function StoreLayout({
   if (settings.flags.maintenanceMode || !settings.flags.storeLive) {
     const user = await getCurrentUser();
     if (!user?.isStaff) {
-      return <HoldingPage settings={settings} />;
+      return (
+        <>
+          <GoogleTagManager />
+          <HoldingPage settings={settings} />
+        </>
+      );
     }
   }
 
@@ -64,6 +70,7 @@ export default async function StoreLayout({
 
   return (
     <AuthProvider>
+      <GoogleTagManager />
       <CartProvider suggestions={bagSuggestions}>
         <SmoothScroll>
           <RouteTransitionProvider>

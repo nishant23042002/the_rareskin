@@ -202,10 +202,11 @@ See `.env.example`. All optional:
 
 | Variable | Purpose |
 | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | canonical domain (metadata, sitemap, OG). Set to the real domain in production. |
+| `NEXT_PUBLIC_SITE_URL` | canonical domain (metadata, sitemap, OG). Defaults to `https://www.therareskin.com` (the host the old site was indexed under). |
 | `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` / `NEXT_PUBLIC_RAZORPAY_KEY_ID` | for the future checkout provider |
 | `CONTACT_FORWARD_EMAIL` | where `/api/contact` should send messages |
 | `NEWSLETTER_API_KEY` / `NEWSLETTER_LIST_ID` | newsletter provider |
+| `NEXT_PUBLIC_GTM_ID` | Google Tag Manager id (`GTM-…`), storefront only. Production environment only; build-time. |
 | `NEXT_PUBLIC_ANALYTICS_ID` | analytics |
 
 ---
