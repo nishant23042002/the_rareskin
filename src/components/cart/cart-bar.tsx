@@ -48,6 +48,7 @@ export function CartBar({
     isOpen,
     openCart,
     goToCheckout,
+    checkoutAvailable,
     suggestions,
   } = useCart();
   const scrolled = useScrolled(64);
@@ -233,13 +234,16 @@ export function CartBar({
           <Button
             size="sm"
             onClick={goToCheckout}
+            disabled={!checkoutAvailable}
             className="group max-[359px]:gap-1.5 max-[359px]:px-3"
           >
-            Checkout
-            <Icon
-              name="arrowRight"
-              className="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
-            />
+            {checkoutAvailable ? "Checkout" : "Opens at launch"}
+            {checkoutAvailable && (
+              <Icon
+                name="arrowRight"
+                className="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
+              />
+            )}
           </Button>
         </div>
       </div>

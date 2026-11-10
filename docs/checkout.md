@@ -212,7 +212,11 @@ header fills with the tri-fragrance gradient as you move through it.
   (no auto-redirect — nothing has been charged yet).
 
 The panel re-quotes (debounced) on every change to PIN, coupon, credit or
-method. `flags.checkoutEnabled` gates it for customers; always on in dev.
+method. `flags.checkoutEnabled` gates it for customers: while it is off the bag's
+Checkout button reads "opens with launch" and `POST /api/checkout/place` answers
+`403 checkout-disabled`. Signed-in **staff always pass**, so the owner can place a
+real test order before launch (including in dev). In-flight payments (Razorpay
+callback / webhook) are never blocked.
 
 **Scroll lock** is ref-counted (`src/lib/scroll-lock.ts`) so the drawer keeps
 `body.is-locked` even as the sign-in modal, stacked on top, opens and closes.

@@ -129,7 +129,8 @@ export interface PlaceOrderFailure {
     | "credit-changed"
     | "sold-out"
     | "payment-init-failed"
-    | "transaction-unsupported";
+    | "transaction-unsupported"
+    | "checkout-disabled";
   message?: string;
   details?: unknown;
 }

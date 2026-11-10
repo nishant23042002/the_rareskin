@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { placeOrderInput } from "@/lib/validation/commerce";
 import { getAuth, checkRate, requestContext } from "@/server/auth";
 import { placeOrder } from "@/server/commerce";
+import { getSiteSettings } from "@/server/data/settings";
 
 /**
  * Start checkout. Requires a valid session — a guest verifies their phone via
@@ -31,6 +32,23 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { ok: false, error: "bad-request", issues: parsed.error.issues.slice(0, 6) },
       { status: 400 },
+    );
+  }
+
+  // `flags.checkoutEnabled` (Site Settings) is the launch switch for ordering.
+  // Enforced HERE, on the server — hiding the button isn't enough. Signed-in
+  // staff always pass, so the owner can place a real test order before launch.
+  // (Paying for an order already in flight is never blocked: the Razorpay
+  // callback / webhook don't go through this route.)
+  const settings = await getSiteSettings();
+  if (!settings.flags.checkoutEnabled && !auth.user.isStaff) {
+    return NextResponse.json(
+      {
+        ok: false,
+        code: "checkout-disabled",
+        message: "Checkout opens with launch — please check back soon.",
+      },
+      { status: 403 },
     );
   }
 

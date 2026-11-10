@@ -179,7 +179,9 @@ money and stock are decided:
   MongoDB transaction, idempotent per client key).
 
 `flags.checkoutEnabled` in Site Settings gates the customer-facing flow (off
-until launch); it's always usable in development.
+until launch): the bag shows "opens with launch" and the server refuses new
+orders (`403 checkout-disabled`). Signed-in staff always pass, so you can test
+before launch.
 
 **Design tokens.** All colour / type / easing values are CSS custom properties
 in the `@theme` block of `globals.css`. Change them there, not in components.

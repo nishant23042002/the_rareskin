@@ -197,7 +197,9 @@ export type PlaceOrderFailure = {
     | "credit-changed"
     | "sold-out"
     | "payment-init-failed"
-    | "transaction-unsupported";
+    | "transaction-unsupported"
+    /** `flags.checkoutEnabled` is off and the account is not staff */
+    | "checkout-disabled";
   message: string;
   details?: unknown;
 };

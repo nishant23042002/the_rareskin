@@ -56,6 +56,12 @@ interface CartContextValue {
   closeCart: () => void;
   /** slide to the checkout view (opening the drawer if needed) */
   goToCheckout: () => void;
+  /**
+   * Can this visitor start checkout? False while `flags.checkoutEnabled` is off,
+   * except for signed-in staff. The buttons show "opens with launch" and
+   * `goToCheckout` does nothing; the server enforces it too.
+   */
+  checkoutAvailable: boolean;
   /** slide back to the bag */
   backToBag: () => void;
   /** order placed — slide to confirmation and empty the bag */
@@ -81,9 +87,12 @@ const CartContext = createContext<CartContextValue | null>(null);
 export function CartProvider({
   children,
   suggestions = [],
+  checkoutEnabled = true,
 }: {
   children: ReactNode;
   suggestions?: BagSuggestion[];
+  /** `flags.checkoutEnabled` from Site Settings (staff can always check out) */
+  checkoutEnabled?: boolean;
 }) {
   const [state, dispatch] = useReducer(cartReducer, initialCartState);
   const [isOpen, setIsOpen] = useState(false);
@@ -105,7 +114,8 @@ export function CartProvider({
 
   // On sign-in, fold the guest bag into the account's server cart (which may
   // hold items added on another device) and adopt the union locally.
-  const { status } = useAuth();
+  const { status, user } = useAuth();
+  const checkoutAvailable = checkoutEnabled || Boolean(user?.isStaff);
   const prevStatus = useRef(status);
   const stateRef = useRef(state);
   const mergingRef = useRef(false);
@@ -230,11 +240,12 @@ export function CartProvider({
   }, []);
 
   const goToCheckout = useCallback(() => {
+    if (!checkoutAvailable) return;
     window.clearTimeout(resetTimer.current);
     setPlacedOrder(null);
     setView("checkout");
     setIsOpen(true);
-  }, []);
+  }, [checkoutAvailable]);
 
   const backToBag = useCallback(() => setView("bag"), []);
 
@@ -261,6 +272,7 @@ export function CartProvider({
       openCart,
       closeCart,
       goToCheckout,
+      checkoutAvailable,
       backToBag,
       completeOrder,
       modalSuspended,
@@ -289,6 +301,7 @@ export function CartProvider({
       openCart,
       closeCart,
       goToCheckout,
+      checkoutAvailable,
       backToBag,
       completeOrder,
     ],

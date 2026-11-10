@@ -41,6 +41,7 @@ export function BagView({
     listTotal,
     hydrated,
     goToCheckout,
+    checkoutAvailable,
   } = useCart();
 
   /** stagger slot for what rises in after the panel (capped, so a long bag
@@ -133,19 +134,26 @@ export function BagView({
 
         <Button
           onClick={goToCheckout}
+          disabled={!checkoutAvailable}
           size="lg"
           className="group mt-4 w-full whitespace-nowrap max-[359px]:px-4 max-[359px]:tracking-[0.1em] [@media(max-height:720px)]:mt-3 [@media(max-height:720px)]:py-3.5"
         >
-          <span>
-            <span className="max-[359px]:hidden">Proceed to </span>
-            Checkout
-            <span aria-hidden> • </span>
-            <span className="tabular-nums">{formatINR(payable)}</span>
-          </span>
-          <Icon
-            name="arrowRight"
-            className="size-[15px] transition-transform duration-300 group-hover:translate-x-1.5"
-          />
+          {checkoutAvailable ? (
+            <>
+              <span>
+                <span className="max-[359px]:hidden">Proceed to </span>
+                Checkout
+                <span aria-hidden> • </span>
+                <span className="tabular-nums">{formatINR(payable)}</span>
+              </span>
+              <Icon
+                name="arrowRight"
+                className="size-[15px] transition-transform duration-300 group-hover:translate-x-1.5"
+              />
+            </>
+          ) : (
+            <span>Checkout opens with launch</span>
+          )}
         </Button>
         <p className="mt-2.5 flex items-center justify-center gap-1.5 text-center text-[10.5px] leading-snug tracking-[0.03em] text-ink-3">
           <Icon name="lock" className="size-3 shrink-0" />

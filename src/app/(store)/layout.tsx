@@ -72,7 +72,10 @@ export default async function StoreLayout({
   return (
     <AuthProvider>
       <GoogleTagManager />
-      <CartProvider suggestions={bagSuggestions}>
+      <CartProvider
+        suggestions={bagSuggestions}
+        checkoutEnabled={settings.flags.checkoutEnabled}
+      >
         <SmoothScroll>
           <RouteTransitionProvider>
             <NavToneProvider>
