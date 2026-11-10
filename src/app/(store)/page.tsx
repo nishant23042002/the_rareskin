@@ -4,6 +4,7 @@ import { LaunchOffer } from "@/components/home/launch-offer";
 import { InFocus } from "@/components/home/in-focus";
 import { Collection } from "@/components/home/collection";
 import { ConceptSwitcher } from "@/components/home/concept-switcher";
+import { StaffOnly } from "@/components/auth/staff-only";
 import { Quiz } from "@/components/home/quiz";
 import { DiscoverySet } from "@/components/home/discovery-set";
 import { WhyExtrait } from "@/components/home/why-extrait";
@@ -76,8 +77,10 @@ export default async function HomePage() {
       />
       <InFocus fragrances={fragrances} />
       <Collection fragrances={fragrances} />
-      {/* preview bar for the card art directions: renders nothing in production (src/config/homepage-assets.ts) */}
-      <ConceptSwitcher />
+      {/* "Preview" tab for the card art directions (src/config/homepage-assets.ts) — signed-in staff only */}
+      <StaffOnly>
+        <ConceptSwitcher />
+      </StaffOnly>
       <Quiz fragrances={fragrances} />
       <DiscoverySet set={discoverySet} fragrances={fragrances} />
       <WhyExtrait />

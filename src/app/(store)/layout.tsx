@@ -16,6 +16,7 @@ import { CartBar } from "@/components/cart/cart-bar";
 import { CampaignNote } from "@/components/layout/campaign-note";
 import { BackToTop } from "@/components/layout/back-to-top";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
+import { StaffOnly } from "@/components/auth/staff-only";
 import { MotionLayer } from "@/components/providers/motion-layer";
 import { DISCOVERY_SET_SLUG } from "@/lib/catalog";
 import { getCatalogNav, getBagSuggestions } from "@/server/data/catalog";
@@ -102,8 +103,10 @@ export default async function StoreLayout({
             <CartToast />
             <CartBar freeShippingAbove={freeShippingAbove} />
             <BackToTop />
-            {/* founder preview: the six colour themes (src/config/themes.ts, app/themes.css) */}
-            <ThemeSwitcher />
+            {/* founder preview: the colour themes (src/config/themes.ts, app/themes.css) — signed-in staff only */}
+            <StaffOnly>
+              <ThemeSwitcher />
+            </StaffOnly>
             {/* scroll reveals, card tilt, button pull: motion.css + this controller (nothing under reduced motion) */}
             <MotionLayer />
             <CampaignNote
