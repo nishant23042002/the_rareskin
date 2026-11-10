@@ -4,6 +4,8 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 
 import { getRazorpayEnv, getRazorpayWebhookSecret } from "@/server/env";
 
+import { assessCapture, type CaptureVerdict } from "./capture";
+
 /**
  * Razorpay REST client — order creation, payment lookup, refunds, and the two
  * signature checks. Raw `fetch` against `api.razorpay.com` with HTTP Basic auth
@@ -84,6 +86,56 @@ export interface RazorpayPayment {
 
 export function fetchRazorpayPayment(id: string): Promise<RazorpayPayment> {
   return rzp<RazorpayPayment>(`/payments/${encodeURIComponent(id)}`);
+}
+
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+/**
+ * Ask Razorpay's own API whether this payment was really **captured** (not just
+ * signed), and that it belongs to `orderId` (and, when given, `amountPaise`).
+ *
+ * Two transient cases are retried briefly: a lookup that errors, and
+ * `authorized` — with auto-capture the capture lands moments after the
+ * checkout callback, so one more look usually settles it. A lookup that still
+ * fails comes back as `lookup-failed` (unknown ≠ failed: callers must not create
+ * an order, and must not claim the payment failed either).
+ */
+export async function verifyCapturedPayment(
+  paymentId: string,
+  expected: { orderId: string; amountPaise?: number | null },
+  opts: { retries?: number; delayMs?: number } = {},
+): Promise<CaptureVerdict> {
+  const retries = opts.retries ?? 2;
+  const delayMs = opts.delayMs ?? 800;
+
+  let payment: RazorpayPayment | null = null;
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      payment = await fetchRazorpayPayment(paymentId);
+    } catch (err) {
+      payment = null;
+      console.error("[razorpay] payment lookup failed", {
+        paymentId,
+        attempt,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+    const settling = payment === null || payment.status === "authorized";
+    if (!settling || attempt >= retries) break;
+    await sleep(delayMs);
+  }
+
+  if (!payment) {
+    return {
+      ok: false,
+      reason: "lookup-failed",
+      status: null,
+      payment: null,
+      message:
+        "We couldn't reach the bank to confirm your payment, so no order was placed yet. If money was debited, your order will be confirmed by email shortly or the amount reversed by your bank.",
+    };
+  }
+  return assessCapture(payment, { paymentId, ...expected });
 }
 
 /** All payment attempts made against one Razorpay order — used by reconciliation. */

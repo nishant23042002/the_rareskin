@@ -52,6 +52,9 @@ export interface CheckoutIntentDoc {
   customerNote?: string;
   /** set when status → "consumed" */
   orderNumber: string | null;
+  /** why the last payment attempt failed (status "failed") — analytics / ops */
+  failureReason: string | null;
+  failedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -79,6 +82,8 @@ const checkoutIntentSchema = new Schema<CheckoutIntentDoc>(
     billingAddress: { type: Schema.Types.Mixed, required: true },
     customerNote: String,
     orderNumber: { type: String, default: null },
+    failureReason: { type: String, default: null },
+    failedAt: { type: Date, default: null },
   },
   { timestamps: true, minimize: false },
 );

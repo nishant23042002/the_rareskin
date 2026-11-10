@@ -66,10 +66,25 @@ interface OpenCheckoutInput {
   reference: string;
 }
 
-type CheckoutOutcome =
+/**
+ * What happened in the modal. `success` only means Razorpay handed back a signed
+ * payload — it is NOT proof of payment: the server must still confirm the
+ * capture before any order exists, so callers must treat it as "verify me".
+ */
+export type CheckoutOutcome =
   | { status: "success"; payload: RazorpaySuccess }
   | { status: "dismissed" }
   | { status: "failed"; message: string };
+
+const DEFAULT_FAILURE = "The payment could not be completed.";
+
+/** Razorpay's `payment.failed` payload → the most useful human-readable reason. */
+function failureMessage(e: unknown): string {
+  const err = (e as { error?: { description?: string; reason?: string } } | null)
+    ?.error;
+  const text = err?.description?.trim() || err?.reason?.trim();
+  return text || DEFAULT_FAILURE;
+}
 
 /** Open the Razorpay modal and resolve with what happened. */
 export async function openRazorpayCheckout(
@@ -102,7 +117,22 @@ export async function openRazorpayCheckout(
       prefill: input.prefill,
       notes: { reference: input.reference },
       theme: { color: "#17140f" },
-      handler: (payload) => done({ status: "success", payload }),
+      handler: (payload) => {
+        // Only a complete, matching payload is even worth sending for
+        // verification; anything else is treated as a failed attempt.
+        const ok =
+          payload?.razorpay_order_id === input.razorpayOrderId &&
+          Boolean(payload.razorpay_payment_id) &&
+          Boolean(payload.razorpay_signature);
+        done(
+          ok
+            ? { status: "success", payload }
+            : {
+                status: "failed",
+                message: "We couldn't read the payment response.",
+              },
+        );
+      },
       modal: {
         ondismiss: () =>
           done(
@@ -113,10 +143,11 @@ export async function openRazorpayCheckout(
         escape: true,
       },
     });
+    // Fires when the bank / UPI app declines or the attempt fails. Capture the
+    // reason; the window stays open for another method, so we settle only when it
+    // is dismissed (or a later attempt succeeds and `handler` wins).
     rzp.on("payment.failed", (e) => {
-      const err = e as { error?: { description?: string } };
-      lastError =
-        err.error?.description ?? "The payment could not be completed.";
+      lastError = failureMessage(e);
     });
     rzp.open();
   });

@@ -44,7 +44,18 @@ import type {
   PAYMENT_EVENT_SOURCES,
 } from "@/lib/validation/commerce";
 
-import { createRazorpayRefund } from "./razorpay";
+import {
+  isProduction,
+  isRazorpayConfigured,
+  isRazorpayTestMode,
+} from "@/server/env";
+
+import { assessCapture, type CaptureVerdict } from "./capture";
+import {
+  createRazorpayRefund,
+  verifyCapturedPayment,
+  type RazorpayPayment,
+} from "./razorpay";
 
 type Source = (typeof PAYMENT_EVENT_SOURCES)[number];
 
@@ -115,15 +126,128 @@ export interface FinalizeInput {
   upiVpa?: string | null;
   source: Source;
   webhookEventId?: string | null;
+  /** the signed webhook's payment entity — `source: "webhook"` only */
   raw?: Record<string, unknown> | null;
+  /**
+   * A payment entity the caller already fetched from Razorpay's API (e.g. via
+   * `verifyCapturedPayment`) so we don't look it up twice. It is **re-assessed**
+   * here, never trusted blindly.
+   */
+  verifiedPayment?: RazorpayPayment | null;
 }
 
 export type FinalizeResult =
   | { ok: true; orderNumber: string; reused: boolean }
   | {
       ok: false;
-      reason: "intent-not-found" | "amount-mismatch" | "sold-out-refunded";
+      reason:
+        | "intent-not-found"
+        | "amount-mismatch"
+        | "sold-out-refunded"
+        /** Razorpay did not report this payment as captured — nothing created */
+        | "payment-not-captured"
+        /** the payment is for another order / is not the payment asked about */
+        | "payment-mismatch"
+        /** could not reach Razorpay to check — unknown, nothing created */
+        | "verification-unavailable";
+      /** customer-safe explanation (capture failures only) */
+      message?: string;
+      /** Razorpay's payment status, when we got one */
+      paymentStatus?: string | null;
     };
+
+type CaptureGate =
+  | {
+      ok: true;
+      /** the Razorpay payment that proved the capture (null = dev simulator) */
+      payment: RazorpayPayment | null;
+      by: "razorpay-api" | "razorpay-webhook" | "dev-simulate";
+    }
+  | { ok: false; result: Extract<FinalizeResult, { ok: false }> };
+
+const gateFailure = (
+  v: Extract<CaptureVerdict, { ok: false }>,
+): CaptureGate => ({
+  ok: false,
+  result: {
+    ok: false,
+    reason:
+      v.reason === "not-captured"
+        ? "payment-not-captured"
+        : v.reason === "lookup-failed"
+          ? "verification-unavailable"
+          : "payment-mismatch",
+    message: v.message,
+    paymentStatus: v.status,
+  },
+});
+
+/**
+ * Zero-trust gate: an order may be minted only from a payment Razorpay itself
+ * says is **captured**. Being called is not evidence of success.
+ *  - `webhook`: the HMAC-verified `payment.captured` / `order.paid` entity must
+ *    itself say `captured`.
+ *  - `dev-simulate`: honoured only on a dev box with no Razorpay keys and
+ *    synthetic `dev_order_` / `pay_dev_` ids — never in production.
+ *  - everything else (checkout callback, cron …): look the payment up on
+ *    Razorpay's API (or re-assess the entity the caller just fetched).
+ */
+async function confirmCapture(
+  input: FinalizeInput,
+): Promise<CaptureGate> {
+  const expected = {
+    paymentId: input.providerPaymentId,
+    orderId: input.providerOrderId,
+  };
+
+  if (input.source === "dev-simulate") {
+    const legit =
+      !isProduction() &&
+      !isRazorpayConfigured() &&
+      input.providerOrderId.startsWith("dev_order_") &&
+      input.providerPaymentId.startsWith("pay_dev_");
+    if (!legit) {
+      console.error("[finalize] dev-simulate refused", {
+        providerOrderId: input.providerOrderId,
+      });
+      return {
+        ok: false,
+        result: {
+          ok: false,
+          reason: "payment-not-captured",
+          message: "Simulated payments are not available here.",
+          paymentStatus: null,
+        },
+      };
+    }
+    return { ok: true, payment: null, by: "dev-simulate" };
+  }
+
+  if (input.source === "webhook") {
+    const entity = input.raw as unknown as RazorpayPayment | null | undefined;
+    const verdict = entity
+      ? assessCapture(entity, expected)
+      : ({
+          ok: false,
+          reason: "not-captured",
+          status: null,
+          payment: null,
+          message: "The payment event carried no payment details.",
+        } satisfies CaptureVerdict);
+    return verdict.ok
+      ? { ok: true, payment: verdict.payment, by: "razorpay-webhook" }
+      : gateFailure(verdict);
+  }
+
+  const verdict = input.verifiedPayment
+    ? assessCapture(input.verifiedPayment, expected)
+    : await verifyCapturedPayment(input.providerPaymentId, {
+        orderId: input.providerOrderId,
+      });
+  return verdict.ok
+    ? { ok: true, payment: verdict.payment, by: "razorpay-api" }
+    : gateFailure(verdict);
+}
 
 /**
  * Turn a paid `CheckoutIntent` into a real, confirmed order. Idempotent — the
@@ -131,6 +255,12 @@ export type FinalizeResult =
  * (`idempotencyKey` = the Razorpay order id). A capture that can't be honoured
  * (item sold out, or a stale / tampered amount) is **auto-refunded in full** and
  * no order is created.
+ *
+ * **Zero-trust:** before anything is written, `confirmCapture` must prove
+ * Razorpay reports the payment as captured. A failed / authorized / unknown
+ * payment returns `payment-not-captured` / `verification-unavailable` having
+ * touched no order, stock, coupon or credit (a hard `failed` is recorded on the
+ * intent only).
  */
 export async function finalizeOnlineCheckout(
   input: FinalizeInput,
@@ -155,11 +285,39 @@ export async function finalizeOnlineCheckout(
     return { ok: true, orderNumber: intent.orderNumber, reused: true };
   }
 
-  const capturedPaise = input.amountPaise ?? intent.amountPaise;
+  // ── zero-trust gate — nothing below runs unless Razorpay says "captured" ──
+  const gate = await confirmCapture(input);
+  if (!gate.ok) {
+    const r = gate.result;
+    console.warn("[finalize] payment not captured — no order created", {
+      providerOrderId: input.providerOrderId,
+      providerPaymentId: input.providerPaymentId,
+      source: input.source,
+      reason: r.reason,
+      paymentStatus: r.paymentStatus ?? null,
+      detail: r.message ?? null,
+    });
+    // Only a hard `failed` is recorded; `authorized` / unknown may still settle
+    // (the webhook or the reconcile cron will then finalize it).
+    if (r.paymentStatus === "failed") {
+      await markIntentFailed(
+        input.providerOrderId,
+        r.message ?? "payment failed",
+      );
+    }
+    return r;
+  }
+  const verified = gate.payment;
+  const instrument = verified?.method ?? input.instrument ?? null;
+  const last4 = verified?.card?.last4 ?? input.last4 ?? null;
+  const upiVpa = verified?.vpa ?? input.upiVpa ?? null;
+  const reportedPaise = verified?.amount ?? input.amountPaise ?? null;
+  const capturedPaise = reportedPaise ?? intent.amountPaise;
+  const testMode = gate.by !== "dev-simulate" && isRazorpayTestMode();
 
   // The charge was locked when we minted the Razorpay order — a different
   // captured amount means a stale window or tampering. Refund, create nothing.
-  if (input.amountPaise != null && input.amountPaise !== intent.amountPaise) {
+  if (reportedPaise != null && reportedPaise !== intent.amountPaise) {
     await autoRefund(input.providerPaymentId, capturedPaise, {
       targetType: "CheckoutIntent",
       targetId: String(intent._id),
@@ -214,6 +372,8 @@ export async function finalizeOnlineCheckout(
               shippingAddress: snap.shippingAddress,
               billingAddress: snap.billingAddress,
               status: "confirmed",
+              // "paid" is written only here, and only after `confirmCapture`
+              // proved Razorpay captured the payment (or the dev simulator ran).
               payment: {
                 method: "razorpay",
                 status: "paid",
@@ -221,10 +381,10 @@ export async function finalizeOnlineCheckout(
                 providerOrderId: input.providerOrderId,
                 providerPaymentId: input.providerPaymentId,
                 signature: input.signature ?? null,
-                instrument: input.instrument ?? null,
+                instrument,
                 capturedAt: new Date(),
-                last4: input.last4 ?? null,
-                upiVpa: input.upiVpa ?? null,
+                last4,
+                upiVpa,
               },
               invoice: {
                 number: null,
@@ -247,9 +407,14 @@ export async function finalizeOnlineCheckout(
                   actor: "system",
                   actorId: null,
                   note:
-                    input.source === "webhook"
+                    (gate.by === "razorpay-webhook"
                       ? "Payment captured — confirmed by Razorpay webhook."
-                      : "Payment received.",
+                      : gate.by === "razorpay-api"
+                        ? "Payment captured — verified with Razorpay."
+                        : "Payment simulated (development).") +
+                    (testMode
+                      ? " Razorpay TEST mode — no real money was collected."
+                      : ""),
                 },
               ],
               customerNote: snap.customerNote,
@@ -363,15 +528,18 @@ export async function finalizeOnlineCheckout(
           providerOrderId: input.providerOrderId,
           providerPaymentId: input.providerPaymentId,
           providerRefundId: null,
-          method: input.instrument ?? null,
-          last4: input.last4 ?? null,
-          upiVpa: input.upiVpa ?? null,
+          method: instrument,
+          last4,
+          upiVpa,
           signatureVerified:
             Boolean(input.signature) || input.source === "webhook",
           source: input.source,
           webhookEventId: input.webhookEventId ?? null,
-          raw: redact(input.raw),
-          note: null,
+          raw: redact(
+            (verified as unknown as Record<string, unknown> | null) ??
+              input.raw,
+          ),
+          note: testMode ? "Razorpay TEST mode — no real money collected." : null,
         },
         dbSession,
       );
@@ -389,7 +557,13 @@ export async function finalizeOnlineCheckout(
       });
       await CheckoutIntent.updateOne(
         { _id: intent._id, status: "pending" },
-        { $set: { status: "failed" } },
+        {
+          $set: {
+            status: "failed",
+            failureReason: "sold-out — payment refunded",
+            failedAt: new Date(),
+          },
+        },
       );
       await recordAudit({
         actorId: null,
@@ -432,6 +606,8 @@ export async function finalizeOnlineCheckout(
         source: input.source,
         paymentId: input.providerPaymentId,
         via: "payment-first",
+        captureVerifiedBy: gate.by,
+        ...(testMode ? { razorpayTestMode: true } : {}),
       },
       ip: null,
       userAgent: null,
@@ -468,20 +644,35 @@ export async function finalizeOnlineCheckout(
   return result;
 }
 
-/** Flag an intent whose payment attempt failed (analytics only — no order). */
+/**
+ * Record that a payment attempt failed — on the `CheckoutIntent` only. Touches
+ * no order, stock, coupon or credit (none exists yet), and never un-consumes a
+ * finished intent (`consumed` is left alone). A `failed` intent is still
+ * finalizable: Razorpay lets the shopper retry on the *same* order inside the
+ * modal, and a later captured attempt must still produce the order. A fresh
+ * attempt from the drawer mints a brand-new intent + Razorpay order anyway.
+ */
 export async function markIntentFailed(
   razorpayOrderId: string,
   reason: string,
 ): Promise<void> {
   await dbConnect();
+  const failureReason = reason.slice(0, 240);
+  const failedAt = new Date();
   const res = await CheckoutIntent.updateOne(
     { razorpayOrderId, status: "pending" },
-    { $set: { status: "failed" } },
+    { $set: { status: "failed", failureReason, failedAt } },
   );
   if (res.modifiedCount > 0) {
     console.info("[checkout] payment attempt failed", { razorpayOrderId, reason });
     await notifyAdminPaymentFailed({ reference: razorpayOrderId, reason });
+    return;
   }
+  // Already failed — keep the latest reason (no second admin notification).
+  await CheckoutIntent.updateOne(
+    { razorpayOrderId, status: "failed" },
+    { $set: { failureReason, failedAt } },
+  );
 }
 
 /** Resolve `{ trackInventory, allowBackorder }` for each ordered line. */

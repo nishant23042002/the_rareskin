@@ -139,6 +139,10 @@ export interface PaymentConfirmResponse {
   ok: boolean;
   orderNumber?: string;
   refunded?: boolean;
+  /** customer-safe reason, set on most `ok: false` answers */
+  message?: string;
+  /** Razorpay's payment status when it reported one (failed / authorized …) */
+  paymentStatus?: string | null;
   error?:
     | "bad-request"
     | "auth-required"
@@ -147,7 +151,12 @@ export interface PaymentConfirmResponse {
     | "failed"
     | "sold-out"
     | "amount-mismatch"
-    | "intent-not-found";
+    | "intent-not-found"
+    /** Razorpay did not report the payment as captured — no order exists */
+    | "payment-not-captured"
+    | "payment-mismatch"
+    /** couldn't reach Razorpay to check — unknown, no order yet */
+    | "verification-unavailable";
 }
 
 /** Customer-facing label for an order status. */

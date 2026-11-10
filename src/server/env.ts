@@ -229,6 +229,12 @@ export const isRazorpayConfigured = () => {
   return Boolean(env.RAZORPAY_KEY_ID && env.RAZORPAY_KEY_SECRET);
 };
 
+/** True when the configured key is a Razorpay **test-mode** key (`rzp_test_…`).
+ *  Test-mode payments are simulated by Razorpay: they report "captured" but no
+ *  real money moves, and a failed/declined UPI app does not change that. */
+export const isRazorpayTestMode = () =>
+  (getEnv().RAZORPAY_KEY_ID ?? "").startsWith("rzp_test_");
+
 export const isRazorpayWebhookConfigured = () =>
   Boolean(getEnv().RAZORPAY_WEBHOOK_SECRET);
 

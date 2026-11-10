@@ -37,8 +37,43 @@ client ─▶ opens hosted checkout, pays
           }
 ```
 
-A failed attempt → `markIntentFailed` (analytics only). The `CheckoutIntent`
-TTL-expires after 24h; nothing to clean up.
+A failed attempt → `markIntentFailed` (`status: "failed"` + `failureReason` on the
+intent, nothing else). The `CheckoutIntent` TTL-expires after 24h; nothing to
+clean up. A `failed` intent is still finalizable (Razorpay lets the shopper retry
+on the same order inside the modal), and the drawer's "Retry payment" mints a
+brand-new intent + Razorpay order.
+
+### A signature is not a capture (zero-trust)
+
+An HMAC signature (callback or webhook) only proves the payload came from
+Razorpay — a payment id can be `created`, `authorized`, `failed` or `refunded`.
+So an order is minted only through `finalizeOnlineCheckout`'s `confirmCapture`
+gate (`server/payments/capture.ts` → `assessCapture`), which requires
+`status === "captured"` **and** `captured === true`, the same payment id, and the
+same Razorpay order id:
+
+- **checkout callback** — verifies the signature, then looks the payment up on
+  Razorpay's API (`verifyCapturedPayment`; briefly retried for `authorized` /
+  lookup errors) and checks the amount against the intent. Not captured →
+  `400 { ok:false, error:"payment-not-captured", message }`; Razorpay unreachable
+  → `503 verification-unavailable`. No order either way.
+- **webhook** — only `payment.captured` / `order.paid`, and the entity itself must
+  say `captured`.
+- **cron** — passes the payment it just fetched; re-assessed.
+- **dev-simulate** — honoured only with no Razorpay keys, outside production, and
+  `dev_order_` / `pay_dev_` ids.
+
+The client treats the modal's "success" as "ask the server": `completeOrder()`
+(the confirmation view) is reachable only from `{ ok:true, orderNumber }`. Every
+other outcome (declined, dismissed, unconfirmed) keeps the drawer on the checkout
+view with a "Payment unsuccessful…" banner.
+
+> **Test mode.** With `rzp_test_` keys Razorpay *simulates* payments: they report
+> `captured`, no real money moves, and a failed real UPI app does not change that
+> (UPI Intent is a live-mode feature). Orders made this way are labelled "Razorpay
+> TEST mode — no real money was collected" in their timeline and payment log. Use
+> `scripts/audit-paid-orders.ts` (read-only) to find paid orders with no captured
+> Razorpay payment.
 
 ### Trade-off — stock is not reserved during the payment window
 
@@ -106,8 +141,9 @@ resolves on the real `ondismiss`.
 
 | Event | Action |
 | --- | --- |
-| `payment.captured` / `order.paid` | `finalizeOnlineCheckout` → confirmed order + stock; a capture that can't be honoured is auto-refunded |
-| `payment.failed` | `markIntentFailed` — flag the intent (analytics); nothing else, no order exists |
+| `payment.captured` / `order.paid` | the **only** events that reach `finalizeOnlineCheckout` — and only if the signed payment entity says `captured`. → confirmed order + stock; a capture that can't be honoured is auto-refunded |
+| `payment.failed` | `markIntentFailed` — records `status: "failed"` + `failureReason` on the intent; **never** creates an order (nothing exists to touch) |
+| `payment.authorized` | ignored — authorized is not captured |
 | `refund.processed` / `refund.failed` | append to `order.refunds[]`, update `payment.status`, log |
 | `payment.dispute.created` | logged loudly; ops alerting + fulfilment freeze is `TODO(phase-j)` |
 

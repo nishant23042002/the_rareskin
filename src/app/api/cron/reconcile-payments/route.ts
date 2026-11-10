@@ -29,8 +29,11 @@ async function run() {
   if (!isRazorpayConfigured()) return { skipped: "razorpay-not-configured" };
 
   const since = new Date(Date.now() - 3 * 86_400_000);
+  // `failed` too: Razorpay lets the shopper retry on the same order inside the
+  // modal, so an intent flagged failed by an earlier attempt may still have a
+  // captured one the callback + webhook both missed.
   const suspects = await CheckoutIntent.find({
-    status: "pending",
+    status: { $in: ["pending", "failed"] },
     createdAt: { $gt: since },
   })
     .select("razorpayOrderId amountPaise")
@@ -59,6 +62,7 @@ async function run() {
         providerOrderId: s.razorpayOrderId,
         providerPaymentId: captured.id,
         source: "cron",
+        verifiedPayment: detail,
         instrument: detail.method ?? null,
         last4: detail.card?.last4 ?? null,
         upiVpa: detail.vpa ?? null,

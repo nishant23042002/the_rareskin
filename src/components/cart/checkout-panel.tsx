@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { Button } from "@/components/ui/button";
 import { Flacon } from "@/components/ui/flacon";
@@ -51,6 +58,48 @@ const emptyAddress = {
   state: "",
   pincode: "",
 };
+
+/**
+ * Why a payment attempt did not produce an order. `failed` = the bank / gateway
+ * said no. `unconfirmed` = we could not confirm either way — nothing is placed,
+ * but money may have left the account, so the copy says so (and never claims
+ * success).
+ */
+type PaymentIssue = { tone: "failed" | "unconfirmed"; reason: string };
+
+/** Join a reason into a sentence without doubling the full stop. */
+function sentence(reason: string): string {
+  return reason.trim().replace(/[.\s]+$/, "");
+}
+
+/** Map the callback API's answer to what the shopper sees. Never a success. */
+function issueFromConfirm(vd: PaymentConfirmResponse | null): PaymentIssue {
+  if (!vd) {
+    return {
+      tone: "unconfirmed",
+      reason: "we couldn't reach our server to confirm it",
+    };
+  }
+  switch (vd.error) {
+    case "payment-not-captured":
+      return {
+        tone: "failed",
+        reason: vd.message ?? "your bank did not complete the payment",
+      };
+    case "sold-out":
+      return {
+        tone: "failed",
+        reason:
+          "an item in your bag just sold out, so your payment was refunded in full",
+      };
+    default:
+      return {
+        tone: "unconfirmed",
+        reason:
+          vd.message ?? "we couldn't confirm the payment with the bank",
+      };
+  }
+}
 
 const labelCls =
   "block text-[10.5px] font-medium tracking-[0.12em] text-ink-3 uppercase";
@@ -165,10 +214,18 @@ export function CheckoutPanel() {
   const [cartChanged, setCartChanged] = useState<QuoteWarning[] | null>(null);
 
   const [paying, setPaying] = useState(false);
-  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [paymentIssue, setPaymentIssue] = useState<PaymentIssue | null>(null);
   const [payState, setPayState] = useState<
     { kind: "dev"; intentId: string } | { kind: "retry" } | null
   >(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // A failed payment puts a banner at the top of the panel — bring it into view.
+  useEffect(() => {
+    if (paymentIssue) {
+      scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [paymentIssue]);
 
   // Dedupes a COD double-submit. Online checkout is payment-first — each attempt
   // mints a fresh Razorpay order, so no client key is needed there.
@@ -426,6 +483,11 @@ export function CheckoutPanel() {
     if (placing || !user) return;
     setPlaceError(null);
     setCartChanged(null);
+    // A fresh attempt: the previous failure no longer applies. (Online checkout
+    // mints a brand-new intent + Razorpay order below, so a failed one is never
+    // reused.)
+    setPaymentIssue(null);
+    setPayState((s) => (s?.kind === "retry" ? null : s));
 
     const body: Record<string, unknown> = {
       items,
@@ -511,7 +573,7 @@ export function CheckoutPanel() {
       return;
     }
     // real Razorpay
-    setPaymentError(null);
+    setPaymentIssue(null);
     setPaying(true);
     // The drawer is a top-layer <dialog>; drop it to non-modal so Razorpay's
     // hosted checkout opens in front of it, not behind.
@@ -524,61 +586,63 @@ export function CheckoutPanel() {
         prefill: payment.prefill,
         reference: "THE RARESKIN order",
       });
+
       if (outcome.status === "success") {
-        const vr = await fetch("/api/payments/razorpay/callback", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(outcome.payload),
-        });
-        const vd = (await vr.json()) as PaymentConfirmResponse;
-        if (vd.ok && vd.orderNumber) {
+        // The modal's "success" is only a signed payload — the server confirms
+        // with Razorpay that money was actually CAPTURED before any order
+        // exists. `completeOrder` (→ the "done" view) is reachable from exactly
+        // one place: the server answering `{ ok: true, orderNumber }`.
+        let vd: PaymentConfirmResponse | null = null;
+        try {
+          const vr = await fetch("/api/payments/razorpay/callback", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(outcome.payload),
+          });
+          vd = (await vr.json()) as PaymentConfirmResponse;
+        } catch {
+          vd = null; // network / non-JSON → unconfirmed, never success
+        }
+        if (vd?.ok === true && vd.orderNumber) {
           completeOrder({
             orderNumber: vd.orderNumber,
             method: "razorpay",
             paid: true,
           });
-        } else if (vd.error === "sold-out") {
-          setPayState({ kind: "retry" });
-          setPaymentError(
-            "That item just sold out — your payment was refunded in full.",
-          );
-        } else {
-          // Payment went through but confirmation didn't land — the webhook
-          // reconciles it. Send the shopper to their orders.
-          setPayState({ kind: "retry" });
-          setPaymentError(
-            "Payment received — we're confirming your order. Check your account in a moment.",
-          );
+          return;
         }
-      } else if (outcome.status === "failed") {
         setPayState({ kind: "retry" });
-        setPaymentError(outcome.message);
-      } else {
-        setPayState({ kind: "retry" });
-        setPaymentError("Payment not completed. Your bag is still here — try again.");
+        setPaymentIssue(issueFromConfirm(vd));
+        return;
       }
+
+      // failed (bank / UPI app declined) or dismissed (window closed) — no
+      // order, bag untouched, drawer stays on the checkout view.
+      setPayState({ kind: "retry" });
+      setPaymentIssue({
+        tone: "failed",
+        reason:
+          outcome.status === "failed"
+            ? outcome.message
+            : "the payment window was closed before the payment completed",
+      });
     } catch (err) {
       setPayState({ kind: "retry" });
-      setPaymentError(
-        err instanceof Error ? err.message : "The payment window failed to open.",
-      );
+      setPaymentIssue({
+        tone: "failed",
+        reason:
+          err instanceof Error ? err.message : "the payment window failed to open",
+      });
     } finally {
       resumeModal();
       setPaying(false);
     }
   }
 
-  async function retryPayment() {
-    // Fresh attempt — a new checkout intent + a new Razorpay order.
-    setPayState(null);
-    setPaymentError(null);
-    await placeOrder();
-  }
-
   async function simulatePayment(outcome: "paid" | "failed") {
     if (payState?.kind !== "dev") return;
     setPaying(true);
-    setPaymentError(null);
+    setPaymentIssue(null);
     try {
       const r = await fetch("/api/payments/dev-simulate", {
         method: "POST",
@@ -593,21 +657,25 @@ export function CheckoutPanel() {
           paid: true,
         });
       } else {
-        setPaymentError(
-          d.error === "sold-out"
-            ? "That item just sold out — the payment was refunded."
-            : outcome === "failed"
-              ? "Simulated a failed payment. Your bag is still here — retry."
-              : "Could not simulate the payment.",
-        );
+        setPaymentIssue({
+          tone: "failed",
+          reason:
+            d.error === "sold-out"
+              ? "an item in your bag just sold out, so the payment was refunded"
+              : outcome === "failed"
+                ? "simulated failure (development)"
+                : (d.message ?? "could not simulate the payment"),
+        });
       }
     } catch {
-      setPaymentError("Network error.");
+      setPaymentIssue({ tone: "unconfirmed", reason: "network error" });
     } finally {
       setPaying(false);
     }
   }
 
+  /** Last attempt did not complete and the shopper is on Razorpay again. */
+  const retrying = payState?.kind === "retry" && method === "razorpay";
   const footerLabel =
     placing || paying
       ? method === "cod"
@@ -615,14 +683,44 @@ export function CheckoutPanel() {
         : "Opening secure payment…"
       : method === "cod"
         ? "Place order"
-        : "Pay securely";
+        : retrying
+          ? "Retry payment"
+          : "Pay securely";
 
   return (
     <>
       <div
+        ref={scrollRef}
         data-lenis-prevent
         className="flex-1 overflow-y-auto overscroll-contain"
       >
+        {/* ── payment did not complete — top of the panel, can't be missed ── */}
+        {paymentIssue && (
+          <div
+            role="alert"
+            className="border-b border-error/40 bg-error/10 px-6 py-4 text-[13px] leading-relaxed text-ink"
+          >
+            {paymentIssue.tone === "failed" ? (
+              <p>
+                <span className="font-medium text-error">
+                  Payment unsuccessful:
+                </span>{" "}
+                {sentence(paymentIssue.reason)}. Your bag is safe, please retry or
+                choose another payment method.
+              </p>
+            ) : (
+              <p>
+                <span className="font-medium text-error">
+                  Payment not confirmed:
+                </span>{" "}
+                {sentence(paymentIssue.reason)}. No order has been placed and your
+                bag is safe. If money was debited it will be confirmed by email or
+                reversed by your bank — check your orders before paying again.
+              </p>
+            )}
+          </div>
+        )}
+
         {/* ── order review — always visible ───────────────────────── */}
         <section className="border-b border-line bg-bg/50 px-6 pt-4 pb-5">
           <p className="text-[10.5px] font-medium tracking-[0.16em] text-ink-3 uppercase">
@@ -1184,9 +1282,9 @@ export function CheckoutPanel() {
             />
           </div>
 
-          {(placeError || paymentError || quoteError) && (
+          {(placeError || quoteError) && (
             <p className="border border-error/40 bg-error/5 px-3 py-2.5 text-[12px] text-error">
-              {paymentError ?? placeError ?? quoteError}
+              {placeError ?? quoteError}
             </p>
           )}
           {pinBlocked && (
@@ -1233,42 +1331,32 @@ export function CheckoutPanel() {
       </div>
 
       <PanelFooter>
-        {payState?.kind === "retry" ? (
-          <Button
-            size="lg"
-            className="w-full"
-            disabled={paying}
-            onClick={retryPayment}
-          >
-            {paying ? "Opening secure payment…" : "Retry payment"}
-          </Button>
-        ) : (
-          <>
-            <Button
-              size="lg"
-              className="w-full"
-              disabled={placing || paying || !canPay}
-              onClick={onPay}
-            >
-              <span className="inline-flex items-center justify-center gap-2 tracking-[0.1em] whitespace-nowrap">
-                {!placing && !paying && (
-                  <Icon
-                    name={method === "cod" ? "banknote" : "lock"}
-                    className="size-[15px]"
-                  />
-                )}
-                {footerLabel}
-                {total != null ? ` · ${formatPaise(total)}` : ""}
-              </span>
-            </Button>
-            <div className="mt-3 flex flex-col items-center gap-1.5">
-              <PaymentBadges />
-              <p className="text-[9px] tracking-[0.12em] text-ink-3 uppercase">
-                256-bit encrypted &middot; Razorpay
-              </p>
-            </div>
-          </>
-        )}
+        {/* One button for every attempt — after a failure it reads "Retry
+            payment" (online) or "Place order" (COD) and follows whichever method
+            is selected, so the shopper can switch UPI app, card or COD freely. */}
+        <Button
+          size="lg"
+          className="w-full"
+          disabled={placing || paying || !canPay}
+          onClick={onPay}
+        >
+          <span className="inline-flex items-center justify-center gap-2 tracking-[0.1em] whitespace-nowrap">
+            {!placing && !paying && (
+              <Icon
+                name={method === "cod" ? "banknote" : "lock"}
+                className="size-[15px]"
+              />
+            )}
+            {footerLabel}
+            {total != null ? ` · ${formatPaise(total)}` : ""}
+          </span>
+        </Button>
+        <div className="mt-3 flex flex-col items-center gap-1.5">
+          <PaymentBadges />
+          <p className="text-[9px] tracking-[0.12em] text-ink-3 uppercase">
+            256-bit encrypted &middot; Razorpay
+          </p>
+        </div>
         <p className="mt-2 text-center text-[10.5px] leading-relaxed text-ink-3">
           By continuing you agree to THE RARESKIN’s Terms &amp; Privacy Policy.
         </p>

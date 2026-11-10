@@ -69,9 +69,23 @@ export async function POST(request: Request) {
     const refund = body.payload?.refund?.entity;
 
     switch (body.event) {
+      // ONLY these two events may create an order — and only when the signed
+      // payment entity itself says "captured" (finalizeOnlineCheckout re-asserts
+      // this). payment.authorized / payment.failed / anything else never does.
       case "payment.captured":
       case "order.paid": {
         if (payment) {
+          if (payment.status !== "captured" || payment.captured !== true) {
+            console.warn("[webhook/razorpay] capture event without a captured payment", {
+              eventId,
+              event: body.event,
+              paymentId: payment.id,
+              status: payment.status ?? null,
+            });
+            status = "failed";
+            error = "payment-not-captured";
+            break;
+          }
           const res = await finalizeOnlineCheckout({
             providerOrderId: payment.order_id,
             providerPaymentId: payment.id,
@@ -85,7 +99,8 @@ export async function POST(request: Request) {
           });
           // A sold-out / amount-mismatch capture is auto-refunded inside
           // `finalizeOnlineCheckout` — the event is handled, don't make
-          // Razorpay retry it.
+          // Razorpay retry it. (A `payment-not-captured` / `payment-mismatch`
+          // result created nothing and is logged as `failed` for ops.)
           const handled =
             res.ok ||
             res.reason === "sold-out-refunded" ||
@@ -95,14 +110,21 @@ export async function POST(request: Request) {
         }
         break;
       }
+      // A failed attempt only flags the intent — it must NEVER create an order.
       case "payment.failed": {
-        if (payment) {
+        if (payment?.order_id) {
           await markIntentFailed(
             payment.order_id,
             payment.error_description ?? "declined",
           );
           status = "processed";
         }
+        break;
+      }
+      // Authorized ≠ captured: money is not collected yet. Wait for
+      // payment.captured / order.paid.
+      case "payment.authorized": {
+        status = "ignored";
         break;
       }
       case "refund.processed":
@@ -162,6 +184,8 @@ interface RazorpayWebhookBody {
         id: string;
         order_id: string;
         amount: number;
+        status?: string;
+        captured?: boolean;
         method?: string | null;
         vpa?: string | null;
         card?: { last4?: string } | null;

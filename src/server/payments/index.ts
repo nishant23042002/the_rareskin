@@ -11,9 +11,12 @@ export {
   fetchRazorpayPayment,
   fetchRazorpayOrderPayments,
   createRazorpayRefund,
+  verifyCapturedPayment,
   verifyCallbackSignature,
   verifyWebhookSignature,
 } from "./razorpay";
+export { assessCapture, DEFAULT_FAILED_MESSAGE } from "./capture";
+export type { CaptureFailure, CaptureVerdict } from "./capture";
 export type {
   RazorpayOrder,
   RazorpayPayment,
