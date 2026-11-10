@@ -35,6 +35,14 @@ export const THEMES = [
     accent: "#6B7F67",
     canvas: "#F4F5F0",
   },
+  {
+    id: "verdant",
+    name: "Verdant Atelier",
+    archetype: "Mineral Sage, Linen & Forest Obsidian",
+    swatch: ["#0F1F17", "#1E3527", "#3E453B", "#8E997C", "#C7CBB8", "#F2F4EE"],
+    accent: "#8E997C",
+    canvas: "#F2F4EE",
+  },
 ] as const satisfies readonly ThemeDef[];
 
 export type ThemeId = (typeof THEMES)[number]["id"];

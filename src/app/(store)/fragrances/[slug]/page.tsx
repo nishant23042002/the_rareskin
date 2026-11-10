@@ -231,7 +231,10 @@ export default async function FragrancePage({
             </p>
 
             {/* buy box — the page's conversion focus */}
-            <div className="mt-6 rounded-[4px] border border-line-2 bg-surface p-[clamp(18px,3vw,26px)] [box-shadow:var(--sh-card)]">
+            <div
+              data-buybox
+              className="mt-6 rounded-[4px] border border-line-2 bg-surface p-[clamp(18px,3vw,26px)] [box-shadow:var(--sh-card)]"
+            >
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
                 <span className="text-[clamp(1.8rem,3.6vw,2.4rem)] leading-none font-light tracking-[0.01em]">
                   <Ticker text={formatINR(f.price)} />
@@ -335,7 +338,7 @@ export default async function FragrancePage({
                           background:
                             i < f.longevity
                               ? f.accent
-                              : "var(--color-line-2)",
+                              : "var(--track, var(--color-line-2))",
                         }}
                       />
                     ))}

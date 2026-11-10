@@ -37,7 +37,14 @@
      10%  focal accents       --brass / --gilt, --cta
 
    WCAG 2.1 AA, measured, not assumed (ratios against the grounds each token sits on):
-     - Every palette hex is used exactly as specified.
+     - Botanical uses every palette hex exactly as specified. Verdant uses its specified hex
+       except four same-hue nudges where the specified value cannot meet AA for the job it does:
+         ink-3  #586354 -> #4C584A   (3.8:1 on --stone, where the hero's quiet text sits -> 4.5:1)
+         line-2 #B8BCAB -> #878E80   (1.75:1 -> 3.05:1: it is the underline of an input, a boundary)
+         brass  #8E997C -> #859075   (2.7:1 -> 3.0:1: it is the focus ring on a light ground)
+         gilt   #C7CBB8 -> #5E6B56   (1.5:1 -> 5.1:1: on a light ground gilt is the star / bar / filled-digit
+                                      accent; the specified sage is kept as --gilt-d, the gilt on dark grounds)
+       The specified hex stays where it is decorative (the swatches in the dock, the accent dot).
      - --brass-d / --gilt-d are the accents as TEXT on a dark ground. The specified brass
        (3.95:1 on Botanical's --onyx) and gilt (2.23:1) are below 4.5:1 there, so they are
        lifted toward --champagne to 5.4:1 (so they also hold 4.5:1 on the lifted card
@@ -55,6 +62,35 @@
   --gilt: var(--gilt-d);
   --color-brass: var(--brass-d);
   --color-gilt: var(--gilt-d);
+}
+
+/* ---- shared by every theme here: the Tailwind tokens follow the set below, one source per theme ---- */
+:root[data-theme="botanical"],
+:root[data-theme="verdant"] {
+  /* a slightly lifted dark for the dark blocks that sit one step above --onyx */
+  --onyx-2: color-mix(in srgb, var(--champagne) 4%, var(--onyx));
+  /* the brand rule: champagne, the accent, then ink (the default theme keeps its tri-juice) */
+  --tri: linear-gradient(90deg, var(--champagne) 0%, var(--brass) 52%, var(--ink) 100%);
+
+  --color-bg: var(--bg);
+  --color-surface: var(--paper);
+  --color-surface-2: var(--stone);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --color-cta: var(--cta);
+  --color-cta-hover: var(--cta-hover);
+  --color-onyx: var(--onyx);
+  --color-champagne: var(--champagne);
+  --color-brass: var(--brass);
+  --color-gilt: var(--gilt);
+  /* the greyscale ramp the buttons and badges use: w0 = surface, w4 = ink */
+  --color-w0: var(--paper);
+  --color-w1: var(--w1);
+  --color-w2: var(--line-2);
+  --color-w4: var(--ink);
 }
 
 /* ---- botanical: Forest & Linen ------------------------------------------ */
@@ -80,32 +116,37 @@
   /* the glass header and its dropdown: a light tint of the theme (its secondary surface over the canvas), so the bar sits
      in the page instead of reading as a white strip; ink on it stays well above 4.5:1 */
   --hdr-tint: color-mix(in srgb, var(--stone) 55%, var(--bg));
+}
 
-  /* a slightly lifted dark for the dark blocks that sit one step above --onyx */
-  --onyx-2: color-mix(in srgb, var(--champagne) 4%, var(--onyx));
-  /* the brand rule: champagne, the accent, then ink (the default theme keeps its tri-juice) */
-  --tri: linear-gradient(90deg, var(--champagne) 0%, var(--brass) 52%, var(--ink) 100%);
+/* ---- verdant: Verdant Atelier, Mineral Sage, Linen & Forest Obsidian ------- */
+:root[data-theme="verdant"] {
+  /* canvas: an airy linen mist; cards: alabaster cardstock (never #fff); the sage is the hero plate, not the page */
+  --bg: #f2f4ee;
+  --paper: #fafaf7;
+  --stone: #c7cbb8;
+  /* warm oat: the recessed wells (input wells, pills, quantity stepper, bar tracks) so the sage never reads cold */
+  --stone-warm: #e9e7df;
+  --ink: #0f1f17;
+  --ink-2: #3e453b;
+  --ink-3: #4c584a;
+  --line: rgba(15, 31, 23, 0.12);
+  --line-2: #878e80;
+  --onyx: #0f1f17;
+  --champagne: #ebe8df;
+  --brass: #859075;
+  --gilt: #5e6b56;
+  --brass-d: #a4b092;
+  --gilt-d: #c7cbb8;
+  --cta: #0f1f17;
+  --cta-hover: #1e3527;
+  --w1: #f2f4ee;
 
-  /* the Tailwind tokens follow the set above, one source per theme */
-  --color-bg: var(--bg);
-  --color-surface: var(--paper);
-  --color-surface-2: var(--stone);
-  --color-ink: var(--ink);
-  --color-ink-2: var(--ink-2);
-  --color-ink-3: var(--ink-3);
-  --color-line: var(--line);
-  --color-line-2: var(--line-2);
-  --color-cta: var(--cta);
-  --color-cta-hover: var(--cta-hover);
-  --color-onyx: var(--onyx);
-  --color-champagne: var(--champagne);
-  --color-brass: var(--brass);
-  --color-gilt: var(--gilt);
-  /* the greyscale ramp the buttons and badges use: w0 = surface, w4 = ink */
-  --color-w0: var(--paper);
-  --color-w1: var(--w1);
-  --color-w2: var(--line-2);
-  --color-w4: var(--ink);
+  --hdr-tint: color-mix(in srgb, var(--stone) 40%, var(--bg));
+
+  /* inset surfaces are the oat, not the sage (the sage stays on --stone: the hero plate, the quiet bands) */
+  --color-surface-2: var(--stone-warm);
+  /* the unfilled track of a bar (longevity, review split) */
+  --track: var(--stone-warm);
 }
 
 /* the theme dock's panel eases in (components/ui/theme-switcher.tsx) */
@@ -119,26 +160,30 @@
 }
 
 /* Secondary text on a dark ground that is set as an alpha of --champagne (or on the champagne band as an alpha of
-   --onyx) was tuned for the default's light champagne. Botanical's champagne is darker, so these few are given a
+   --onyx) was tuned for the default's light champagne. The other themes' champagnes differ, so these few are given a
    little more weight there to hold 4.5:1. The default theme is not touched. */
-:root[data-theme="botanical"] .rh-focus__tabs button:not([aria-selected="true"]):not(:hover) {
+:root:is([data-theme="botanical"], [data-theme="verdant"]) .rh-focus__tabs button:not([aria-selected="true"]):not(:hover) {
   color: color-mix(in srgb, var(--champagne) 66%, transparent);
 }
-:root[data-theme="botanical"] .rh-fslide__notes {
+/* the struck-through list price on the In Focus slides (champagne at .55) */
+:root:is([data-theme="botanical"], [data-theme="verdant"]) .rh-fslide__price s {
+  opacity: 0.7;
+}
+:root:is([data-theme="botanical"], [data-theme="verdant"]) .rh-fslide__notes {
   color: color-mix(in srgb, var(--champagne) 66%, transparent);
 }
-:root[data-theme="botanical"] .rh-dset__fine {
+:root:is([data-theme="botanical"], [data-theme="verdant"]) .rh-dset__fine {
   color: color-mix(in srgb, var(--champagne) 68%, transparent);
 }
-:root[data-theme="botanical"] .rs-dark [class*="text-champagne/55"] {
+:root:is([data-theme="botanical"], [data-theme="verdant"]) .rs-dark [class*="text-champagne/55"] {
   color: color-mix(in srgb, var(--color-champagne) 68%, transparent);
 }
-:root[data-theme="botanical"] footer [class*="text-onyx/65"] {
+:root:is([data-theme="botanical"], [data-theme="verdant"]) footer [class*="text-onyx/65"] {
   color: color-mix(in srgb, var(--color-onyx) 80%, transparent);
 }
 
 /* the drawers' quiet text (ink-3) sits on lifted card surfaces as well as on --onyx: a little more weight in the darker champagne */
-:root[data-theme="botanical"] .rh-dk {
+:root:is([data-theme="botanical"], [data-theme="verdant"]) .rh-dk {
   --color-ink-3: color-mix(in srgb, var(--champagne) 74%, var(--onyx));
 }
 
@@ -165,11 +210,23 @@ select optgroup {
 }
 
 /* the dark hero panel (a picture with a dark edge) reads its quiet text from the theme's champagne, a little firmer than the default's */
-:root[data-theme="botanical"] .rh-hero[data-panel="dark"] .rh-hero__text {
+:root:is([data-theme="botanical"], [data-theme="verdant"]) .rh-hero[data-panel="dark"] .rh-hero__text {
   --ink-3: color-mix(in srgb, var(--champagne) 72%, transparent);
 }
 
 /* the sign-in card is an elevated surface (tier 2), not the bare canvas */
-:root[data-theme="botanical"] .signin-panel {
+:root:is([data-theme="botanical"], [data-theme="verdant"]) .signin-panel {
   background-color: var(--paper);
+}
+
+/* ---- verdant: the finishing touches ---------------------------------------------- */
+
+/* the buy box rests on alabaster with a delicate hairline, not the stronger interactive border */
+:root[data-theme="verdant"] [data-buybox] {
+  border-color: var(--line);
+}
+
+/* the launch-offer pill: champagne on obsidian */
+:root[data-theme="verdant"] .rh-pill {
+  color: var(--champagne);
 }
