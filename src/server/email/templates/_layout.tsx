@@ -55,8 +55,8 @@ export function EmailLayout({
               <Img
                 src={brand.logoUrl}
                 alt={brand.siteName}
-                width={176}
-                height={67}
+                width={216}
+                height={48}
                 style={{ display: "inline-block", border: 0 }}
               />
             </Link>

@@ -1,9 +1,12 @@
 import { ImageResponse } from "next/og";
 
+import { brandDataUrl } from "@/server/brand";
+
 export const size = { width: 512, height: 512 };
 export const contentType = "image/png";
 
-/** Favicon / app icon — the crossbar-less ∧ in cream on ink. */
+/** Favicon / app icon — the brand's own "A" (cut from the wordmark artwork,
+ *  `public/brand/mark-a-cream.png`, 176 × 180) in cream on ink. */
 export default function Icon() {
   return new ImageResponse(
     (
@@ -17,21 +20,8 @@ export default function Icon() {
           background: "#232120",
         }}
       >
-        <svg
-          width="300"
-          height="210"
-          viewBox="0 0 12 8"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M1 7 L6 1.4 L11 7"
-            stroke="#fafaf7"
-            strokeWidth={1.3}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={brandDataUrl("mark-a-cream.png")} width={264} height={270} alt="" />
       </div>
     ),
     size,

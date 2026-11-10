@@ -228,6 +228,7 @@ export default async function AccountPage() {
                 <span className="text-[12px] text-ink-3">
                   {s.ip ?? "—"} · last seen{" "}
                   {new Date(s.lastSeenAt).toLocaleDateString("en-IN", {
+                    timeZone: "Asia/Kolkata",
                     day: "numeric",
                     month: "short",
                   })}

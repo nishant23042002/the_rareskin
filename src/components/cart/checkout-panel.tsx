@@ -21,6 +21,7 @@ import { formatPaise } from "@/lib/money";
 import { GST_STATES, resolvePincode } from "@/lib/pincode";
 import { maskPhone, normalizeIndianMobile } from "@/lib/auth";
 import { isFragranceSlug } from "@/lib/catalog";
+import { itemThumbPath } from "@/lib/item-thumb";
 import { openRazorpayCheckout } from "@/lib/razorpay-checkout";
 import type {
   CheckoutQuoteResponse,
@@ -405,7 +406,9 @@ export function CheckoutPanel() {
       slug: l.fragrance ?? "",
       name: l.name,
       sku: l.sku,
-      image: null,
+      // the same item thumbnail the quote returns, so the photo doesn't pop in
+      // after the first price check
+      image: l.fragrance ? itemThumbPath(l.fragrance) : null,
       qty: l.qty,
       unitPrice: l.price,
       mrp: l.mrp ?? l.price,

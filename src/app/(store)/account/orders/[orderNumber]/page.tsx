@@ -23,8 +23,11 @@ export const metadata = pageMeta({
 export const dynamic = "force-dynamic";
 
 const P = (rupees: number) => formatPaise(Math.round(rupees * 100));
+// The shop and its customers are in India, but the server renders in UTC — pin IST
+// so an order placed at 1:31 am on the 11th isn't shown as "10 Nov, 8:01 pm".
 const fmtFull = (iso: string) =>
   new Date(iso).toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -33,6 +36,7 @@ const fmtFull = (iso: string) =>
   });
 const fmtDay = (iso: string) =>
   new Date(iso).toLocaleDateString("en-IN", {
+    timeZone: "Asia/Kolkata",
     day: "numeric",
     month: "long",
     year: "numeric",

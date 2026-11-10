@@ -12,6 +12,15 @@ import {
 } from "./_parts";
 import { mockBase } from "./_mock";
 
+/** A reason typed by staff or set by a job may lack a full stop or a capital —
+ *  make it a proper sentence so "…at your request Nothing has been charged" can't happen. */
+function asSentence(text: string | null | undefined, fallback: string): string {
+  const t = (text ?? "").trim();
+  if (!t) return fallback;
+  const s = t.charAt(0).toUpperCase() + t.slice(1);
+  return /[.!?]$/.test(s) ? s : `${s}.`;
+}
+
 export default function OrderCancelled(props: OrderCancelledProps) {
   const { brand, customerName } = props;
   return (
@@ -19,8 +28,10 @@ export default function OrderCancelled(props: OrderCancelledProps) {
       <Eyebrow>Order cancelled</Eyebrow>
       <Title>This one didn&rsquo;t go through, {customerName}.</Title>
       <Lede>
-        {props.reason ||
-          "Your order was cancelled before payment was completed."}{" "}
+        {asSentence(
+          props.reason,
+          "Your order was cancelled before payment was completed.",
+        )}{" "}
         Nothing has been charged
         {props.refundNote ? `, and ${props.refundNote.toLowerCase()}` : ""}.
       </Lede>

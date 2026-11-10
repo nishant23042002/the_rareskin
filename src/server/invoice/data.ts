@@ -1,5 +1,8 @@
 import "server-only";
 
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
 import { dbConnect } from "@/server/db";
 import {
   Order,
@@ -8,6 +11,8 @@ import {
   type ProductDoc,
 } from "@/server/models";
 import { SITE, CONTACT } from "@/lib/site";
+import { itemThumbPath } from "@/lib/item-thumb";
+import { brandFile } from "@/server/brand";
 import {
   DISCOVERY_SET_SLUG,
   FRAGRANCE_PALETTE,
@@ -70,7 +75,7 @@ function under1000(n: number): string {
   return [h ? `${ONES[h]} hundred` : "", r ? under100(r) : ""].filter(Boolean).join(" ");
 }
 
-/** `159800` → `"One thousand five hundred ninety-eight rupees only"`. */
+/** `159800` → `"One thousand five hundred ninety-eight rupees only"`; `100` → `"One rupee only"`. */
 export function amountInWords(paise: number): string {
   const rupees = Math.floor(paise / 100);
   const p = paise % 100;
@@ -89,16 +94,40 @@ export function amountInWords(paise: number): string {
   ].filter(Boolean);
 
   let words = chunks.join(" ").replace(/\s+/g, " ").trim();
+  if (!words) words = "zero"; // paise only, e.g. 50 paise
   words = words.charAt(0).toUpperCase() + words.slice(1);
   const paisePart = p ? ` and ${under100(p)} paise` : "";
-  return `${words} rupees${paisePart} only`;
+  return `${words} ${rupees === 1 ? "rupee" : "rupees"}${paisePart} only`;
 }
 
 // ── product visuals (live catalogue join) ─────────────────────────────
 
+/**
+ * The official item thumbnail (`@/lib/item-thumb`, a JPEG) read straight off disk
+ * and handed to react-pdf as bytes — no network, no URL to resolve. The file is
+ * bundled into the invoice route (`outputFileTracingIncludes` in next.config.ts).
+ * `null` when the item has none (Discovery Set) or the file is missing, in which
+ * case the invoice falls back to the vector glyph rather than failing.
+ */
+function itemThumbFile(slug: string): { data: Buffer; format: "jpg" } | null {
+  const rel = itemThumbPath(slug);
+  if (!rel) return null;
+  try {
+    return {
+      data: readFileSync(path.join(process.cwd(), "public", rel)),
+      format: "jpg",
+    };
+  } catch {
+    return null;
+  }
+}
+
 /** Force a PDF-safe raster from a Cloudinary URL (react-pdf can't do WebP/AVIF). */
 function pdfSafeImage(url: string | null): string | null {
   if (!url) return null;
+  // a root-relative path (an order snapshot of the item thumbnail) is not a URL
+  // react-pdf can fetch — drop it, the glyph is the safe fallback
+  if (url.startsWith("/")) return null;
   if (url.includes("res.cloudinary.com") && url.includes("/upload/")) {
     return url.replace("/upload/", "/upload/f_jpg,q_82,w_640/");
   }
@@ -138,8 +167,9 @@ export interface InvoiceLine {
   noteLine: string | null;
   /** juice hex for the vector flacon glyph, or null (non-fragrance → mark glyph) */
   juice: string | null;
-  /** a real packshot URL, PDF-safe, or null → draw the glyph */
-  photo: string | null;
+  /** the item's picture, PDF-safe — a URL, or the thumbnail file read off disk —
+   *  or null → draw the glyph */
+  photo: string | { data: Buffer; format: "jpg" } | null;
   qty: number;
   unitPrice: string;
   lineTotal: string;
@@ -147,6 +177,8 @@ export interface InvoiceLine {
 
 export interface InvoiceData {
   brand: {
+    /** the real wordmark artwork (PNG bytes), or null → the text lockup */
+    logo: { data: Buffer; format: "png" } | null;
     name: string;
     legalName: string;
     tagline: string;
@@ -245,6 +277,9 @@ export async function loadInvoiceData(
     : [];
   const byId = new Map(products.map((p) => [String(p._id), p]));
 
+  // the real wordmark for the masthead (read once per invoice, ~42 KB)
+  const wordmark = brandFile("rareskin-wordmark.png");
+
   const items: InvoiceLine[] = o.items.map((i) => {
     const p = byId.get(String(i.productId));
     const slug = p?.slug ?? i.slug;
@@ -256,7 +291,8 @@ export async function loadInvoiceData(
       juice: isFragranceSlug(slug)
         ? FRAGRANCE_PALETTE[slug as FragranceSlug].juice
         : null,
-      photo: pdfSafeImage(pickImage(p?.media) ?? i.image),
+      photo:
+        itemThumbFile(slug) ?? pdfSafeImage(pickImage(p?.media) ?? i.image),
       qty: i.qty,
       unitPrice: inr(i.unitPricePaise),
       lineTotal: inr(i.lineTotalPaise),
@@ -285,6 +321,7 @@ export async function loadInvoiceData(
 
   return {
     brand: {
+      logo: wordmark ? { data: wordmark, format: "png" } : null,
       name: SITE.name,
       legalName: SITE.legalName,
       tagline: SITE.tagline,

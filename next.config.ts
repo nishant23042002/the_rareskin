@@ -54,9 +54,27 @@ const nextConfig: NextConfig = {
     // pulls in fontkit + a PDF writer that use Node built-ins (zlib/stream/fs)
     "@react-pdf/renderer",
   ],
-  // the invoice PDF reads the brand fonts straight off disk — bundle them
+  // the invoice PDF reads the brand fonts, the wordmark and the item thumbnails
+  // straight off disk — bundle them (src/server/invoice/fonts.ts, src/server/brand.ts,
+  // itemThumbFile in data.ts)
   outputFileTracingIncludes: {
-    "/api/account/orders/[orderNumber]/invoice": ["./public/fonts/**"],
+    "/api/account/orders/[orderNumber]/invoice": [
+      "./public/fonts/**",
+      "./public/brand/rareskin-wordmark.png",
+      "./public/images/pdp/*/item-thumb.jpg",
+    ],
+    // the product share card re-renders daily on the server (see its file)
+    "/fragrances/[slug]/opengraph-image*": [
+      "./public/brand/rareskin-wordmark.png",
+      "./public/brand/rareskin-wordmark-cream.png",
+      "./public/images/pdp/*/item-thumb.jpg",
+    ],
+  },
+  // Order emails sent before 2026-11-11 point at /email/logo (a generated lockup,
+  // since removed). Serve the real wordmark from that old address so a mail client
+  // that re-fetches it shows the right logo — new emails use /brand/email-logo.png.
+  async rewrites() {
+    return [{ source: "/email/logo", destination: "/brand/email-logo.png" }];
   },
   // The previous therareskin.com (a separate project) used other paths. Anything
   // Google has indexed, a customer bookmarked, or a Razorpay "business website"

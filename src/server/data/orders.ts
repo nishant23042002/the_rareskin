@@ -9,6 +9,7 @@ import {
 } from "@/server/models";
 import { toRupees } from "@/lib/money";
 import { DISCOVERY_SET_SLUG, isFragranceSlug } from "@/lib/catalog";
+import { itemThumbPath } from "@/lib/item-thumb";
 
 /**
  * Order reads for the account area. Not cached — an order list must always be
@@ -63,7 +64,8 @@ async function productVisuals(
 
   for (const d of docs) {
     out.set(String(d._id), {
-      image: pickImage(d.media),
+      // the official item thumbnail first (same as the checkout), then an upload
+      image: itemThumbPath(d.slug) ?? pickImage(d.media),
       href: hrefForSlug(d.slug),
       isFragrance: isFragranceSlug(d.slug),
       notes: (d.notes ?? []).slice(0, 4),
@@ -161,7 +163,7 @@ function toSummary(
         slug: i.slug,
         name: i.name,
         qty: i.qty,
-        image: v?.image ?? i.image ?? null,
+        image: v?.image ?? i.image ?? itemThumbPath(i.slug),
         isFragrance: v?.isFragrance ?? isFragranceSlug(i.slug),
       };
     }),
@@ -202,7 +204,7 @@ export async function getUserOrder(
         name: i.name,
         slug: i.slug,
         sku: i.sku,
-        image: v?.image ?? i.image ?? null,
+        image: v?.image ?? i.image ?? itemThumbPath(i.slug),
         href: v?.href ?? hrefForSlug(i.slug),
         isFragrance: v?.isFragrance ?? isFragranceSlug(i.slug),
         notes: v?.notes ?? [],

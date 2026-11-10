@@ -11,7 +11,7 @@ export interface EmailBrand {
   supportEmail: string;
   supportAddress: string;
   siteUrl: string;
-  /** hosted masthead PNG (`/email/logo`) */
+  /** hosted masthead PNG — the real wordmark (`/brand/email-logo.png`, 648 × 144, shown at 216 × 48) */
   logoUrl: string;
   /** the account landing */
   accountUrl: string;

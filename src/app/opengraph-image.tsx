@@ -1,10 +1,14 @@
 import { ImageResponse } from "next/og";
+
 import { SITE } from "@/lib/site";
+import { brandDataUrl } from "@/server/brand";
 
 export const alt = `${SITE.name} — ${SITE.tagline}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+/** The social-share card: the real wordmark (`public/brand/rareskin-wordmark.png`,
+ *  1487 × 331) over the tagline, on the site's warm paper. */
 export default function OpengraphImage() {
   return new ImageResponse(
     (
@@ -21,27 +25,9 @@ export default function OpengraphImage() {
           color: "#232120",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 18,
-            fontSize: 22,
-            letterSpacing: 10,
-            textTransform: "uppercase",
-            color: "#6b6963",
-          }}
-        >
-          <svg width="34" height="24" viewBox="0 0 12 8" fill="none">
-            <path
-              d="M1 7 L6 1.4 L11 7"
-              stroke="#232120"
-              strokeWidth={1.3}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          The Rareskin
+        <div style={{ display: "flex" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={brandDataUrl("rareskin-wordmark.png")} width={400} height={89} alt={SITE.name} />
         </div>
 
         <div style={{ display: "flex", fontSize: 82, lineHeight: 1.05, maxWidth: 900 }}>

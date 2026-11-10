@@ -12,6 +12,7 @@ import {
 } from "@/server/models";
 import { nextStatuses } from "@/server/payments";
 import { DISCOVERY_SET_SLUG, isFragranceSlug } from "@/lib/catalog";
+import { itemThumbPath } from "@/lib/item-thumb";
 import {
   ORDER_STATUSES,
   PAYMENT_METHODS,
@@ -71,7 +72,7 @@ async function itemVisuals(
     .lean<Pick<ProductDoc, "_id" | "slug" | "media">[]>();
   for (const d of docs) {
     out.set(String(d._id), {
-      image: pickImage(d.media),
+      image: itemThumbPath(d.slug) ?? pickImage(d.media),
       href: hrefForSlug(d.slug),
       isFragrance: isFragranceSlug(d.slug),
     });
@@ -350,7 +351,7 @@ export async function getOrderForAdmin(
         unitPricePaise: i.unitPricePaise,
         mrpPaise: i.mrpPaise,
         lineTotalPaise: i.lineTotalPaise,
-        image: v?.image ?? i.image ?? null,
+        image: v?.image ?? i.image ?? itemThumbPath(i.slug),
         href: v?.href ?? hrefForSlug(i.slug),
         isFragrance: v?.isFragrance ?? isFragranceSlug(i.slug),
       };

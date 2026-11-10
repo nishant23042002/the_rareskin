@@ -8,6 +8,7 @@ import { OrderThumb } from "./order-thumb";
 
 const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-IN", {
+    timeZone: "Asia/Kolkata", // server renders in UTC; the customer is in India
     day: "numeric",
     month: "short",
     year: "numeric",

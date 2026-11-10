@@ -8,6 +8,7 @@ import { Cart, Product, type CartDoc, type ProductDoc } from "@/server/models";
 import { getCurrentUser } from "@/server/auth";
 import { COOKIES_SECURE, COOKIE_HOST_PREFIX } from "@/lib/auth";
 import { toRupees } from "@/lib/money";
+import { itemThumbPath } from "@/lib/item-thumb";
 import {
   MAX_CART_LINES,
   MAX_LINE_QTY,
@@ -280,11 +281,16 @@ interface HydratedCart {
   count: number;
 }
 
-/** A real uploaded packshot, or `null` — the UI draws the vector flacon when
- *  there is no photography yet. (No static `/images/*` fallback: those files
- *  don't exist until Cloudinary is wired.) */
+/** The line's picture: the official item thumbnail of the extrait (`@/lib/item-thumb`),
+ *  else an uploaded packshot, else `null` (the UI then draws the vector flacon —
+ *  only the Discovery Set and unknown products ever get there). */
 function lineImage(doc: ProductDoc): string | null {
-  return doc.media?.flat?.url ?? doc.media?.hero?.url ?? null;
+  return (
+    itemThumbPath(doc.slug) ??
+    doc.media?.flat?.url ??
+    doc.media?.hero?.url ??
+    null
+  );
 }
 
 /**

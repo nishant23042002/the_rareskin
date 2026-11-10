@@ -14,6 +14,7 @@ import {
   type UserDoc,
 } from "@/server/models";
 import { isFragranceSlug, DISCOVERY_SET_SLUG } from "@/lib/catalog";
+import { itemThumbPath } from "@/lib/item-thumb";
 import { initialsFrom } from "@/lib/reviews";
 import type { ReviewStatus } from "@/lib/validation/review";
 
@@ -355,7 +356,7 @@ export async function getReviewableItems(
       productId: p.productId,
       slug: p.slug,
       name: p.name,
-      image: doc ? pickImage(doc.media) : null,
+      image: itemThumbPath(p.slug) ?? (doc ? pickImage(doc.media) : null),
       isFragrance: isFragranceSlug(p.slug),
       deliveredAt: p.deliveredAt ? p.deliveredAt.toISOString() : null,
     };

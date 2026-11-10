@@ -11,8 +11,8 @@ const mockBrand: EmailBrand = {
   supportEmail: "therareskinsupport@velocityventuresgroup.in",
   supportAddress:
     "Shop No. 04, Jija Mata Bachat Bhavan, Near S.T. Stand, Roha, Dist. Raigad – 402109",
-  siteUrl: "https://therareskin.com",
-  logoUrl: "https://therareskin.com/email/logo",
+  siteUrl: "https://www.therareskin.com",
+  logoUrl: "https://www.therareskin.com/brand/email-logo.png",
   accountUrl: "https://therareskin.com/account",
   orderUrl: "https://therareskin.com/account/orders/RRS-2026-000042",
   invoiceUrl: "https://therareskin.com/api/account/orders/RRS-2026-000042/invoice",

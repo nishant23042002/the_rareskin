@@ -33,6 +33,7 @@ export function SignInMethods({ methods }: { methods: Methods }) {
 
   const linkedSince = methods.google
     ? new Date(methods.google.linkedAt).toLocaleDateString("en-IN", {
+        timeZone: "Asia/Kolkata",
         day: "numeric",
         month: "short",
         year: "numeric",

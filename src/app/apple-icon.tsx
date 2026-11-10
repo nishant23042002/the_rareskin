@@ -1,9 +1,11 @@
 import { ImageResponse } from "next/og";
 
+import { brandDataUrl } from "@/server/brand";
+
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-/** Apple touch icon — same mark, a little more inset for the rounded mask. */
+/** Apple touch icon — the same "A", a little more inset for the rounded mask. */
 export default function AppleIcon() {
   return new ImageResponse(
     (
@@ -17,21 +19,8 @@ export default function AppleIcon() {
           background: "#232120",
         }}
       >
-        <svg
-          width="96"
-          height="68"
-          viewBox="0 0 12 8"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M1 7 L6 1.4 L11 7"
-            stroke="#fafaf7"
-            strokeWidth={1.3}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={brandDataUrl("mark-a-cream.png")} width={88} height={90} alt="" />
       </div>
     ),
     size,

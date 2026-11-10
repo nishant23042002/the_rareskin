@@ -13,6 +13,7 @@ import {
 import { getSiteSettings } from "@/server/data/settings";
 import { formatPaise } from "@/lib/money";
 import { DISCOVERY_SET_SLUG, isFragranceSlug } from "@/lib/catalog";
+import { itemThumbPath } from "@/lib/item-thumb";
 import { SITE, CONTACT, absoluteUrl } from "@/lib/site";
 
 import type {
@@ -59,7 +60,9 @@ export function accountBrand(): EmailBrand {
     supportEmail: CONTACT.email,
     supportAddress: CONTACT.address,
     siteUrl: SITE.url,
-    logoUrl: absoluteUrl("/email/logo"),
+    // the real wordmark on white (public/brand/email-logo.png). A new URL, so mail
+    // clients that cached the old generated lockup under /email/logo fetch it fresh.
+    logoUrl: absoluteUrl("/brand/email-logo.png"),
     accountUrl,
     orderUrl: accountUrl,
     invoiceUrl: accountUrl,
@@ -117,10 +120,15 @@ function itemsFor(
 ): EmailLineItem[] {
   return o.items.map((i) => {
     const v = visuals.get(String(i.productId));
-    // live catalogue photo → the order's own snapshot → a generated flacon
+    // the official item thumbnail (a JPEG — safe in every mail client) → a live
+    // upload → the order's own snapshot → a generated flacon. Email needs absolute URLs.
+    const thumb = itemThumbPath(i.slug);
+    const abs = (u: string | null | undefined) =>
+      u ? (u.startsWith("/") ? absoluteUrl(u) : u) : null;
     const image =
-      v?.image ??
-      i.image ??
+      abs(thumb) ??
+      abs(v?.image) ??
+      abs(i.image) ??
       (isFragranceSlug(i.slug) ? absoluteUrl(`/email/flacon/${i.slug}`) : null);
     const notes = (v?.notes ?? []).slice(0, 3);
     return {

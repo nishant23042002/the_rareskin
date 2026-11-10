@@ -187,9 +187,22 @@ function Flacon({ juice }: { juice: string }) {
 
 function ItemGlyph({ line }: { line: InvoiceLine }) {
   if (line.photo) {
+    // the square item thumbnail (see `@/lib/item-thumb`) in a hairline frame.
     // react-pdf <Image>, not an HTML <img> — no alt attribute exists.
-    // eslint-disable-next-line jsx-a11y/alt-text
-    return <Image src={line.photo} style={{ width: 34, height: 46, objectFit: "cover", borderRadius: 2 }} />;
+    return (
+      // eslint-disable-next-line jsx-a11y/alt-text
+      <Image
+        src={line.photo}
+        style={{
+          width: 46,
+          height: 46,
+          objectFit: "cover",
+          borderRadius: 2,
+          borderWidth: 0.5,
+          borderColor: c.line,
+        }}
+      />
+    );
   }
   if (line.juice) return <Flacon juice={line.juice} />;
   return (
@@ -216,11 +229,18 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
         {/* masthead */}
         <View style={s.masthead}>
           <View>
-            <View style={s.wordmark}>
-              <Mark size={16} />
-              <Text style={s.brandName}>THE RARESKIN</Text>
-            </View>
-            <Text style={s.brandKicker}>Extrait de Parfum</Text>
+            {brand.logo ? (
+              // the real wordmark artwork (1487 × 331), shown 150 pt wide
+              // eslint-disable-next-line jsx-a11y/alt-text
+              <Image src={brand.logo} style={{ width: 150, height: 33.4 }} />
+            ) : (
+              // only if the artwork file is missing from the bundle
+              <View style={s.wordmark}>
+                <Mark size={16} />
+                <Text style={s.brandName}>THE RARESKIN</Text>
+              </View>
+            )}
+            <Text style={[s.brandKicker, brand.logo ? { marginTop: 8 } : {}]}>Extrait de Parfum</Text>
           </View>
           <View>
             <Text style={s.invoiceTitle}>Invoice</Text>
