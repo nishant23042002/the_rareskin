@@ -1,4 +1,4 @@
-import "./_bootstrap";
+import { requireDestructiveConsent } from "./_bootstrap";
 
 import mongoose from "mongoose";
 
@@ -38,6 +38,7 @@ function flagNumber(name: string, fallback: number): number {
 }
 
 async function main() {
+  requireDestructiveConsent("reset:commerce");
   if (isProduction()) {
     throw new Error("reset:commerce refuses to run in production");
   }

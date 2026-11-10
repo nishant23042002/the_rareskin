@@ -1,6 +1,5 @@
 import type {
   EmailBrand,
-  NewDeviceProps,
   OrderEmailBase,
   ReviewRequestProps,
 } from "../types";
@@ -13,9 +12,9 @@ const mockBrand: EmailBrand = {
     "Shop No. 04, Jija Mata Bachat Bhavan, Near S.T. Stand, Roha, Dist. Raigad – 402109",
   siteUrl: "https://www.therareskin.com",
   logoUrl: "https://www.therareskin.com/brand/email-logo.png",
-  accountUrl: "https://therareskin.com/account",
-  orderUrl: "https://therareskin.com/account/orders/RRS-2026-000042",
-  invoiceUrl: "https://therareskin.com/api/account/orders/RRS-2026-000042/invoice",
+  accountUrl: "https://www.therareskin.com/account",
+  orderUrl: "https://www.therareskin.com/account/orders/RRS-2026-000042",
+  invoiceUrl: "https://www.therareskin.com/api/account/orders/RRS-2026-000042/invoice",
 };
 
 /** Sample data so `pnpm email:preview` renders every template standalone. */
@@ -34,7 +33,7 @@ export const mockBase: OrderEmailBase = {
       qty: 1,
       unitPrice: "₹799",
       lineTotal: "₹799",
-      image: "https://therareskin.com/email/flacon/aurevan",
+      image: "https://www.therareskin.com/images/pdp/aurevan/item-thumb.jpg",
     },
     {
       name: "Discovery Set",
@@ -69,14 +68,6 @@ export const mockBase: OrderEmailBase = {
   paymentLine: "UPI · aditi@okhdfcbank",
 };
 
-export const mockNewDevice: NewDeviceProps = {
-  brand: mockBrand,
-  customerName: "Aditi",
-  deviceLabel: "Chrome on Windows",
-  ip: "203.0.113.42",
-  when: "2 Sep 2026, 9:14 am",
-};
-
 export const mockReviewRequest: ReviewRequestProps = {
   brand: mockBrand,
   customerName: "Aditi",
@@ -86,8 +77,8 @@ export const mockReviewRequest: ReviewRequestProps = {
     {
       name: "AURÉVAN",
       slug: "aurevan",
-      image: "https://therareskin.com/email/flacon/aurevan",
+      image: "https://www.therareskin.com/images/pdp/aurevan/item-thumb.jpg",
     },
   ],
-  reviewUrl: "https://therareskin.com/account/reviews",
+  reviewUrl: "https://www.therareskin.com/account/reviews",
 };

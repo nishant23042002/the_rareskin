@@ -48,43 +48,11 @@ export function formatPaise(paise: Paise): string {
   })}`;
 }
 
-/**
- * Legacy helper kept for the static storefront, which still passes whole
- * rupees. New code should store paise and call {@link formatPaise}.
- */
-export function formatINR(rupees: number): string {
-  return `₹${rupees.toLocaleString("en-IN")}`;
-}
-
-/** Sum a list of paise amounts, guarding against overflow. */
-export function sumPaise(amounts: readonly Paise[]): Paise {
-  return amounts.reduce((total, amount) => {
-    assertPaise(amount);
-    const next = total + amount;
-    if (!Number.isSafeInteger(next)) {
-      throw new RangeError("sumPaise: running total exceeded safe integer range");
-    }
-    return next;
-  }, 0);
-}
-
 /** A whole-paise, non-negative amount. Throws otherwise. */
-export function assertPaise(value: unknown): asserts value is Paise {
+function assertPaise(value: unknown): asserts value is Paise {
   if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
     throw new RangeError(
       `Expected a non-negative integer amount of paise, got ${String(value)}`,
     );
   }
-}
-
-/** Discount of `mrp` vs `price`, both in paise — e.g. `{ amount: 40000, percent: 33 }`. */
-export function savings(
-  pricePaise: Paise,
-  mrpPaise: Paise,
-): { amount: Paise; percent: number } {
-  assertPaise(pricePaise);
-  assertPaise(mrpPaise);
-  if (mrpPaise <= pricePaise) return { amount: 0, percent: 0 };
-  const amount = mrpPaise - pricePaise;
-  return { amount, percent: Math.round((amount / mrpPaise) * 100) };
 }

@@ -205,11 +205,8 @@ See `.env.example`. All optional:
 | Variable | Purpose |
 | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | canonical domain (metadata, sitemap, OG). Defaults to `https://www.therareskin.com` (the host the old site was indexed under). |
-| `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` / `NEXT_PUBLIC_RAZORPAY_KEY_ID` | for the future checkout provider |
-| `CONTACT_FORWARD_EMAIL` | where `/api/contact` should send messages |
-| `NEWSLETTER_API_KEY` / `NEWSLETTER_LIST_ID` | newsletter provider |
+| `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` / `RAZORPAY_WEBHOOK_SECRET` | the checkout provider — see [`docs/payments.md`](docs/payments.md). Server-side only: the key id reaches the browser through the checkout response, there is no `NEXT_PUBLIC_` copy. |
 | `NEXT_PUBLIC_GTM_ID` | Google Tag Manager id (`GTM-…`), storefront only. Production environment only; build-time. |
-| `NEXT_PUBLIC_ANALYTICS_ID` | analytics |
 
 ---
 
@@ -251,10 +248,13 @@ are bundled into the route via `outputFileTracingIncludes`.
 
 ### Contact & newsletter forms
 
-`src/app/api/contact/route.ts` and `src/app/api/newsletter/route.ts` validate
-the payload and return `{ ok: true }` without delivering anything. Replace the
-`// TODO` in each with a call to your email/ESP provider. The client components
-(`ContactForm`, and the footer's `FooterNewsletter`) already handle success and error states.
+`src/app/api/contact/route.ts` saves every enquiry as a `ContactMessage`
+(worked in **`/admin/messages`**) and raises a notification. 
+`src/app/api/newsletter/route.ts` only validates the address and raises a
+low-priority admin notification — **sign-ups are not stored anywhere yet**; wire a
+list provider (or a `subscribers` collection) there before relying on the footer
+form. The client components (`ContactForm`, the footer's `FooterNewsletter`)
+already handle success and error states.
 
 ### Product photography
 

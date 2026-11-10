@@ -1,4 +1,4 @@
-import "./_bootstrap";
+import { requireDestructiveConsent } from "./_bootstrap";
 
 import mongoose, { Types } from "mongoose";
 
@@ -368,6 +368,7 @@ async function add() {
 }
 
 async function main() {
+  requireDestructiveConsent("seed:reviews");
   if (isProduction()) {
     throw new Error("seed:reviews refuses to run in production");
   }
