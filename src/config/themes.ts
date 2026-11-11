@@ -47,7 +47,16 @@ export const THEMES = [
 
 export type ThemeId = (typeof THEMES)[number]["id"];
 
+/** FINALIZED (2026-11-12): the Original theme. Every other theme is kept in `themes.css` and in the list above, untouched. */
 export const DEFAULT_THEME: ThemeId = "default";
+
+/**
+ * The staff colour dock and the remembered preview. Off in production now that the Original theme is chosen
+ * (a stored preview is ignored and cleared); still on in development, or in a build made with
+ * NEXT_PUBLIC_THEME_PREVIEW=1, so the other themes can be compared again at any time.
+ */
+export const THEME_PREVIEW_ENABLED =
+  process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_THEME_PREVIEW === "1";
 
 /** where the founder's choice is remembered (this browser only) */
 export const THEME_STORAGE_KEY = "rareskin_theme_preview";
@@ -63,7 +72,9 @@ export function isThemeId(value: unknown): value is ThemeId {
  * was retired) is never applied, so the page renders the original look, and the
  * stale entry is cleared.
  */
-export const THEME_BOOT_SCRIPT = `(function(){try{var k=${JSON.stringify(
+export const THEME_BOOT_SCRIPT = !THEME_PREVIEW_ENABLED
+  ? `(function(){try{localStorage.removeItem(${JSON.stringify(THEME_STORAGE_KEY)})}catch(e){}})();`
+  : `(function(){try{var k=${JSON.stringify(
   THEME_STORAGE_KEY,
 )};var t=localStorage.getItem(k);var ok=${JSON.stringify(
   THEMES.filter((x) => x.id !== DEFAULT_THEME).map((x) => x.id),

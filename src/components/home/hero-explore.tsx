@@ -4,7 +4,6 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 
 import { RhIcon } from "@/components/ui/rh-icon";
-import { HERO_COLUMNS } from "@/config/hero-spots";
 import { formatINR, type FragranceSlug } from "@/lib/catalog";
 import { useHero } from "./hero-frame";
 
@@ -61,13 +60,14 @@ export function HeroIndex({ items }: { items: HeroExploreItem[] }) {
 }
 
 export function HeroSpots({ items, price }: { items: HeroExploreItem[]; /** launch price, rupees (for the accessible name) */ price: number }) {
-  const { hot, setHot } = useHero();
+  const { hot, setHot, spots } = useHero();
+  if (!spots) return null;
 
   return (
     <>
       {items.map((f, i) => {
-        const w = HERO_COLUMNS.wide[f.slug];
-        const t = HERO_COLUMNS.tall[f.slug];
+        const w = spots.columns.wide[f.slug];
+        const t = spots.columns.tall[f.slug];
         return (
           <Link
             key={f.slug}
@@ -122,11 +122,12 @@ export function HeroPlaques({
   price: number;
   mrp: number;
 }) {
-  const { hot } = useHero();
+  const { hot, spots } = useHero();
+  if (!spots) return null;
   return (
     <div className="rh-plaques" aria-hidden="true">
       {items.map((f) => {
-        const w = HERO_COLUMNS.wide[f.slug];
+        const w = spots.columns.wide[f.slug];
         return (
           <div
             key={f.slug}

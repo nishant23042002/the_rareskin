@@ -14,9 +14,12 @@
  * The concept ids are the card directions of `src/config/homepage-assets.ts`, so by
  * default ONE preview bar drives the hero and "The Three" together
  * (`HERO_FOLLOWS_CARD_CONCEPT`). A direction whose hero pictures are still
- * placeholders shows the baseline hero (never a grey plate). When a direction is
- * chosen: set `DEFAULT_HERO_CONCEPT` (and `DEFAULT_CARD_CONCEPT`), set
- * `HERO_FOLLOWS_CARD_CONCEPT = false`.
+ * placeholders shows the baseline hero (never a grey plate).
+ *
+ * FINALIZED (2026-11-12): the cards are STONE (`DEFAULT_CARD_CONCEPT` in `homepage-assets.ts`) and the hero
+ * FOLLOWS THE CARDS, so the live hero is `hero-grounded_stone`. The baseline pedestal hero (`hero`), the other
+ * directions and the four reference variants are all kept as they were (nothing deleted); to change the
+ * choice, change the card default or set `HERO_FOLLOWS_CARD_CONCEPT = false` and pick `DEFAULT_HERO_CONCEPT`.
  *
  * Plain data, no imports of components, so the library and the components can read it.
  */
@@ -60,11 +63,11 @@ export function heroVariantAssetId(n: HeroVariantNumber): `hero-${HeroVariantId}
 
 export type HeroAssetId = "hero" | `hero-${PlateConceptId}` | `hero-${HeroVariantId}`;
 
-/** the hero switches with the card-direction preview bar */
+/** the hero follows the cards (finalized: Stone cards, so the Stone hero) and switches with the card-direction preview bar in development */
 export const HERO_FOLLOWS_CARD_CONCEPT = true;
 
-/** the direction everyone sees when the hero does not follow the bar */
-export const DEFAULT_HERO_CONCEPT: CardConceptId = "current";
+/** the direction everyone would see if the hero did NOT follow the cards (kept in step with the finalized choice) */
+export const DEFAULT_HERO_CONCEPT: CardConceptId = "grounded_stone";
 
 export function heroAssetId(concept: CardConceptId): HeroAssetId {
   return concept === "current" ? "hero" : `hero-${concept}`;

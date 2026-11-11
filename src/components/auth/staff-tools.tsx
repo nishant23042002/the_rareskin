@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 
+import { THEME_PREVIEW_ENABLED } from "@/config/themes";
 import { StaffOnly } from "./staff-only";
 
 /**
@@ -21,6 +22,8 @@ const ConceptSwitcher = dynamic(
 );
 
 export function StaffThemeSwitcher() {
+  // the Original theme is finalized (config/themes.ts): the dock is a development / opt-in tool now
+  if (!THEME_PREVIEW_ENABLED) return null;
   return (
     <StaffOnly>
       <ThemeSwitcher />

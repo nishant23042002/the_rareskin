@@ -114,10 +114,13 @@ function ShippedHero({
   stage,
   children,
   overlay,
+  pos,
 }: {
   asset: HomeAsset;
   onError: () => void;
   stage: boolean;
+  /** the picture's object position in its box from 1024px (stage layout) */
+  pos?: { ox: number; oy: number };
   children?: ReactNode;
   overlay?: ReactNode;
 }) {
@@ -173,6 +176,8 @@ function ShippedHero({
         {
           "--ar-w": desktop.width / desktop.height,
           "--ar-t": mobile.width / mobile.height,
+          "--dox": pos?.ox ?? 0.5,
+          "--doy": pos?.oy ?? 0.5,
         } as CSSProperties
       }
     >
@@ -198,7 +203,7 @@ export function HeroMedia({
   /** drawn only in the stage layout, over the picture and pinned to the visible hero rather than to the picture (the plaques) */
   overlay?: ReactNode;
 }) {
-  const { failed, setFailed, layout } = useHero();
+  const { failed, setFailed, layout, spots } = useHero();
   // the art direction chosen in the preview bar (src/config/hero.config.ts); the baseline hero until a direction's pictures are final
   const cardConcept = useCardConcept();
   // a reference variant (?hero=1..4, or `activeHeroVariant`) beats the card direction; a variant that is still a placeholder falls back to it
@@ -214,6 +219,7 @@ export function HeroMedia({
           asset={heroAsset}
           onError={() => setFailed(true)}
           stage={layout === "stage"}
+          pos={spots?.pos}
           overlay={overlay}
         >
           {children}

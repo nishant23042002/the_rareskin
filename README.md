@@ -362,12 +362,17 @@ before going live:
   light, three fragrances each, plus a "Stone v2" AUREVAN alternative), next to the
   original pedestal cards; plate prompts in `public/images/prompt-manifest.json`,
   files in `public/images/homepage/cards/<direction>/`, choice in
-  `src/config/homepage-assets.ts`. For the founder showcase a **slim "Preview" tab on
-  the left edge of the homepage opens a panel that switches the direction live**
-  (`/?concept=<id>` opens one),
-  and it is on in every build while `CARD_SWITCHER_PUBLIC` is true. When a direction
-  is chosen: set `DEFAULT_CARD_CONCEPT`, set `CARD_SWITCHER_PUBLIC = false`, delete
-  the losing pictures and the pedestal cards. Every card has the bottle at the same
+  `src/config/homepage-assets.ts`. **FINALIZED (2026-11-12): STONE** is the default
+  (`DEFAULT_CARD_CONCEPT = "grounded_stone"`), the hero FOLLOWS THE CARDS
+  (`HERO_FOLLOWS_CARD_CONCEPT = true`, so the live hero is `hero-grounded_stone`) and
+  the colour theme is the Original (`DEFAULT_THEME`). Nothing was deleted: the pedestal
+  set, Studio light, Mineral bed, Liquid light, the reference hero variants and the other
+  themes (Botanical, Verdant) stay in the repo and on disk, untouched, and are one line
+  away. The founder's **slim "Preview" tab** (a panel that switches the direction live,
+  `/?concept=<id>`, `/?hero=1..4`) and the **colour dock** are now development tools: off
+  in production (`CARD_SWITCHER_PUBLIC = false`; `THEME_PREVIEW_ENABLED` in
+  `src/config/themes.ts`), on in `next dev` or in a build made with
+  `NEXT_PUBLIC_CARD_SWITCHER=1` / `NEXT_PUBLIC_THEME_PREVIEW=1`. Every card has the bottle at the same
   place (`BOTTLE` in the local build script). `pnpm home:images check` verifies
   size / ratio / weight; `pnpm home:images placeholders` rewrites missing
   placeholders. Hero: a Site Settings photograph still wins over the shipped one.

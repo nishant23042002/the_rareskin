@@ -12,9 +12,9 @@ import {
 } from "react";
 
 import { DEFAULT_HERO_CONCEPT, HERO_FOLLOWS_CARD_CONCEPT } from "@/config/hero.config";
-import { HERO_SPOTS_ASSET_ID } from "@/config/hero-spots";
+import { HERO_SPOTS, type HeroSpotSet } from "@/config/hero-spots";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
-import { getHomeAsset, isFinal, resolveHeroAsset } from "@/lib/home-images";
+import { isFinal, resolveHeroAsset } from "@/lib/home-images";
 import { useCardConcept } from "./card-concept";
 import { useHeroVariant } from "./hero-variant";
 
@@ -22,18 +22,20 @@ import { useHeroVariant } from "./hero-variant";
  * The hero section. It decides how the hero is laid out and holds what its parts share.
  *
  * Two layouts:
- *  - "stage": the shipped hero picture is shown in full and the headline stands on its empty wall
- *    (from 1024px; stacked, text above and picture below, on a phone and a tablet). The picture is
- *    explorable: a dot on each flacon, a plaque on hover, the index beside the headline linked to them
- *    (the shared `hot` fragrance below), and on a mouse a warm light follows the pointer.
- *    Nothing in the picture moves or scales on hover or with the pointer: hover changes light and opacity only.
- *  - "split": everything else (a photograph uploaded in Site Settings, the preview bar's other art
- *    directions, the reference variants, the illustrated trio when the picture fails to load): the
- *    headline on a panel beside the picture, as before. The panel is tinted from the picture's own edge
- *    (`panel` in `public/images/assets-manifest.json`, sampled by `scripts/hero-panel-tones.py`): a
- *    gradient that continues the picture's left edge on desktop, one colour that continues its top edge
- *    when the panel sits above it. The baseline has no `panel` and keeps the warm stone; so does an
- *    uploaded photograph (we cannot know its light).
+ *  - "stage": the picture has a set of hotspots (`config/hero-spots.ts`: the baseline pedestal picture and
+ *    STONE, the finalized hero). The picture is explorable: a dot on each flacon, a focus frame and a plaque
+ *    on hover, the index beside the headline linked to them (the shared `hot` fragrance below), and on a
+ *    mouse a warm light follows the pointer. Nothing in the picture moves or scales on hover or with the
+ *    pointer: hover changes light and opacity only. Its `form` is "overlay" (the headline stands on the
+ *    picture's empty wall) or "split" (the headline on the picture-tinted panel beside it) from 1024px;
+ *    below that the text is above and the picture below.
+ *  - "split": everything else (a photograph uploaded in Site Settings, the other art directions, the
+ *    reference variants, the illustrated trio when the picture fails to load): the headline on a panel
+ *    beside the picture, as before, without hotspots.
+ * The panel is tinted from the picture's own edge (`panel` in `public/images/assets-manifest.json`,
+ * sampled by `scripts/hero-panel-tones.py`): a gradient that continues the picture's left edge on
+ * desktop, one colour that continues its top edge when the panel sits above it. The baseline has no
+ * `panel` and keeps the warm stone; so does an uploaded photograph (we cannot know its light).
  */
 
 interface HeroShared {
@@ -44,6 +46,8 @@ interface HeroShared {
   failed: boolean;
   setFailed: (failed: boolean) => void;
   layout: "stage" | "split";
+  /** the hotspot set of the picture on show (stage layout only) */
+  spots: HeroSpotSet | null;
 }
 
 const HeroContext = createContext<HeroShared>({
@@ -52,6 +56,7 @@ const HeroContext = createContext<HeroShared>({
   failed: false,
   setFailed: () => {},
   layout: "split",
+  spots: null,
 });
 
 export const useHero = () => useContext(HeroContext);
@@ -64,10 +69,12 @@ export function HeroFrame({ hasPhoto, children }: { hasPhoto: boolean; children:
   const [hot, setHot] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
 
-  const stageEligible = !hasPhoto && asset.id === HERO_SPOTS_ASSET_ID && isFinal(getHomeAsset("hero"));
-  const layout = stageEligible && !failed ? "stage" : "split";
+  const spots = !hasPhoto && isFinal(asset) ? (HERO_SPOTS[asset.id] ?? null) : null;
+  const layout = spots && !failed ? "stage" : "split";
+  const form = layout === "stage" ? spots!.form : null;
 
-  const panel = hasPhoto || layout === "stage" ? undefined : asset.panel;
+  // the picture-tinted panel: every split hero, and the stage's split form; not the overlay (the text is on the picture)
+  const panel = hasPhoto || form === "overlay" ? undefined : asset.panel;
   const style = panel
     ? ({
         "--hp-grad": `linear-gradient(180deg, ${panel.desktop.join(", ")})`,
@@ -105,7 +112,7 @@ export function HeroFrame({ hasPhoto, children }: { hasPhoto: boolean; children:
     delete el.dataset.pointer;
   }, []);
 
-  const shared: HeroShared = { hot, setHot, failed, setFailed, layout };
+  const shared: HeroShared = { hot, setHot, failed, setFailed, layout, spots: layout === "stage" ? spots : null };
 
   return (
     <HeroContext.Provider value={shared}>
@@ -114,6 +121,7 @@ export function HeroFrame({ hasPhoto, children }: { hasPhoto: boolean; children:
         className="rh-hero"
         aria-labelledby="hero-h"
         data-layout={layout}
+        data-form={form ?? undefined}
         data-panel={panel?.tone}
         data-hot={hot ?? undefined}
         style={style}

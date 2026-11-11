@@ -7,6 +7,8 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useSlideDialog } from "@/hooks/use-slide-dialog";
 import { Logo } from "@/components/ui/logo";
 import { RhIcon } from "@/components/ui/rh-icon";
+import { Roll } from "@/components/ui/roll";
+import { PDP_GALLERY, pdpPhotoSrc } from "@/config/pdp-gallery";
 import { MenuFooter } from "./menu-footer";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useCart } from "@/components/providers/cart-provider";
@@ -21,12 +23,28 @@ const LINKS = [
   { label: "Shipping & Returns", href: "/shipping" },
 ];
 
+/** the official packshot of a fragrance (the first picture of its product page), as a small responsive set; null if it has none */
+function packshot(slug: CatalogNavItem["slug"]) {
+  const p = PDP_GALLERY[slug]?.[0];
+  if (!p) return null;
+  return {
+    src: pdpPhotoSrc(slug, p, "tiny"),
+    srcSet: `${pdpPhotoSrc(slug, p, "tiny")} 160w, ${pdpPhotoSrc(slug, p, "small")} ${p.small}w`,
+  };
+}
+
 /**
- * Left drawer opened by the header's burger (every breakpoint), dark like the
- * announcement bar: the three
- * fragrances as quiet rows (colour dot, name, volume; the row slides 6px to the
- * right on hover), a bordered Discovery Set card, four brand links, Bag and
- * Account pills, and a one-line reassurance footer.
+ * Left drawer opened by the header's burger (every breakpoint): the three
+ * fragrances as rows with their packshot (the product page's own first picture), the
+ * name and the volume; a Discovery Set card with the three packshots fanned in it;
+ * four brand links; Bag and Account pills; and a one-line reassurance footer.
+ *
+ * Hover (a mouse; a touch screen just taps): a row gets a wash in its fragrance's
+ * colour sweeping in behind it, its picture draws closer inside the frame, a ring in the
+ * colour closes round it, the name rolls and an arrow slides in; the Discovery Set card
+ * fans its three bottles apart under a sheen; each link rolls, draws a brass line
+ * under its row and slides in an arrow. Only opacity and transforms change, so
+ * nothing shifts.
  *
  * A native <dialog> + showModal() hosts it, which gives the focus trap, ESC and
  * an inert background for free. The slide is plain CSS (`.is-open` on the panel),
@@ -83,6 +101,7 @@ export function SiteMenu({
 
   const rise = (i: number) => ({ "--i": i }) as CSSProperties;
   const afterNav = nav.length + 1;
+  const trio = nav.map((f) => ({ slug: f.slug, shot: packshot(f.slug) })).filter((t) => t.shot);
 
   return (
     <dialog
@@ -121,9 +140,32 @@ export function SiteMenu({
                   style={{ "--c": f.accent } as CSSProperties}
                 >
                   <span className="rh-sb__frag-in">
-                    <span className="rh-sb__dot" aria-hidden="true" />
-                    <span className="rh-sb__name">{f.name}</span>
-                    <span className="rh-sb__meta">{f.volumeMl} ml Extrait</span>
+                    <span className="rh-sb__pic" aria-hidden="true">
+                      {(() => {
+                        const shot = packshot(f.slug);
+                        return shot ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={shot.src}
+                            srcSet={shot.srcSet}
+                            sizes="50px"
+                            alt=""
+                            width={50}
+                            height={58}
+                            decoding="async"
+                            fetchPriority="low"
+                          />
+                        ) : null;
+                      })()}
+                      <i className="rh-sb__dot" />
+                    </span>
+                    <span className="rh-sb__txt">
+                      <span className="rh-sb__name">
+                        <Roll>{f.name}</Roll>
+                      </span>
+                      <span className="rh-sb__meta">{f.volumeMl} ml Extrait</span>
+                    </span>
+                    <RhIcon name="arrow" className="rh-sb__go" />
                   </span>
                 </Link>
               </li>
@@ -132,10 +174,27 @@ export function SiteMenu({
 
           <Link
             href="/discovery-set"
-            className="rh-sb__set rh-rise"
+            className={`rh-sb__set rh-rise${trio.length === 3 ? "" : " rh-sb__set--plain"}`}
             style={rise(afterNav)}
             onClick={onClose}
           >
+            {trio.length === 3 && (
+              <span className="rh-sb__trio" aria-hidden="true">
+                {trio.map((t, k) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={t.slug}
+                    src={t.shot!.src}
+                    alt=""
+                    width={40}
+                    height={46}
+                    decoding="async"
+                    fetchPriority="low"
+                    style={{ "--k": k } as CSSProperties}
+                  />
+                ))}
+              </span>
+            )}
             <span className="rh-sb__set-t">The Discovery Set</span>
             <span className="rh-sb__set-badge">3 × 10 ml</span>
             {setPrice ? (
@@ -147,16 +206,18 @@ export function SiteMenu({
             {LINKS.map((l) => (
               <li key={l.href}>
                 <Link href={l.href} onClick={onClose}>
-                  {l.label}
+                  <Roll>{l.label}</Roll>
+                  <RhIcon name="arrow" className="rh-sb__go" />
                 </Link>
               </li>
             ))}
             <li>
               <Link href="/faq" onClick={onClose}>
-                Concierge &amp; FAQ
+                <Roll>Concierge &amp; FAQ</Roll>
+                <RhIcon name="arrow" className="rh-sb__go" />
               </Link>
               <Link href="/contact" className="rh-sb__sub" onClick={onClose}>
-                Contact
+                <Roll>Contact</Roll>
               </Link>
             </li>
           </ul>
