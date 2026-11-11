@@ -1,0 +1,339 @@
+/* ==========================================================================
+   The product page (app/(store)/fragrances/[slug]/page.tsx and components/product/pdp-*.tsx)
+
+   The page is built in layers so it can carry a lot without looking crowded: a calm buying column beside the
+   gallery (name, price, one button, four reassurances, a nudge, one accordion), then full-width sections that
+   each say one thing: the scent in three acts and the facts of how it wears (stone), the reviews, the
+   Discovery Set (the site's one dark), and the rest of the range. `--frag` (set on the page) is the
+   fragrance's own colour: it tints the dots, the rail and the bars, never the text.
+   ========================================================================== */
+
+@layer components {
+  /* ---- the scent, in three acts, and how it wears ---- */
+  .pdp-scent {
+    background: var(--color-surface-2);
+    padding-block: clamp(52px, 8vw, 104px);
+  }
+  .pdp-scent__grid {
+    display: grid;
+    gap: clamp(32px, 5vw, 56px);
+  }
+  .pdp-scent__lead {
+    display: grid;
+    gap: 16px;
+    align-content: start;
+  }
+  .pdp-scent__h {
+    margin: 0;
+    max-width: 14ch;
+    font: italic 300 clamp(2rem, 4.6vw, 3.2rem) / 1.08 var(--f-serif);
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+  }
+  .pdp-scent__mood {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pdp-scent__mood li {
+    padding: 7px 12px;
+    border: 1px solid var(--color-line-2);
+    border-radius: 999px;
+    font: 400 10.5px/1 var(--f-label);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+  .pdp-scent__lede {
+    max-width: 36ch;
+    font-size: 14.5px;
+    line-height: 1.75;
+    color: var(--color-ink-2);
+  }
+
+  .pdp-acts {
+    display: grid;
+    gap: 14px;
+  }
+  .pdp-acts__tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .pdp-act {
+    display: grid;
+    gap: 7px;
+    padding: 14px 14px 13px;
+    text-align: left;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line-2);
+    color: var(--color-ink);
+    transition:
+      background-color 0.45s var(--ease),
+      color 0.45s var(--ease),
+      border-color 0.45s var(--ease);
+  }
+  .pdp-act__n {
+    font: 400 10px/1 var(--f-label);
+    letter-spacing: 0.2em;
+    color: var(--color-ink-3);
+    transition: color 0.45s var(--ease);
+  }
+  .pdp-act__l {
+    font: 400 12px/1 var(--f-label);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .pdp-act[aria-selected="true"] {
+    background: var(--onyx);
+    border-color: var(--onyx);
+    color: var(--champagne);
+  }
+  .pdp-act[aria-selected="true"] .pdp-act__n {
+    color: var(--brass-d);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pdp-act[aria-selected="false"]:hover {
+      border-color: var(--color-ink);
+    }
+  }
+  .pdp-panel {
+    position: relative;
+    min-height: clamp(196px, 26vw, 250px);
+    padding: clamp(22px, 3vw, 34px);
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+  }
+  .pdp-panel__hint {
+    margin: 0;
+    font: 400 11px/1.4 var(--f-label);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
+  }
+  .pdp-panel__notes {
+    display: grid;
+    gap: 6px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pdp-panel__note {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font: 300 clamp(1.8rem, 4vw, 2.7rem) / 1.14 var(--f-serif);
+    letter-spacing: -0.005em;
+    animation: pdp-note 0.65s var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 80ms);
+  }
+  .pdp-panel__note::before {
+    content: "";
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--frag, var(--brass));
+  }
+  @keyframes pdp-note {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+  .pdp-rail {
+    position: relative;
+    height: 2px;
+    overflow: hidden;
+    background: var(--color-line-2);
+  }
+  .pdp-rail i {
+    position: absolute;
+    inset: 0;
+    background: var(--frag, var(--brass));
+    transform-origin: left;
+    transform: scaleX(var(--p, 0.34));
+    transition: transform 0.8s var(--ease);
+  }
+
+  .pdp-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0;
+  }
+  .pdp-fact {
+    padding: clamp(16px, 2vw, 22px);
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    transition:
+      border-color 0.4s,
+      transform 0.5s var(--ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pdp-fact:hover {
+      border-color: var(--color-ink);
+      transform: translateY(-3px);
+    }
+  }
+  .pdp-fact dt {
+    font: 400 10px/1.4 var(--f-label);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
+  }
+  .pdp-fact dd {
+    margin: 12px 0 0;
+    font: 300 clamp(1.15rem, 2vw, 1.4rem) / 1.2 var(--f-serif);
+  }
+  .pdp-fact small {
+    display: block;
+    margin-top: 7px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--color-ink-3);
+  }
+  .pdp-bars {
+    display: flex;
+    gap: 4px;
+    margin-top: 14px;
+  }
+  .pdp-bars i {
+    flex: 1;
+    height: 3px;
+    background: var(--color-line-2);
+  }
+  .pdp-bars i.on {
+    background: var(--frag, var(--brass));
+  }
+
+  @media (min-width: 1024px) {
+    .pdp-scent__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: clamp(48px, 6vw, 96px);
+      align-items: start;
+    }
+    .pdp-scent__facts {
+      grid-column: 1 / -1;
+    }
+    .pdp-facts {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  /* ---- the Discovery Set band: the page's one dark ---- */
+  .pdp-set {
+    background: var(--onyx);
+    color: var(--champagne);
+    padding-block: clamp(52px, 8vw, 96px);
+  }
+  .pdp-set__in {
+    display: grid;
+    gap: clamp(28px, 4vw, 44px);
+    align-items: center;
+  }
+  .pdp-set__h {
+    margin: 0;
+    max-width: 16ch;
+    font: italic 300 clamp(1.9rem, 4.2vw, 3rem) / 1.1 var(--f-serif);
+    text-wrap: balance;
+  }
+  .pdp-set__p {
+    max-width: 46ch;
+    font-size: 14.5px;
+    line-height: 1.75;
+    color: color-mix(in srgb, var(--champagne) 76%, transparent);
+  }
+  .pdp-set__vials {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pdp-set__vials li {
+    display: grid;
+    gap: 6px;
+    padding: 16px 12px;
+    text-align: center;
+    border: 1px solid color-mix(in srgb, var(--champagne) 16%, transparent);
+    transition:
+      border-color 0.4s,
+      transform 0.5s var(--ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pdp-set__vials li:hover {
+      border-color: var(--brass-d);
+      transform: translateY(-3px);
+    }
+  }
+  .pdp-set__vials b {
+    font: 400 11px/1.2 var(--f-label);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .pdp-set__vials span {
+    font: 400 10px/1.2 var(--f-label);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--champagne) 60%, transparent);
+  }
+  .pdp-set__cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 22px;
+    margin-top: 6px;
+  }
+  .pdp-set__price {
+    font: 300 1.5rem/1 var(--f-sans);
+    letter-spacing: 0.03em;
+  }
+  @media (min-width: 900px) {
+    .pdp-set__in {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      gap: clamp(40px, 6vw, 96px);
+    }
+  }
+
+  /* ---- the sticky buy bar: slides up once the buy box has scrolled away, while the bag is empty ---- */
+  .pdp-bar {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 35;
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-line);
+    box-shadow: 0 -18px 40px -30px rgba(16, 14, 12, 0.4);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    transform: translateY(110%);
+    transition: transform 0.45s var(--ease-out-strong);
+  }
+  .pdp-bar.is-on {
+    transform: none;
+  }
+  /* the floating note and the back-to-top button ride above it, as they do above the bag bar */
+  html[data-pdp-bar] .rh-totop {
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  }
+  html[data-pdp-bar] [data-campaign-note] {
+    bottom: 84px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pdp-panel__note {
+      animation: none;
+    }
+    .pdp-rail i,
+    .pdp-act,
+    .pdp-fact,
+    .pdp-set__vials li,
+    .pdp-bar {
+      transition: none;
+    }
+  }
+}

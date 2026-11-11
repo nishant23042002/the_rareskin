@@ -26,7 +26,6 @@
   /* on-dark forms of the accents (themes.css lifts them where AA needs it) and the dark one step above --onyx */
   --brass-d: #c5a880;
   --gilt-d: #d89a4d;
-  --onyx-2: #14110e;
   --tri: linear-gradient(90deg, #e0d7bf 0%, #c5872f 52%, #3d2712 100%);
   --f-sans: var(--font-sans);
   --f-serif: var(--font-serif);
@@ -59,7 +58,7 @@
   .rh-btn:hover .rh-ico {transform:translateX(4px)}
   .rh-btn--ghost {border-color:color-mix(in srgb,var(--ink) 50%,transparent)}
   .rh-btn--ghost:hover {background:var(--ink);border-color:var(--ink);color:var(--paper)}
-  .rh-btn--solid {background:var(--ink);border-color:var(--ink);color:var(--paper)}
+  .rh-btn--solid {background:var(--onyx);border-color:var(--onyx);color:var(--paper)}
   .rh-btn--solid:hover {background:var(--color-cta-hover)}
   .rh-btn--light {border-color:color-mix(in srgb,var(--champagne) 60%,transparent);color:var(--champagne)}
   .rh-btn--light:hover {background:var(--champagne);border-color:var(--champagne);color:var(--onyx)}
@@ -117,37 +116,58 @@
     .rh-hdr__r {margin-right:-8px}
   }
   .rh-nav-btn {display:inline-flex;align-items:center;gap:8px;min-height:44px;font:400 11px/1 var(--f-label);letter-spacing:.2em;text-transform:uppercase;white-space:nowrap;position:relative}
-  .rh-nav-btn::after {content:"";position:absolute;left:0;right:0;bottom:9px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .45s var(--ease)}
-  .rh-nav-btn:hover::after, .rh-nav-btn[aria-expanded="true"]::after {transform:scaleX(1)}
-  .rh-nav-btn .rh-ico--s {transition:transform .35s var(--ease)}
+  .rh-nav-btn:focus-visible, .rh-hdr__burger:focus-visible {outline:1px solid var(--ink);outline-offset:3px;border-radius:3px}
+  .rh-nav-btn .rh-ico--s {transition:transform .45s var(--ease)}
   .rh-nav-btn[aria-expanded="true"] .rh-ico--s {transform:rotate(180deg)}
   .rh-bagcount {font-weight:400;min-width:1ch;font-variant-numeric:tabular-nums}
   .rh-hdr__nav, .rh-hide-lg {display:none}
-  /* menu button. A hairline ring around a four-dot glyph whose diagonal dots are two sizes, so it never reads as a stock
-     hamburger. Hover: an ink disc fills the ring from the centre, the glyph spins 90° with a spring (the big and small
-     dots swap places) and the ring leans a few pixels toward the pointer (magnetic, mouse only, see header.tsx). Open:
-     the glyph settles to a diamond. From 1360px the ring stretches into a capsule and says MENU. 44px hit box throughout. */
-  .rh-hdr__burger {position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-width:44px;height:44px;margin-left:-6px;border-radius:999px;color:var(--ink);transition:color .45s var(--ease)}
-  .rh-hdr__burger::before, .rh-hdr__burger::after {content:"";position:absolute;inset:2px;border-radius:999px;translate:calc(var(--mx,0)*1px) calc(var(--my,0)*1px);transition:translate .35s var(--ease),transform .55s var(--ease),background-color .45s var(--ease),border-color .45s var(--ease)}
-  .rh-hdr__burger::before {border:1px solid color-mix(in srgb,var(--ink) 24%,transparent)}
-  .rh-hdr__burger::after {background:var(--ink);transform:scale(0)}
-  .rh-burger {position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,5px);grid-template-rows:repeat(2,5px);gap:3px;place-items:center;translate:calc(var(--mx,0)*1.4px) calc(var(--my,0)*1.4px);transition:rotate .7s cubic-bezier(.34,1.56,.64,1),translate .35s var(--ease)}
-  .rh-burger i {display:block;border-radius:50%;background:currentColor;transition:width .5s var(--ease),height .5s var(--ease)}
-  .rh-burger i:nth-child(1), .rh-burger i:nth-child(4) {width:5px;height:5px}
-  .rh-burger i:nth-child(2), .rh-burger i:nth-child(3) {width:3px;height:3px}
-  .rh-burger__label {position:relative;z-index:1;display:none;padding-right:2px;font:500 10.5px/1 var(--f-label);letter-spacing:.24em;text-transform:uppercase}
-  .rh-hdr__burger:hover, .rh-hdr__burger:focus-visible, .rh-hdr__burger[aria-expanded="true"] {color:var(--paper)}
-  .rh-hdr__burger:hover::after, .rh-hdr__burger:focus-visible::after, .rh-hdr__burger[aria-expanded="true"]::after {transform:scale(1)}
-  .rh-hdr__burger:hover::before, .rh-hdr__burger:focus-visible::before, .rh-hdr__burger[aria-expanded="true"]::before {border-color:var(--ink)}
-  .rh-hdr__burger:hover .rh-burger, .rh-hdr__burger:focus-visible .rh-burger {rotate:90deg}
-  .rh-hdr__burger[aria-expanded="true"] .rh-burger {rotate:45deg}
-  .rh-hdr__burger:active::after {transform:scale(.92)}
+  /* menu button: two plain lines of different lengths (the top the full 24px, the bottom just over half), drawn in with a
+     small stagger on load. Hover / focus: the short line grows to match the long one, smoothly (one scale per line,
+     compositor only). Open: both even out and cross into an X. 44px hit box. From 1360px the word MENU rolls beside it. */
+  .rh-hdr__burger {position:relative;display:inline-flex;align-items:center;justify-content:center;gap:14px;min-width:44px;height:44px;margin-left:-8px;padding-inline:8px;color:var(--ink)}
+  .rh-burger {display:grid;gap:6px;width:24px}
+  .rh-burger i {display:block;height:1.5px;transition:translate .6s var(--expo),rotate .6s var(--expo)}
+  .rh-burger b {display:block;height:100%;border-radius:2px;background:currentColor;transform-origin:0 50%;scale:var(--s,1) 1;transition:scale .65s var(--expo);animation:rh-burger-in .9s var(--expo) calc(.3s + var(--n,0)*.1s) backwards}
+  .rh-burger i:nth-child(1) b {--n:0;--s:1}
+  .rh-burger i:nth-child(2) b {--n:1;--s:.56;transition-delay:.05s}
+  .rh-hdr__burger:focus-visible .rh-burger b, .rh-hdr__burger[aria-expanded="true"] .rh-burger b {--s:1}
+  .rh-hdr__burger[aria-expanded="true"] .rh-burger i:nth-child(1) {translate:0 3.75px;rotate:45deg}
+  .rh-hdr__burger[aria-expanded="true"] .rh-burger i:nth-child(2) {translate:0 -3.75px;rotate:-45deg}
+  .rh-hdr__burger:active .rh-burger b {--s:.88}
+  @media(hover:hover) {
+    .rh-hdr__burger:hover .rh-burger b {--s:1}
+    .rh-hdr__burger:hover:active .rh-burger b {--s:.88}
+  }
+  @keyframes rh-burger-in {from{scale:0 1}}
+  .rh-burger__label {display:none;font:500 10.5px/1 var(--f-label);letter-spacing:.24em;text-transform:uppercase}
   @media(min-width:1360px) {
-    .rh-hdr__burger {margin-left:0;padding-inline:17px 19px}
+    .rh-hdr__burger {margin-left:0;padding-inline:4px 6px}
     .rh-burger__label {display:block}
   }
   @media(prefers-reduced-motion:reduce) {
-    .rh-hdr__burger::before, .rh-hdr__burger::after, .rh-burger {transition-duration:.01s}
+    .rh-burger i, .rh-burger b {transition-duration:.01s;animation:none}
+  }
+
+  /* label roll (components/ui/roll.tsx): the letters rise out one after another and a brass copy comes up behind them */
+  .rh-roll {position:relative;display:inline-flex;overflow:hidden;padding-block:.16em;line-height:1.15;--roll-c:color-mix(in srgb,var(--brass) 58%,var(--ink))}
+  .rh-roll__a, .rh-roll__b {display:inline-flex}
+  .rh-roll__b {position:absolute;left:0;top:.16em;color:var(--roll-c)}
+  .rh-roll__a > span, .rh-roll__b > span {display:block;white-space:pre}
+  .rh-roll__b > span {transform:translateY(120%)}
+  :is(.rh-nav-btn,.rh-hdr__burger):is(:focus-visible,[aria-current="page"],[aria-expanded="true"]) .rh-roll__a > span {transform:translateY(-120%)}
+  :is(.rh-nav-btn,.rh-hdr__burger):is(:focus-visible,[aria-current="page"],[aria-expanded="true"]) .rh-roll__b > span {transform:none}
+  @media(hover:hover) {
+    :is(.rh-nav-btn,.rh-hdr__burger):hover .rh-roll__a > span {transform:translateY(-120%)}
+    :is(.rh-nav-btn,.rh-hdr__burger):hover .rh-roll__b > span {transform:none}
+  }
+  @media(prefers-reduced-motion:no-preference) {
+    .rh-roll__a > span, .rh-roll__b > span {transition:transform .65s var(--expo) calc(var(--i)*18ms)}
+  }
+  /* the links not in play step back while one is hovered / focused, or while the dropdown is open */
+  .rh-hdr__nav .rh-nav-btn {transition:opacity .45s var(--ease)}
+  .rh-hdr.is-open .rh-hdr__nav .rh-nav-btn:not([aria-expanded="true"]) {opacity:.4}
+  @media(hover:hover) {
+    .rh-hdr__nav:has(.rh-nav-btn:hover) .rh-nav-btn:not(:hover) {opacity:.4}
   }
   .rh-nav-btn--story {display:none}
   .rh-hide-sm {display:none}
@@ -161,26 +181,56 @@
   @media(min-width:1100px) {
     .rh-hide-sm {display:inline}
   }
-  .rh-mega {position:absolute;left:0;right:0;top:100%;background:color-mix(in srgb,var(--hdr-tint) 97%,transparent);border-top:1px solid var(--line);border-bottom:1px solid var(--line);opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity .3s,transform .5s var(--ease),visibility 0s .3s}
-  .rh-mega.is-open {opacity:1;visibility:visible;transform:none;transition-delay:0s}
-  .rh-mega__in {display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(16px,3vw,48px);padding-block:30px 22px}
-  .rh-mega__item {display:flex;gap:14px;align-items:flex-start;padding:6px 0}
+  /* Fragrances dropdown. The panel is revealed top-down (clip-path, slower in than out), the page behind it dims
+     (a scrim hung off the panel, no pointer events so leaving the header still closes it), and the four items rise
+     in one after the other. Hover: a wash in the fragrance's own colour, the dot swells into a halo, the name nudges
+     and an arrow slides in; the other items step back. */
+  .rh-mega {position:absolute;left:0;right:0;top:100%;visibility:hidden;pointer-events:none;transition:visibility 0s .5s}
+  .rh-mega.is-open {visibility:visible;pointer-events:auto;transition-delay:0s}
+  .rh-mega::before {content:"";position:absolute;left:0;right:0;top:100%;height:100vh;background:color-mix(in srgb,var(--onyx) 40%,transparent);opacity:0;pointer-events:none;transition:opacity .45s var(--ease)}
+  .rh-mega.is-open::before {opacity:1}
+  .rh-mega__panel {background:color-mix(in srgb,var(--hdr-tint) 98%,transparent);border-top:1px solid var(--line);border-bottom:1px solid var(--line);clip-path:inset(0 0 100% 0);transition:clip-path .4s var(--ease)}
+  .rh-mega.is-open .rh-mega__panel {clip-path:inset(0 0 0 0);transition-duration:.75s}
+  .rh-mega__in {display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(8px,1.4vw,20px);padding-block:26px 14px}
+  .rh-mega__item {position:relative;display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:4px;isolation:isolate;--c:var(--ink-3)}
+  .rh-mega__item::before {content:"";position:absolute;inset:0;z-index:-1;border-radius:4px;background:color-mix(in srgb,var(--c) 11%,transparent);border:1px solid color-mix(in srgb,var(--c) 30%,transparent);opacity:0;transform:scale(.96);transition:opacity .4s var(--ease),transform .55s var(--expo)}
+  .rh-mega__txt {display:block;min-width:0;flex:1;transition:transform .55s var(--expo)}
   .rh-mega__item b {display:block;font:400 12.5px/1.2 var(--f-label);letter-spacing:.22em;text-transform:uppercase}
   .rh-mega__item em {display:block;margin-top:7px;font:italic 400 15px/1.3 var(--f-serif);color:var(--ink-2)}
   .rh-mega__item small {display:block;margin-top:5px;font-size:11px;letter-spacing:0.164em;text-transform:uppercase;color:var(--ink-3);font-family:var(--f-label)}
-  .rh-mega__item:hover b {text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:1px}
-  .rh-mega__foot {padding-bottom:26px}
-  .rh-dot {width:8px;height:8px;border-radius:50%;background:var(--c,#999);margin-top:3px;flex:none}
+  .rh-mega__item > .rh-ico {flex:none;margin-top:2px;opacity:0;translate:-8px 0;transition:opacity .35s var(--ease),translate .55s var(--expo)}
+  .rh-mega__item:focus-visible {outline:1px solid var(--ink);outline-offset:2px}
+  .rh-mega__item:focus-visible::before {opacity:1;transform:none}
+  .rh-mega.is-open .rh-mega__item {animation:rh-mega-in .8s var(--expo) calc(var(--k,0)*65ms + 150ms) backwards}
+  @keyframes rh-mega-in {from{opacity:0;transform:translateY(16px)}}
+  @media(hover:hover) {
+    .rh-mega__item:hover::before {opacity:1;transform:none}
+    .rh-mega__item:hover .rh-mega__txt {transform:translateX(4px)}
+    .rh-mega__item:hover > .rh-ico {opacity:1;translate:0 0}
+    .rh-mega__item:hover .rh-dot {transform:scale(1.35);box-shadow:0 0 0 5px color-mix(in srgb,var(--c) 22%,transparent)}
+    .rh-mega__in:has(.rh-mega__item:hover) .rh-mega__item:not(:hover) {opacity:.5}
+  }
+  .rh-mega__item {transition:opacity .4s var(--ease)}
+  .rh-mega__foot {padding-block:4px 24px}
+  .rh-mega__foot .rh-link-u {margin-left:18px}
+  .rh-dot {width:9px;height:9px;border-radius:50%;background:var(--c,#999);margin-top:3px;flex:none;transition:transform .55s var(--spring),box-shadow .45s var(--ease)}
   .rh-dot--ring {background:transparent;border:1px solid var(--ink-3)}
+  @media(prefers-reduced-motion:reduce) {
+    .rh-mega.is-open .rh-mega__item {animation:none}
+    .rh-mega__panel, .rh-mega::before {transition-duration:.01s}
+  }
   /* ------------------------------------------------------------------
-     Dark chrome scope (the bag drawer): onyx and champagne, the same as the
-     announcement bar. The storefront's colour tokens are re-pointed inside it,
-     so every text-ink / border-line / bg-surface / bg-cta in the bag flips with
-     it, with no per-component dark variants. (The menu drawer sets the
-     homepage's own `--ink`, `--line` ... variables the same way, below.)
+     Light chrome scope (the bag drawer and its sticky bar): paper and ink, so
+     the storefront's own tokens apply as they are and the bag, the checkout and
+     the confirmation need no per-component colours. Onyx is kept for about a
+     tenth of the surface: the bag's ticker ribbon, the primary buttons, the
+     menu's Discovery Set card. The one thing the light ground changes is `gilt`:
+     the amber that reads on onyx is below 3:1 on paper, so as text / fill on a
+     light drawer it is darkened (the botanical theme already ships a dark
+     light-ground gilt, so it is left alone there).
      ------------------------------------------------------------------ */
-  .rh-dk {color-scheme:dark;--color-w0:var(--onyx);--color-w1:color-mix(in srgb,var(--brass) 5%,var(--onyx));--color-w2:color-mix(in srgb,var(--champagne) 24%,var(--onyx));--color-w4:color-mix(in srgb,var(--brass) 5%,var(--onyx));--color-bg:color-mix(in srgb,var(--brass) 5%,var(--onyx));--color-surface:var(--onyx);--color-surface-2:color-mix(in srgb,var(--brass) 9%,var(--onyx));--color-ink:var(--champagne);--color-ink-2:color-mix(in srgb,var(--champagne) 76%,var(--onyx));--color-ink-3:color-mix(in srgb,var(--champagne) 62%,var(--onyx));--color-line:color-mix(in srgb,var(--champagne) 13%,var(--onyx));--color-line-2:color-mix(in srgb,var(--champagne) 22%,var(--onyx));--color-cta:var(--champagne);--color-cta-hover:color-mix(in srgb,var(--champagne) 82%,var(--paper));--color-error:#e58573;--color-ok:#7fb392;--color-warn:#dba64e}
-  .rh-dk :focus-visible {outline-color:var(--champagne)}
+  .rh-lt {color-scheme:light}
+  :root:not([data-theme="botanical"]):not([data-theme="verdant"]) .rh-lt {--color-gilt:color-mix(in srgb,var(--gilt) 55%,#2a1a08)}
 
   /* ------------------------------------------------------------------
      Menu drawer (site-menu.tsx, menu-footer.tsx): a dark, editorial left
@@ -190,28 +240,28 @@
      The bag drawer (`.rh-cart`) slides with the same 0.65s curve, driven by the
      same hook (`useSlideDialog`), so the two always move alike.
      ------------------------------------------------------------------ */
-  .rh-sb {--ink:var(--champagne);--ink-2:color-mix(in srgb,var(--champagne) 74%,transparent);--ink-3:color-mix(in srgb,var(--champagne) 62%,transparent);--line:color-mix(in srgb,var(--champagne) 12%,transparent);--line-2:color-mix(in srgb,var(--champagne) 22%,transparent);--paper:var(--onyx);--sb-px:clamp(22px,6.5vw,32px);--sb-hair:color-mix(in srgb,var(--champagne) 10%,transparent);
-    color-scheme:dark;position:fixed;top:0;bottom:0;left:0;z-index:110;width:min(420px,88vw);display:flex;flex-direction:column;background-color:color-mix(in srgb,var(--onyx) 98%,transparent);background-image:radial-gradient(90% 38% at 0% 0%,color-mix(in srgb,var(--brass) 7.5%,transparent),transparent 70%);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);color:var(--ink);padding-top:env(safe-area-inset-top,0px);padding-left:env(safe-area-inset-left,0px);transform:translateX(-102%);visibility:hidden;transition:transform .65s var(--ease),visibility 0s .65s;box-shadow:1px 0 0 var(--sb-hair),28px 0 64px -34px rgba(0,0,0,.7)}
+  .rh-sb {--sb-px:clamp(22px,6.5vw,32px);--sb-hair:var(--line);
+    color-scheme:light;position:fixed;top:0;bottom:0;left:0;z-index:110;width:min(420px,88vw);display:flex;flex-direction:column;background-color:var(--paper);background-image:radial-gradient(90% 38% at 0% 0%,color-mix(in srgb,var(--brass) 9%,transparent),transparent 70%);color:var(--ink);padding-top:env(safe-area-inset-top,0px);padding-left:env(safe-area-inset-left,0px);transform:translateX(-102%);visibility:hidden;transition:transform .65s var(--ease),visibility 0s .65s;box-shadow:1px 0 0 var(--sb-hair),28px 0 64px -34px rgba(16,14,12,.34)}
   .rh-sb.is-open {transform:none;visibility:visible;transition-delay:0s}
-  .rh-sb :focus-visible {outline-color:var(--champagne)}
   .rh-sb__top {flex:none;display:flex;align-items:center;justify-content:space-between;height:var(--hh);padding-inline:var(--sb-px);border-bottom:1px solid var(--sb-hair)}
   .rh-sb__close {display:grid;place-items:center;width:44px;height:44px;margin-right:-12px;border-radius:50%;transition:background-color .35s var(--ease),transform .5s var(--ease)}
-  .rh-sb__close:hover {background:color-mix(in srgb,var(--champagne) 8%,transparent);transform:rotate(90deg)}
+  .rh-sb__close:hover {background:color-mix(in srgb,var(--ink) 7%,transparent);transform:rotate(90deg)}
   .rh-sb__scroll {flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:clamp(16px,2.6svh,24px) var(--sb-px) 16px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
   .rh-rise {opacity:0;transform:translateY(12px);transition:opacity .4s var(--ease),transform .5s var(--ease)}
   .rh-sb.is-open .rh-rise {opacity:1;transform:none;transition:opacity .6s var(--ease) calc(var(--i,0)*60ms + 160ms),transform .9s var(--ease) calc(var(--i,0)*60ms + 160ms)}
   .rh-sb__eye {margin:0 0 clamp(4px,1svh,8px);font:400 10px/1.5 var(--f-label);letter-spacing:.28em;text-transform:uppercase;color:var(--ink-3)}
-  .rh-sb__frag {--dot:color-mix(in srgb,var(--c,#999) 62%,var(--champagne));display:block;padding-block:clamp(6px,1.1svh,9px)}
+  .rh-sb__frag {--dot:color-mix(in srgb,var(--c,#999) 88%,var(--ink));display:block;padding-block:clamp(6px,1.1svh,9px)}
   .rh-sb__frag-in {display:grid;grid-template-columns:auto 1fr;column-gap:16px;align-items:center;transition:transform .55s var(--ease)}
   .rh-sb__frag:hover .rh-sb__frag-in, .rh-sb__frag:focus-visible .rh-sb__frag-in {transform:translateX(6px)}
   .rh-sb__dot {grid-row:1 / span 2;width:9px;height:9px;border-radius:50%;background:var(--dot);box-shadow:0 0 0 3px color-mix(in srgb,var(--dot) 18%,transparent);transition:box-shadow .45s var(--ease)}
   .rh-sb__frag:hover .rh-sb__dot, .rh-sb__frag:focus-visible .rh-sb__dot {box-shadow:0 0 0 5px color-mix(in srgb,var(--dot) 26%,transparent)}
   .rh-sb__name {grid-column:2;font:300 1.25rem/1.15 var(--f-label);letter-spacing:.14em;text-transform:uppercase}
   .rh-sb__meta {grid-column:2;margin-top:6px;font:400 10px/1.3 var(--f-label);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
-  .rh-sb__set {display:grid;grid-template-columns:1fr auto;grid-template-areas:"t p" "b p";gap:8px 16px;align-items:center;margin-top:clamp(12px,2.2svh,20px);padding:clamp(12px,2svh,18px) 20px;border:1px solid var(--line-2);transition:border-color .35s var(--ease),transform .5s var(--ease)}
+  .rh-sb__set {display:grid;grid-template-columns:1fr auto;grid-template-areas:"t p" "b p";gap:8px 16px;align-items:center;margin-top:clamp(12px,2.2svh,20px);padding:clamp(12px,2svh,18px) 20px;border:1px solid var(--onyx);background:var(--onyx);color:var(--champagne);transition:border-color .35s var(--ease),transform .5s var(--ease)}
   .rh-sb__set:hover, .rh-sb__set:focus-visible {border-color:var(--brass);transform:translateX(3px)}
+  .rh-sb__set:focus-visible {outline-color:var(--brass)}
   .rh-sb__set-t {grid-area:t;font:300 1.1rem/1.25 var(--f-label);letter-spacing:.12em;text-transform:uppercase;text-wrap:balance}
-  .rh-sb__set-badge {grid-area:b;justify-self:start;padding:5px 11px;border:1px solid var(--line-2);border-radius:999px;font:500 10px/1 var(--f-label);letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;color:var(--ink-2)}
+  .rh-sb__set-badge {grid-area:b;justify-self:start;padding:5px 11px;border:1px solid color-mix(in srgb,var(--champagne) 30%,transparent);border-radius:999px;font:500 10px/1 var(--f-label);letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;color:color-mix(in srgb,var(--champagne) 80%,transparent)}
   .rh-sb__set-price {grid-area:p;font:400 1.05rem/1 var(--f-sans);letter-spacing:.04em;font-variant-numeric:tabular-nums;white-space:nowrap}
   .rh-sb__links {margin-top:clamp(14px,2.4svh,22px);padding-top:clamp(8px,1.6svh,14px);border-top:1px solid var(--sb-hair)}
   .rh-sb__links li {display:flex;align-items:center;justify-content:space-between;gap:16px}
@@ -238,9 +288,9 @@
      Bag drawer (cart-drawer.tsx): parked off the right edge, slides in with the
      menu's curve; the header, the lines and the footer then rise in a short
      stagger (`.rh-in` with `--i`). The layout, colours and type stay on the
-     component's Tailwind classes; `.rh-dk` (above) makes them dark.
+     component's Tailwind classes, which read the storefront's own light tokens.
      ------------------------------------------------------------------ */
-  .rh-cart {background-color:var(--onyx);background-image:radial-gradient(90% 38% at 100% 0%,color-mix(in srgb,var(--brass) 7.5%,transparent),transparent 70%);transform:translateX(102%);visibility:hidden;transition:transform .65s var(--ease),visibility 0s .65s;box-shadow:-1px 0 0 color-mix(in srgb,var(--champagne) 10%,transparent),-28px 0 64px -34px rgba(0,0,0,.7)}
+  .rh-cart {background-color:var(--color-surface);background-image:radial-gradient(90% 38% at 100% 0%,color-mix(in srgb,var(--brass) 9%,transparent),transparent 70%);transform:translateX(102%);visibility:hidden;transition:transform .65s var(--ease),visibility 0s .65s;box-shadow:-1px 0 0 var(--color-line),-28px 0 64px -34px rgba(16,14,12,.34)}
   .rh-cart.is-open {transform:none;visibility:visible;transition-delay:0s}
   .rh-cart.is-open .rh-in {animation:rh-rise .7s var(--ease) calc(var(--i,0)*70ms + 200ms) backwards}
   /* the free-delivery bar draws itself in once the panel has landed */
@@ -271,7 +321,6 @@
   @media(min-width:1500px) {
     .rh-hero__text {padding-left:calc((100vw - var(--maxw))/2 + var(--gutter))}
   }
-  .rh-ticket-wrap {position:relative;z-index:3;margin-top:-46px;display:flex;justify-content:center;padding-inline:max(var(--gutter),env(safe-area-inset-left,0px)) max(var(--gutter),env(safe-area-inset-right,0px));background:linear-gradient(to bottom,transparent 46px,var(--paper) 46px)}
   .rh-pill {display:inline-block;background:var(--ink);color:var(--paper);font:400 11px/1 var(--f-label);letter-spacing:0.138em;text-transform:uppercase;padding:6px 9px;border-radius:99px}
   .rh-promises {background:var(--paper);padding:clamp(32px,4vw,44px) 0 clamp(36px,4.6vw,56px)}
   .rh-promises .rh-wrap {display:flex;flex-direction:column;align-items:center;gap:20px}
@@ -286,11 +335,11 @@
     .rh-promises ul {grid-template-columns:repeat(2,minmax(0,auto));gap:14px 14px}
     .rh-promises li {white-space:normal;letter-spacing:.08em;line-height:1.35}
   }
-  .rh-focus {position:relative;display:grid;min-height:clamp(660px,100svh,880px);background:var(--onyx-2);color:var(--champagne);overflow:hidden;scroll-margin-top:var(--hh)}
+  .rh-focus {position:relative;display:grid;min-height:clamp(660px,100svh,880px);background:var(--onyx);color:var(--champagne);overflow:hidden;scroll-margin-top:var(--hh)}
   .rh-fslides {grid-area:1/1;display:grid}
   .rh-fslide {grid-area:1/1;position:relative;display:grid;opacity:0;visibility:hidden;transition:opacity 1s var(--ease),visibility 0s 1s}
   .rh-fslide.is-active {opacity:1;visibility:visible;transition-delay:0s}
-  .rh-fslide__bg {position:absolute;inset:0;background:radial-gradient(58% 70% at 56% 56%,var(--glow),transparent 72%),radial-gradient(120% 90% at 50% 120%,rgba(0,0,0,.55),transparent 60%),var(--base)}
+  .rh-fslide__bg {position:absolute;inset:0;background:radial-gradient(58% 70% at 56% 56%,color-mix(in srgb,var(--glow) 34%,transparent),transparent 72%),radial-gradient(120% 90% at 50% 120%,rgba(0,0,0,.55),transparent 60%),var(--base)}
   .rh-fslide__ghost {position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);font:500 clamp(5rem,24vw,19rem)/1 var(--f-sans);letter-spacing:.04em;white-space:nowrap;color:color-mix(in srgb,var(--champagne) 4.5%,transparent);user-select:none;pointer-events:none}
   .rh-fslide__in {position:relative;display:grid;grid-template-rows:1fr auto;padding-bottom:clamp(76px,10vh,104px)}
   .rh-fslide__bottle {justify-self:center;align-self:center;height:min(46svh,420px);aspect-ratio:140/282;margin-top:clamp(28px,6vh,56px);filter:drop-shadow(0 34px 40px rgba(0,0,0,.6));position:relative}
@@ -404,7 +453,7 @@
     .rh-q-res {grid-template-columns:120px 1fr;gap:30px}
     .rh-q-res__bottle {width:110px}
   }
-  .rh-dset {position:relative;isolation:isolate;background:var(--onyx-2);color:var(--champagne);overflow:hidden;min-height:clamp(600px,86vh,800px);display:grid;align-items:center;scroll-margin-top:var(--hh)}
+  .rh-dset {position:relative;isolation:isolate;background:var(--onyx);color:var(--champagne);overflow:hidden;min-height:clamp(600px,86vh,800px);display:grid;align-items:center;scroll-margin-top:var(--hh)}
   .rh-dset__scene {position:absolute;inset:0;z-index:-1}
   .rh-dset__scene .rh-dset__art {width:100%;height:100%;filter:blur(1.5px)}
   .rh-dset__scene::after {content:"";position:absolute;inset:0;background:linear-gradient(color-mix(in srgb,var(--onyx) 50%,transparent),color-mix(in srgb,var(--onyx) 74%,transparent))}
@@ -442,10 +491,10 @@
     .rh-why__pts div {border-bottom:0;padding-block:30px 0}
   }
   .rh-why__cta {display:flex;justify-content:center;margin-top:clamp(30px,4vw,48px)}
-  .rh-founder {position:relative;isolation:isolate;background:var(--onyx-2);color:var(--champagne);overflow:hidden;padding-block:clamp(64px,9vw,120px);scroll-margin-top:var(--hh)}
-  .rh-founder__tex {position:absolute;inset:-4%;z-index:-1;background:radial-gradient(60% 80% at 22% 40%,color-mix(in srgb,var(--brass) 14%,transparent),transparent 70%),radial-gradient(50% 70% at 78% 60%,color-mix(in srgb,var(--champagne) 5%,transparent),transparent 72%);opacity:.7}  /* was a 26px-blurred stripe layer: a full-section blur filter for a texture nobody could read as stripes */
+  .rh-founder {position:relative;isolation:isolate;background:var(--onyx);color:var(--champagne);overflow:hidden;padding-block:clamp(64px,9vw,120px);scroll-margin-top:var(--hh)}
+  .rh-founder__tex {position:absolute;inset:-4%;z-index:-1;background:radial-gradient(60% 80% at 22% 40%,color-mix(in srgb,var(--champagne) 5%,transparent),transparent 70%),radial-gradient(50% 70% at 78% 60%,color-mix(in srgb,var(--champagne) 3%,transparent),transparent 72%);opacity:.7}  /* was a 26px-blurred stripe layer: a full-section blur filter for a texture nobody could read as stripes */
   .rh-founder__grid {display:grid;gap:clamp(30px,5vw,56px);justify-items:center;align-items:center;text-align:center}
-  .rh-founder__photo {width:min(100%,340px);background:#222;position:relative}
+  .rh-founder__photo {width:min(100%,340px);background:color-mix(in srgb,var(--champagne) 8%,var(--onyx));position:relative}
   .rh-founder__photo img {width:100%;height:auto}
   .rh-founder__copy {display:grid;gap:clamp(16px,2vw,22px);justify-items:center;max-width:560px}
   .rh-founder__meta {display:flex;justify-content:center;gap:18px;flex-wrap:wrap}
@@ -460,19 +509,51 @@
     .rh-founder__meta {justify-content:flex-start}
     .rh-founder__sign {justify-items:start}
   }
-  .rh-trust {background:var(--stone);padding-block:clamp(56px,8vw,96px)}
-  .rh-trust__head {display:grid;gap:14px;justify-items:center;text-align:center;max-width:600px;margin:0 auto clamp(30px,4vw,52px)}
-  .rh-trust__head .rh-serif {font-size:clamp(1.4rem,2.6vw,2rem);line-height:1.3;text-wrap:balance}
-  .rh-trust__grid {display:grid;gap:0;border-top:1px solid var(--line-2)}
-  .rh-trust__grid div {display:grid;justify-items:center;gap:10px;text-align:center;padding:26px 8px;border-bottom:1px solid var(--line-2)}
-  .rh-trust__grid h3 {font:400 11.5px/1.3 var(--f-label);letter-spacing:.24em;text-transform:uppercase}
-  .rh-trust__grid p {font-size:13.5px;line-height:1.7;color:var(--ink-2);max-width:30ch}
-  @media(min-width:760px) {
-    .rh-trust__grid {grid-template-columns:repeat(2,1fr);column-gap:32px}
+  /* Made deliberately (made-deliberately.tsx): four claims as paper cards on the stone ground. One custom property,
+     --fill (0 or 1), drives every "on" state: the obsidian rising from the bottom edge, the brass light, the colours.
+     It is set to 1 by :hover (a mouse) or by .is-live (the card in the middle of a touch screen, set in the component). */
+  .rh-vow {position:relative;background:var(--stone);padding-block:clamp(64px,9vw,128px);overflow:hidden}
+  .rh-vow__in {display:grid;gap:clamp(34px,5vw,60px)}
+  .rh-vow__head {display:grid;justify-items:center;text-align:center;gap:clamp(14px,1.6vw,20px)}
+  .rh-vow__h {margin:0;max-width:17ch;font:italic 300 clamp(1.95rem,5.2vw,3.5rem)/1.1 var(--f-serif);letter-spacing:-.012em;text-wrap:balance}
+  .rh-vow__seal {display:none;position:relative;width:108px;height:108px;margin-top:clamp(6px,2vw,26px);color:var(--ink-3)}
+  .rh-vow__ring {position:absolute;inset:0;width:100%;height:100%;overflow:visible;animation:rh-vow-spin 56s linear infinite}
+  .rh-vow__ring text {font:400 8.4px var(--f-label);fill:currentColor;text-transform:uppercase}
+  .rh-vow__mark {position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:var(--brass-d)}
+  @keyframes rh-vow-spin {to {transform:rotate(360deg)}}
+  .rh-vow__list {list-style:none;margin:0;padding:0;display:grid;gap:12px}
+  .rh-vow__card {--fill:0;--mx:50%;--my:0%;position:relative;isolation:isolate;display:flex;flex-direction:column;gap:10px;overflow:hidden;
+    padding:clamp(22px,2.6vw,36px) clamp(20px,2.4vw,32px) clamp(24px,2.8vw,38px);background:var(--paper);
+    border:1px solid color-mix(in srgb,var(--onyx) calc(var(--fill)*100%),var(--line-2));transition:border-color .6s var(--ease)}
+  .rh-vow__card::before {content:"";position:absolute;inset:0;z-index:-2;background:var(--onyx);transform:scaleY(var(--fill));transform-origin:50% 100%;transition:transform .8s var(--ease)}
+  .rh-vow__glow {position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:var(--fill);transition:opacity .6s var(--ease);
+    background:radial-gradient(300px circle at var(--mx) var(--my),color-mix(in srgb,var(--champagne) 13%,transparent),transparent 70%)}
+  .rh-vow__top {display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:clamp(18px,3vw,40px)}
+  .rh-vow__ico {flex:none;width:40px;height:40px;fill:none;stroke:currentColor;stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round;
+    color:color-mix(in srgb,var(--brass-d) calc(var(--fill)*100%),var(--ink));transition:color .6s var(--ease),transform .9s var(--ease);transform:translateY(calc(var(--fill)*-3px))}
+  .rh-vow__n {font:400 11px/1 var(--f-label);letter-spacing:.26em;padding-top:4px;color:color-mix(in srgb,var(--brass-d) calc(var(--fill)*100%),var(--ink-3));transition:color .6s var(--ease)}
+  .rh-vow__card h3 {font:400 12.5px/1.35 var(--f-label);letter-spacing:.22em;text-transform:uppercase;color:color-mix(in srgb,var(--champagne) calc(var(--fill)*100%),var(--ink));transition:color .6s var(--ease)}
+  .rh-vow__card p {max-width:34ch;font-size:14.5px;line-height:1.7;color:color-mix(in srgb,color-mix(in srgb,var(--champagne) 78%,var(--onyx)) calc(var(--fill)*100%),var(--ink-2));transition:color .6s var(--ease)}
+  .rh-vow__card.is-live {--fill:1}
+  @media(hover:hover) and (pointer:fine) {
+    .rh-vow__card:hover {--fill:1}
+  }
+  @media(min-width:640px) {
+    .rh-vow__list {grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .rh-vow__seal {display:block}
   }
   @media(min-width:1100px) {
-    .rh-trust__grid {grid-template-columns:repeat(4,1fr)}
-    .rh-trust__grid div {border-bottom:0;padding-top:34px}
+    .rh-vow {--stag:clamp(30px,3.4vw,52px)}
+    .rh-vow__in {grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(48px,6vw,104px);align-items:start}
+    .rh-vow__head {position:sticky;top:calc(var(--hh) + 40px);justify-items:start;text-align:left;gap:20px}
+    .rh-vow__h {max-width:13ch}
+    .rh-vow__list {gap:16px;padding-bottom:var(--stag)}
+    .rh-vow__card {min-height:296px}
+    .rh-vow__card:nth-child(even) {margin-top:var(--stag);margin-bottom:calc(var(--stag)*-1)}
+  }
+  @media(prefers-reduced-motion:reduce) {
+    .rh-vow__ring {animation:none}
+    .rh-vow__card, .rh-vow__card::before, .rh-vow__glow, .rh-vow__ico, .rh-vow__n, .rh-vow__card h3, .rh-vow__card p {transition:none}
   }
   .rh-ig {background:var(--paper);padding-block:clamp(56px,8vw,104px) clamp(56px,8vw,104px)}
   .rh-ig__head {display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:clamp(20px,3vw,34px)}
@@ -495,12 +576,7 @@
   }
   @media(max-width:759px) {
     .rh-totop.rh-totop {width:40px;height:40px;right:max(14px,env(safe-area-inset-right,0px));bottom:max(14px,env(safe-area-inset-bottom,0px))}
-    .rh-trust {padding-block:44px}
-    .rh-trust__head {margin-bottom:24px}
-    .rh-trust__grid {grid-template-columns:repeat(2,1fr);column-gap:14px}
-    .rh-trust__grid div {padding:20px 4px;gap:8px}
-    .rh-trust__grid h3 {font-size:11px;letter-spacing:0.172em}
-    .rh-trust__grid p {font-size:12.5px;line-height:1.6;max-width:24ch}
+    .rh-vow {padding-block:52px}
     .rh-why {padding-block:48px}
     .rh-why__in {padding-block:26px 8px;gap:14px}
     .rh-why__in>svg {width:56px}
@@ -602,7 +678,7 @@
     .rh-tile__media.is-dragging, .rh-tile__media.is-dragging * {cursor:grabbing!important}
   }
   .rh-h2--sentence {text-transform:none;letter-spacing:.005em;font-size:clamp(2rem,4vw,3.1rem);line-height:1.12}
-  .rh-ticket-wrap {scroll-margin-top:calc(var(--hh) + 24px)}
+  .rh-pass-wrap {scroll-margin-top:calc(var(--hh) + 24px)}
   .rh-promises {scroll-margin-top:calc(var(--hh) + 12px)}
   a.rh-ann {color:inherit;text-decoration:none;align-self:stretch}
   a.rh-ann:hover b {text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
@@ -789,69 +865,9 @@
   .rh-hero__index a:hover .rh-ico, .rh-hero__index a:focus-visible .rh-ico {opacity:1;transform:none}
 
   /* ---- the launch ticket ---- */
-  @keyframes rh-glint {0%,55%{background-position:160% 0,0 0}100%{background-position:-60% 0,0 0}}
   @keyframes rh-dot {0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--gilt) 55%,transparent)}70%,100%{box-shadow:0 0 0 9px color-mix(in srgb,var(--gilt) 0%,transparent)}}
-  @keyframes rh-stamp {0%{opacity:0;transform:scale(1.8) rotate(-18deg)}55%{opacity:1;transform:scale(.92) rotate(3deg)}100%{opacity:1;transform:none}}
   @keyframes rh-rise {from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-  .rh-ticket {--mx:50%;--my:50%;position:relative;isolation:isolate;display:grid;grid-template-columns:1fr 0 1.3fr;width:min(100%,780px);background:var(--paper);border:1px solid var(--line-2);box-shadow:0 26px 40px -30px color-mix(in srgb,var(--ink) 40%,transparent);transition:transform .6s var(--ease),box-shadow .6s var(--ease)}
-  @media(hover:hover) {
-    .rh-ticket:hover {transform:translateY(-3px);box-shadow:0 36px 54px -30px color-mix(in srgb,var(--ink) 50%,transparent)}
-  }
-  /* the brass edge, with a glint that crosses it every few seconds */
-  .rh-ticket::before {content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:3px;background-image:linear-gradient(100deg,transparent 42%,color-mix(in srgb,var(--paper) 85%,transparent) 50%,transparent 58%),var(--tri);background-size:260% 100%,100% 100%;background-repeat:no-repeat;animation:rh-glint 7s ease-in-out infinite}
-  /* the light that follows the pointer (set by LaunchTicket) */
-  .rh-ticket::after {content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .5s;background:radial-gradient(340px 210px at var(--mx) var(--my),color-mix(in srgb,var(--brass) 22%,transparent),transparent 72%)}
-  @media(hover:hover) {
-    .rh-ticket:hover::after {opacity:1}
-  }
-  .rh-ticket__a, .rh-ticket__b {position:relative;z-index:1;padding:clamp(18px,2.6vw,26px) clamp(16px,3vw,32px) clamp(16px,2.4vw,24px)}
-  .rh-ticket__perf {border-left:1px dashed var(--line-2);margin-block:14px}
-  .rh-ticket__eyebrow {display:flex;align-items:center}
-  .rh-ticket__dot {display:inline-block;flex:none;width:6px;height:6px;margin-right:10px;border-radius:50%;background:var(--gilt);animation:rh-dot 2.8s ease-out infinite}
-  .rh-ticket__price {display:flex;align-items:baseline;gap:12px;margin-top:10px;flex-wrap:wrap}
-  .rh-ticket__price b {display:inline-block;text-align:left;font:300 clamp(2.2rem,4.2vw,3.1rem)/1 var(--f-sans);letter-spacing:.01em}
-  .rh-ticket__price s {position:relative;text-decoration:none;font-size:15px;color:var(--ink-3)}
-  .rh-ticket__price s::after {content:"";position:absolute;left:-3px;right:-3px;top:54%;height:1px;background:currentColor;transform-origin:left center;transition:transform .55s var(--ease) 1.35s}
-  .rh-ticket__save {display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13.5px;line-height:1.45;margin-top:2px}
-  .rh-ticket__meter {position:relative;height:5px;margin:14px 0 0;border-radius:99px;background:var(--line);overflow:hidden}
-  .rh-ticket__meter i {position:absolute;inset:0;border-radius:inherit;background:var(--tri);transform-origin:left center;transform:scaleX(var(--p,.33));transition:transform 1.25s var(--ease) .5s}
-  .rh-ticket__chips {display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0;padding:0;list-style:none}
-  .rh-ticket__chips a {display:inline-flex;align-items:baseline;gap:9px;padding:9px 13px 8px;border:1px solid var(--line-2);border-radius:99px;font:400 11px/1 var(--f-label);letter-spacing:.16em;text-transform:uppercase;color:var(--ink);transition:background .3s,border-color .3s,color .3s,transform .45s var(--ease)}
-  .rh-ticket__chips em {font-style:normal;letter-spacing:.04em;color:var(--ink-3);transition:color .3s}
-  .rh-ticket__chips a:hover, .rh-ticket__chips a:focus-visible {background:var(--ink);border-color:var(--ink);color:var(--paper);transform:translateY(-2px)}
-  .rh-ticket__chips a:hover em, .rh-ticket__chips a:focus-visible em {color:color-mix(in srgb,var(--paper) 72%,transparent)}
-  .rh-ticket__fine {margin-top:12px;font-size:11px;letter-spacing:0.134em;text-transform:uppercase;color:var(--ink-3);line-height:1.7;font-family:var(--f-label)}
-  .rh-ticket__fine span {display:block}
-  /* the sequence (LaunchTicket sets data-state="pre" before paint, then "in"; without JS or with reduced motion neither is set and this is all final) */
-  .rh-ticket[data-state="pre"] .rh-ticket__price s::after {transform:scaleX(0);transition:none}
-  .rh-ticket[data-state="pre"] .rh-ticket__meter i {transform:scaleX(0);transition:none}
-  .rh-ticket[data-state="pre"] .rh-ticket__save .rh-pill {opacity:0}
-  .rh-ticket[data-state="pre"] .rh-ticket__chips li {opacity:0}
-  .rh-ticket[data-state="in"] .rh-ticket__save .rh-pill {animation:rh-stamp .75s cubic-bezier(.2,1.25,.4,1) .8s both}
-  .rh-ticket[data-state="in"] .rh-ticket__chips li {animation:rh-rise .6s var(--ease) calc(1.15s + var(--i,0)*90ms) both}
-  @media(prefers-reduced-motion:reduce) {
-    .rh-ticket::before, .rh-ticket__dot {animation:none}
-    .rh-ticket, .rh-ticket__chips a {transition:none}
-  }
-  @media(max-width:599px) {
-    .rh-ticket {--n:9px;--ny:92px;grid-template-columns:1fr auto;grid-template-rows:var(--ny) auto auto auto auto}
-    .rh-ticket__a {grid-area:1/1;align-self:center;padding:0 0 0 22px}
-    .rh-ticket__price {margin-top:8px;gap:9px}
-    .rh-ticket__price b {font-size:2.45rem}
-    .rh-ticket__b, .rh-ticket__save {display:contents}
-    .rh-ticket__save .rh-pill {grid-area:1/2;align-self:center;justify-self:end;margin-right:22px;display:grid;place-items:center;width:56px;height:56px;padding:0;border-radius:50%;font-size:12px;letter-spacing:.03em;box-shadow:inset 0 0 0 3px var(--ink),inset 0 0 0 4px color-mix(in srgb,var(--paper) 28%,transparent)}
-    .rh-ticket__save>span:not(.rh-pill) {grid-area:2/1/3/3;margin:0 22px;padding-top:15px;border-top:1px dashed var(--line-2);font-size:14px;line-height:1.45}
-    .rh-ticket__meter {grid-area:3/1/4/3;margin:13px 22px 0}
-    .rh-ticket__chips {grid-area:4/1/5/3;margin:14px 22px 0;gap:6px}
-    .rh-ticket__chips a {padding:8px 11px 7px;font-size:10.5px;letter-spacing:.13em}
-    .rh-ticket__chips em {display:none}
-    .rh-ticket__fine {grid-area:5/1/6/3;margin:0 22px;padding:12px 0 17px;line-height:1.6}
-    .rh-ticket__fine .rh-ticket__fine-b {display:none}
-    .rh-ticket__perf {position:absolute;inset:0;margin:0;border:0;pointer-events:none;z-index:1}
-    .rh-ticket__perf::before, .rh-ticket__perf::after {content:"";position:absolute;top:calc(var(--ny) - var(--n));box-sizing:border-box;width:calc(var(--n)*2);height:calc(var(--n)*2);border-radius:50%;background:var(--paper);border:1px solid var(--line-2)}
-    .rh-ticket__perf::before {left:calc(-1px - var(--n));clip-path:inset(0 0 0 50%)}
-    .rh-ticket__perf::after {right:calc(-1px - var(--n));clip-path:inset(0 50% 0 0)}
-  }
+  /* the launch pass (formerly the ticket) and the hero's explorable stage: app/hero.css */
 
   /* why extrait: the atomizer macro beside the argument (above it on a phone, text first) */
   .rh-why__top {display:grid;justify-items:center;gap:clamp(8px,2vw,24px)}

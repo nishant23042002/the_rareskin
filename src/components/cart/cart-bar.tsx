@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Flacon } from "@/components/ui/flacon";
 import { Icon } from "@/components/ui/icon";
-import { Mark } from "@/components/ui/mark";
 import { useCart } from "@/components/providers/cart-provider";
 import { useScrolled } from "@/hooks/use-scrolled";
 import { cloudinaryVariant, formatINR, isFragranceSlug } from "@/lib/catalog";
@@ -19,8 +18,8 @@ const MAX_THUMBS = 3;
  * The sticky bag bar. Hidden at the top of every page and whenever the bag is
  * empty; slides up once the reader scrolls, and tucks away over the footer.
  *
- * Dark like the bag drawer (`.rh-dk`: onyx and champagne), and built as one
- * precise strip:
+ * Light like the bag drawer (`.rh-lt`: paper and ink; the Checkout button is the
+ * dark note), and built as one precise strip:
  *
  *   ──────────────────────────────────────────────  the bar's top edge IS the
  *   [pack][pack]  2 ITEMS  ₹1,598  You save ₹800     free-delivery meter: it fills
@@ -90,7 +89,7 @@ export function CartBar({
   return (
     <div
       className={cn(
-        "rh-dk fixed inset-x-0 bottom-0 z-40 w-[calc(100vw+var(--sbw,0px))] bg-surface text-ink shadow-[0_-22px_48px_-30px_rgba(0,0,0,0.85)] transition-transform duration-[450ms] ease-[var(--ease-out-strong)] motion-reduce:transition-none",
+        "rh-lt fixed inset-x-0 bottom-0 z-40 w-[calc(100vw+var(--sbw,0px))] border-t border-line bg-surface text-ink shadow-[0_-18px_44px_-30px_rgba(16,14,12,0.4)] transition-transform duration-[450ms] ease-[var(--ease-out-strong)] motion-reduce:transition-none",
         visible ? "translate-y-0" : "translate-y-full",
       )}
       aria-hidden={!visible}
@@ -148,14 +147,12 @@ export function CartBar({
                       <span className="grid size-full place-items-center">
                         {l.fragrance && isFragranceSlug(l.fragrance) ? (
                           <Flacon fragrance={l.fragrance} className="w-4" />
-                        ) : (
-                          <Mark className="w-3.5 text-ink-3" />
-                        )}
+                        ) : null}
                       </span>
                     )}
                   </span>
                   {l.qty > 1 && (
-                    <span className="absolute -right-1 -bottom-1 z-10 rounded-full bg-gilt px-1 py-px text-[9px] leading-none font-semibold text-[#100e0c] tabular-nums">
+                    <span className="absolute -right-1 -bottom-1 z-10 rounded-full bg-ink px-1 py-px text-[9px] leading-none font-semibold text-w0 tabular-nums">
                       ×{l.qty}
                     </span>
                   )}

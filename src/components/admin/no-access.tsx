@@ -1,8 +1,5 @@
-import { Mark } from "@/components/ui/mark";
 import { Button } from "@/components/ui/button";
-import { getCurrentUser } from "@/server/auth";
-import { maskPhone } from "@/lib/auth";
-
+import { SignedInAs } from "./signed-in-as";
 import { SwitchAccountButton } from "./switch-account-button";
 
 /**
@@ -19,16 +16,17 @@ import { SwitchAccountButton } from "./switch-account-button";
  * It names the signed-in account so the person can tell they're logged in as
  * the wrong one, and offers a way back to the store plus a one-click account
  * switch.
+ *
+ * Deliberately synchronous and free of cookies: Next renders the root
+ * `forbidden.tsx` into the tree of *every* page (not only a forbidden one), so a
+ * session lookup here would run on each storefront render. The account name is
+ * fetched on the client by `SignedInAs` instead.
  */
-export async function NoAccess({
+export function NoAccess({
   variant = "studio",
 }: {
   variant?: "studio" | "section";
 }) {
-  const user = await getCurrentUser();
-  const account =
-    user?.email || (user?.phone ? maskPhone(user.phone) : null);
-
   const heading =
     variant === "section"
       ? "This part of Studio is off-limits"
@@ -45,8 +43,7 @@ export async function NoAccess({
       className="flex min-h-svh flex-col items-center justify-center px-6 text-center"
     >
       <div className="w-full max-w-[520px]">
-        <Mark className="mx-auto w-11 text-ink" />
-        <p className="eyebrow mt-6">403 · No access</p>
+        <p className="eyebrow">403 · No access</p>
         <h1 className="mt-3 text-[clamp(1.7rem,4.5vw,2.5rem)] leading-[1.15]">
           {heading}
         </h1>
@@ -54,11 +51,7 @@ export async function NoAccess({
           {body}
         </p>
 
-        {account && (
-          <p className="mt-5 text-[12px] tracking-[0.04em] text-ink-3">
-            Signed in as <span className="text-ink">{account}</span>
-          </p>
-        )}
+        <SignedInAs />
 
         <div className="mt-7 flex flex-wrap justify-center gap-2.5">
           {variant === "section" ? (

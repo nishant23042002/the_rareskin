@@ -204,7 +204,7 @@ const INFO = {
   kind: "fragrance = one of 'The Three'. set = the Discovery Set. This can't change after creation.",
   slug: "The URL segment — the product page is /fragrances/<slug>. Lowercase, hyphens only. Permanent: carts and past orders reference it.",
   sku: "The stock-keeping code every cart line and order references. UPPERCASE, hyphens. Permanent once created.",
-  name: "The product name in caps, e.g. AURÉVAN. Shows as the page heading and on the collection card.",
+  name: "The product name in caps, e.g. AUREVAN. Shows as the page heading and on the collection card.",
   title:
     "The short phrase under the name on the product page, e.g. 'The Quiet Confidence'.",
   poem: "The 2–3 sentence prose block on the product page, under the title. Max 600 characters.",

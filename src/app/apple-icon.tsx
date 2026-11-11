@@ -5,7 +5,7 @@ import { brandDataUrl } from "@/server/brand";
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-/** Apple touch icon — the same "A", a little more inset for the rounded mask. */
+/** Apple touch icon — the same "R", a little more inset for the rounded mask. */
 export default function AppleIcon() {
   return new ImageResponse(
     (
@@ -16,11 +16,11 @@ export default function AppleIcon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#232120",
+          background: "#100e0c",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={brandDataUrl("mark-a-cream.png")} width={88} height={90} alt="" />
+        <img src={brandDataUrl("mark-r-cream.png")} width={71} height={90} alt="" />
       </div>
     ),
     size,

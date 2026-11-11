@@ -33,12 +33,12 @@ export interface SeedFragrance {
 }
 
 export const SEED_PRICE = 799;
-export const SEED_MRP = 1199;
+export const SEED_MRP = 1499;
 
 export const SEED_FRAGRANCES: SeedFragrance[] = [
   {
     slug: "aurevan",
-    name: "AURÉVAN",
+    name: "AUREVAN",
     pronunciation: "ऑ-रे-व्हान · aw-ray-vahn",
     title: "The Quiet Confidence",
     poem: "Not everything powerful needs to be loud. For the moments when you don't need to say much. You simply arrive.",
@@ -64,7 +64,7 @@ export const SEED_FRAGRANCES: SeedFragrance[] = [
   },
   {
     slug: "orvelis",
-    name: "ORVÉLIS",
+    name: "ORVELIS",
     pronunciation: "ऑर-वे-लिस · or-vay-lis",
     title: "The Lasting Impression",
     poem: "The first impression gets noticed. The lasting one gets remembered. Rich, smooth, and effortlessly captivating.",
@@ -90,7 +90,7 @@ export const SEED_FRAGRANCES: SeedFragrance[] = [
   },
   {
     slug: "vayren",
-    name: "VAYRÉN",
+    name: "VAYREN",
     pronunciation: "वे-रेन · vay-ren",
     title: "The Unexplained Attraction",
     poem: "Some people are easy to understand. Some are not. It reveals itself slowly, and leaves them wanting to know more.",
@@ -123,7 +123,7 @@ export const SEED_DISCOVERY_SET = {
   detail:
     "Three 10 ml extraits in the full-size formula. ₹799, about the price of one launch bottle, credited back in full toward your first 50 ml.",
   price: 799,
-  mrp: 1199,
+  mrp: 1499,
   perVialMl: 10,
   vialCount: 3,
 } as const;

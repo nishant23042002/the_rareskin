@@ -74,7 +74,7 @@ export function CartLineRow({
     >
       <div className="flex gap-4 bg-surface px-5 py-5">
         {/* product picture */}
-        <div className="relative aspect-[7/8] w-[104px] shrink-0 self-start overflow-hidden rounded-md border border-line-2 bg-[#ebeae6] shadow-[0_14px_26px_-18px_rgba(0,0,0,0.9)] max-[379px]:w-[88px]">
+        <div className="relative aspect-[7/8] w-[104px] shrink-0 self-start overflow-hidden rounded-md border border-line-2 bg-[#ebeae6] shadow-[0_14px_26px_-18px_rgba(16,14,12,0.45)] max-[379px]:w-[88px]">
           {image ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img

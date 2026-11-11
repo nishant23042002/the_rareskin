@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Jost, Newsreader } from "next/font/google";
+import { preload } from "react-dom";
 import { ScrollbarVar } from "@/components/providers/scrollbar-var";
 import { SvgDefs } from "@/components/ui/svg-defs";
 import { THEME_BOOT_SCRIPT } from "@/config/themes";
 import { DEV_CLIENT_BEACON } from "@/lib/dev-client-beacon";
-import { SITE } from "@/lib/site";
+import { SITE, WORDMARK_WEB_SRC } from "@/lib/site";
 import { organizationJsonLd } from "@/lib/seo";
 import "./globals.css";
 
@@ -21,11 +22,24 @@ const jost = Jost({
   display: "swap",
 });
 
+// Newsreader is two faces, loaded by two loaders so they can be treated differently. The italic carries the
+// serif lines in the first screen (the hero's "Scents that stay with you.") and is preloaded; the roman is
+// not on the homepage's first screen at all, so it is fetched only when something uses it (a variable font of
+// about 60 KB that used to sit in the critical path, ahead of the hero picture). Both define the one family
+// name, so `--font-newsreader` (in `--font-serif`) resolves either style from the same stack; the fallback
+// is size-adjusted, so the swap on a page that does use the roman does not move anything.
 const newsreader = Newsreader({
   subsets: ["latin"],
-  style: ["normal", "italic"],
+  style: ["italic"],
   variable: "--font-newsreader",
   display: "swap",
+});
+const newsreaderRoman = Newsreader({
+  subsets: ["latin"],
+  style: ["normal"],
+  variable: "--font-newsreader-roman",
+  display: "swap",
+  preload: false,
 });
 
 // The label voice: eyebrows, buttons, navigation, micro-caps, product names and counters are set in
@@ -67,11 +81,14 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  // The wordmark is a CSS mask set in an inline style, which the browser's preload scanner does not read:
+  // without this it is only requested once styles are applied, after the first paint is already waiting on it.
+  preload(WORDMARK_WEB_SRC, { as: "image" });
   return (
     // suppressHydrationWarning: the boot script below sets `data-theme` on <html> before React hydrates
     <html
       lang="en-IN"
-      className={`${jost.variable} ${newsreader.variable} ${jetbrainsMono.variable}`}
+      className={`${jost.variable} ${newsreader.variable} ${newsreaderRoman.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
       <head>

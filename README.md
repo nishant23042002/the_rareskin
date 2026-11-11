@@ -29,6 +29,30 @@ India / INR. Built greenfield from the approved "Campaign" prototype.
   curtain that closes toward your tap and parts to reveal the next page,
   context-aware to the destination. See
   [`docs/route-transition.md`](docs/route-transition.md).
+- **Names without accents:** the three fragrances are written AUREVAN, ORVELIS and
+  VAYREN everywhere (code, copy, emails, invoices, the database). The photographs
+  with the name printed on the flacon are the one place an accent can still show.
+- **No chevron mark:** the old crossbar-less "A" device was removed from the whole
+  product (bag, ticker, 404s, admin, invoice, favicon). The favicon is now the
+  wordmark's own "R" (`public/brand/mark-r-cream.png`).
+- **Product page:** a calm buying column (price, one button, four reassurances read
+  from the admin settings, a Discovery Set nudge, one accordion) beside the
+  gallery; then full-width sections: the scent in three acts + how it wears
+  (`components/product/pdp-scent.tsx`), reviews, the Discovery Set band, the rest of
+  the range, and a sticky buy bar (`pdp-sticky-bar.tsx`). Styles: `app/pdp.css`.
+- **Homepage sections that are switched off:** `src/config/homepage-sections.ts`.
+  "On the skin" (the `@therareskin` strip) is off until there are real Instagram
+  posts; set `SHOW_ON_THE_SKIN = true` to bring it back.
+- **One dark:** every dark surface (announcement bar, In Focus, the Discovery Set,
+  the founder letter, the footer, the account pages' band) is `--onyx` (`#100e0c`,
+  the announcement bar's colour); there is no second, browner dark any more.
+- **Account area:** light pages with a dark band at the top of each
+  (`components/account/account-hero.tsx`, styles in `app/account.css`) and a few
+  precise dark accents; `.ac-dark` re-points the colour tokens inside a dark block.
+- **Loading performance:** measured with Lighthouse against a production build;
+  what was changed, what was left alone and why (the storefront is rendered per
+  request on purpose), and how to re-measure without a stale server fooling you:
+  [`docs/performance.md`](docs/performance.md).
 - **Fonts:** Jost + Newsreader via `next/font/google`
 
 ---
@@ -109,9 +133,10 @@ src/
     sitemap.ts  robots.ts  manifest.ts  icon.tsx  apple-icon.tsx  opengraph-image.tsx
     api/newsletter/  api/contact/   (validation stubs — see below)
   components/
-    layout/    AnnouncementBar  Header (glass + Fragrances dropdown)  SiteMenu (dark
-               left sidebar)  MenuFooter  BackToTop  Footer  PageIntro  LegalDoc
-    home/      Hero (+HeroMedia)  LaunchOffer (ticket + promises)  InFocus
+    layout/    AnnouncementBar  Header (glass; rolling labels; Fragrances dropdown opens on
+               hover, click or keyboard)  SiteMenu (left sidebar)  MenuFooter  BackToTop  Footer  PageIntro  LegalDoc
+    home/      Hero (+HeroFrame, HeroMedia, HeroExplore)  LaunchOffer (LaunchPass +
+               promises)  InFocus
                Collection (tiles)  Quiz  DiscoverySet  WhyExtrait  FounderNote
                UnboxingRitual  MadeDeliberately  InstagramStrip
                HomeImage (manifest-driven <Image>)
@@ -151,7 +176,8 @@ migrations/                versioned, reversible migrate-mongo migrations
 scripts/                   db:seed / db:check / catalog (tsx, load .env via @next/env)
 docs/data-layer.md         how the data layer works + provisioning steps
 public/
-  brand/rareskin-wordmark.png     wordmark artwork (rendered as a CSS mask)
+  brand/rareskin-wordmark.png     wordmark artwork (invoice, emails, share cards)
+  brand/rareskin-wordmark-web.webp  the same art at 640 px: what <Logo> paints as a CSS mask
   pay/                            vendored card-network SVGs + India flag
 ```
 
@@ -333,7 +359,7 @@ before going live:
   be invalidated, so URLs carry `?v=<assetVersion>`); existing sections keep their
   illustrations while a picture is a placeholder. **"The Three" cards: four pedestal-free
   art directions are built** (grounded stone, studio light, mineral bed, liquid
-  light, three fragrances each, plus a "Stone v2" AURÉVAN alternative), next to the
+  light, three fragrances each, plus a "Stone v2" AUREVAN alternative), next to the
   original pedestal cards; plate prompts in `public/images/prompt-manifest.json`,
   files in `public/images/homepage/cards/<direction>/`, choice in
   `src/config/homepage-assets.ts`. For the founder showcase a **slim "Preview" tab on
@@ -349,10 +375,20 @@ before going live:
   `src/config/hero.config.ts`; `/?hero=1..4` or the Hero bar previews the variants,
   `activeHeroVariant` ships one). The text panel beside the picture is tinted from the
   picture's own edge (`HeroFrame`): after replacing a hero picture run
-  `pnpm home:images panels` to resample its `panel` colours. The launch-offer ticket
-  (`launch-ticket.tsx`) counts the price down once when it scrolls into view and links
-  to the three product pages; it shows its final state without JavaScript or with
-  reduced motion.
+  `pnpm home:images panels` to resample its `panel` colours. That split layout is now the
+  fallback: the SHIPPED hero (`hero`) is drawn as an explorable "stage" (the picture full
+  width from 1024px with the headline on its wall, stacked below that; a dot and a hover
+  plaque on each flacon, an index that lights them, and a focus frame that dims the rest of the scene on hover; hover never moves the picture). The dots, plaques and
+  hover targets are positioned from `src/config/hero-spots.ts`, measured on THAT picture:
+  when the hero art is replaced, re-measure them (percentages of the picture, two crops).
+  Other hero directions and a Site Settings photograph keep the split layout, no hotspots.
+  The launch pass (`launch-pass.tsx`, styles `.rh-pass*` in `app/hero.css`) is the dark
+  "exclusive, limited-time" price card: it counts the price down from the list price once
+  when it scrolls into view, strikes the list price, turns a seal, fills a savings meter and
+  links to the three product pages; it shows its final state without JavaScript or with
+  reduced motion. It shows an end date only when **Site Settings → Campaign** is active and
+  has an "Ends" date still ahead ("Ends 30 Nov · 12 days left"); otherwise it says the price
+  returns to the list price when the launch ends. No countdown is made up.
   Before launch, confirm the `claimsToVerify` items (the unboxing box is not
   approved packaging; no "30% extrait" figure is printed; the ritual copy is a
   draft).

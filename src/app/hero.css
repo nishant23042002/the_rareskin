@@ -1,0 +1,282 @@
+/* ==========================================================================
+   The hero (components/home/hero*.tsx) and the launch pass (components/home/launch-pass.tsx)
+
+   HERO. Two layouts, chosen by HeroFrame (`data-layout`):
+     "split"  the original: headline on a panel beside the picture (a photograph from Site Settings, the
+              preview bar's other art directions, the illustrated trio). Its rules live in home.css.
+     "stage"  the shipped picture is the hero. From 1024px it fills the section and the headline stands on
+              its empty wall; below that the text panel is above and the picture below, so nothing ever
+              overlaps a bottle. The picture is explorable (a dot on each flacon, a plaque on hover, an
+              index that lights them, a focus frame that dims the rest of the scene).
+
+   THE STAGE. The picture is not cropped with `object-fit` but drawn at its own aspect ratio inside
+   `.rh-hero__stage`, a box that reproduces `cover` with container-query units: it is as wide as
+   max(box width, box height x ratio) and as tall as max(box height, box width / ratio), pinned by the
+   object position (`--ox`, `--oy`). The flacon columns (config/hero-spots.ts) are percentages of that
+   same box, so they stay on the bottles at any size or crop.
+
+   Only transform / opacity / scale / translate are animated. Under reduced motion the page is still:
+   no intro, no light, no pulse; the hover states remain (they are state, not motion).
+   ========================================================================== */
+
+@layer components {
+  /* ------------------------------------------------------------------
+     Copy (both layouts)
+     ------------------------------------------------------------------ */
+  .rh-hero__ln {display:block;overflow:hidden;padding-bottom:.08em;margin-bottom:-.08em}
+  .rh-hero__ln > span {display:block}
+  .rh-hero__cta {display:flex;flex-wrap:wrap;align-items:center;gap:14px 28px}
+  .rh-hero__alt {position:relative;padding-block:10px;font:500 11px/1 var(--f-label);letter-spacing:.24em;text-transform:uppercase;color:var(--ink)}
+  .rh-hero__alt::after {content:"";position:absolute;left:0;right:0;bottom:3px;height:1px;background:currentColor;opacity:.3;transform-origin:left center;transition:opacity .35s var(--ease),transform .6s var(--expo)}
+  .rh-hero__alt:hover::after, .rh-hero__alt:focus-visible::after {opacity:1}
+  @media(hover:hover) {
+    .rh-hero__alt:hover::after {animation:rh-hero-sweep .7s var(--expo)}
+  }
+
+  /* the price, stated on the first screen, with the reason it is special */
+  .rh-hero .rh-hero__offer {display:grid;gap:11px;margin:2px 0 0;color:var(--ink)}
+  .rh-hero__tag {display:inline-flex;align-items:center;gap:10px;font:500 10.5px/1.3 var(--f-label);letter-spacing:.22em;text-transform:uppercase;color:color-mix(in srgb,var(--brass) 55%,var(--ink))}
+  .rh-hero__tag i {flex:none;width:7px;height:7px;border-radius:50%;background:var(--gilt);animation:rh-dot 2.8s ease-out infinite}
+  .rh-hero__amt {display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 14px}
+  .rh-hero .rh-hero__amt b {font:300 clamp(2.2rem,3.1vw,2.9rem)/1 var(--f-sans);letter-spacing:.01em;color:var(--ink)}
+  .rh-hero .rh-hero__amt s {position:relative;margin-left:0;text-decoration:none;font-size:15px;color:var(--ink-3)}
+  .rh-hero__amt s::after {content:"";position:absolute;left:-3px;right:-3px;top:54%;height:1px;background:currentColor;transform-origin:left center;animation:rh-hero-sweep .7s var(--expo) 1.7s backwards}
+  .rh-hero__amt em {font:500 10.5px/1 var(--f-label);font-style:normal;letter-spacing:.14em;padding:6px 9px 5px;border-radius:99px;background:var(--onyx);color:var(--champagne)}
+
+  /* on a dark panel (a preview direction) the solid button inverts, since --paper is the dark there */
+  .rh-hero[data-panel="dark"] .rh-btn--solid {background:var(--champagne);border-color:var(--champagne);color:var(--onyx)}
+  .rh-hero[data-panel="dark"] .rh-hero__amt em {background:var(--champagne);color:var(--onyx)}
+
+  /* the index: a row lights its flacon in the picture, and the flacon lights its row */
+  /* nothing here changes size or position (a hover must never move the layout): a soft fill sweeps in behind the row,
+     the number darkens, the arrow slides in */
+  .rh-hero__index a {position:relative;isolation:isolate}
+  .rh-hero__index a::before {content:"";position:absolute;inset:0 -8px;z-index:-1;background:color-mix(in srgb,var(--ink) 6%,transparent);transform:scaleX(0);transform-origin:left center;transition:transform .7s var(--expo)}
+  .rh-hero .rh-hero__index a:is(:hover,:focus-visible,.is-hot) {padding-left:2px}
+  .rh-hero__index a:is(:hover,:focus-visible,.is-hot)::before {transform:none}
+  .rh-hero__index a.is-hot .rh-ico {opacity:1;transform:none}
+  .rh-hero__index a.is-hot .rh-hero__no {color:var(--ink)}
+
+  /* arrival: the lines rise out of their masks, the rest follows */
+  @keyframes rh-hero-fade {from {opacity:0;transform:translateY(14px)}}
+  @keyframes rh-hero-rise {from {transform:translateY(106%)}}
+  @keyframes rh-hero-draw {from {transform:scaleX(0)}}
+  @keyframes rh-hero-sweep {from {transform:scaleX(0)}}
+  @keyframes rh-hero-in {from {scale:1.14}}
+  @keyframes rh-hero-pop {from {opacity:0;scale:0}}
+  @keyframes rh-hero-ping {0% {opacity:.55;scale:1}70%,100% {opacity:0;scale:3.1}}
+  @keyframes rh-hero-cue {0% {transform:scaleY(0);transform-origin:top}45% {transform:scaleY(1);transform-origin:top}55% {transform:scaleY(1);transform-origin:bottom}100% {transform:scaleY(0);transform-origin:bottom}}
+  @media(prefers-reduced-motion:no-preference) {
+    .rh-hero__eyebrow {animation:rh-hero-fade .9s var(--expo) .1s backwards}
+    .rh-hero__rule {transform-origin:left center;animation:rh-hero-draw 1.1s var(--expo) .25s backwards}
+    .rh-hero__ln > span {animation:rh-hero-rise 1.15s var(--expo) calc(.22s + var(--n,0)*.1s) backwards}
+    .rh-hero__ln:nth-of-type(2) > span {--n:1}
+    .rh-hero__sub {animation:rh-hero-fade 1.1s var(--expo) .6s backwards}
+    .rh-hero__cta {animation:rh-hero-fade 1.1s var(--expo) .75s backwards}
+    .rh-hero .rh-hero__offer {animation:rh-hero-fade 1.1s var(--expo) .9s backwards}
+    .rh-hero__index li {animation:rh-hero-fade 1s var(--expo) calc(1s + var(--i,0)*.09s) backwards}
+  }
+
+  /* ------------------------------------------------------------------
+     Stage layout: the picture, explorable
+     ------------------------------------------------------------------ */
+  .rh-hero[data-layout="stage"] {position:relative;isolation:isolate;background:var(--stone);grid-template-columns:1fr;min-height:0}
+  .rh-hero[data-layout="stage"] .rh-hero__media {position:relative;height:auto;aspect-ratio:4/5;background:var(--stone)}
+  @media(min-width:768px) {
+    .rh-hero[data-layout="stage"] .rh-hero__media {aspect-ratio:16/9}
+  }
+  @media(max-width:599px) {
+    .rh-hero[data-layout="stage"] .rh-hero__text {padding-block:34px 36px}
+  }
+
+  /* the art box owns the cover arithmetic (--ar, --ox, --oy, --W) so the stage and the plaque layer share it */
+  .rh-hero__art {--ar:var(--ar-t);--ox:.5;--oy:.5;--drift:1.05;--W:max(100cqw,calc(100cqh * var(--ar)));position:absolute;inset:0;overflow:hidden;overflow:clip;container-type:size}
+  .rh-hero__stage {position:absolute;left:calc(100cqw * var(--ox));top:calc(100cqh * var(--oy));width:max(100cqw,calc(100cqh * var(--ar)));height:max(100cqh,calc(100cqw / var(--ar)));translate:calc(-100% * var(--ox)) calc(-100% * var(--oy))}
+  @media(min-width:768px) {
+    .rh-hero__art {--ar:var(--ar-w)}
+  }
+  @media(min-width:1024px) {
+    /* a short window crops the foot of the picture (the floor), never the caps */
+    .rh-hero__art {--oy:.12}
+  }
+  @media(prefers-reduced-motion:no-preference) {
+    .rh-hero__stage {animation:rh-hero-in 2.6s var(--expo) backwards}
+  }
+  /* the picture and its hotspots, one layer. It is oversized a little (so the scroll parallax in motion.css never shows an edge) and
+     is NEVER moved or scaled by a hover or the pointer: pointing at a flacon only changes light, never position. */
+  .rh-hero__drift {position:absolute;inset:0;scale:var(--drift)}
+  .rh-hero__drift picture {display:block;width:100%;height:100%}
+  .rh-hero[data-layout="stage"] .rh-hero__drift img {display:block;width:100%;height:100%;object-fit:fill;object-position:50% 50%;animation:none}
+
+  /* a column over each flacon and its pedestal: hover target, link, home of the dot and the plaque */
+  .rh-col {--dy:var(--tdy);--qy:var(--tqy);position:absolute;z-index:3;display:block;left:var(--tl);top:var(--tt);width:var(--tw);height:var(--th);cursor:pointer}
+  @media(min-width:768px) {
+    .rh-col {--dy:var(--wdy);--qy:var(--wqy);left:var(--wl);top:var(--wt);width:var(--ww);height:var(--wh)}
+  }
+  .rh-col:focus-visible {outline:1px solid var(--onyx);outline-offset:3px}
+  .rh-col__glow {position:absolute;left:50%;top:var(--dy);width:160%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:radial-gradient(closest-side,rgba(255,247,232,.55),rgba(255,247,232,0));opacity:0;scale:.7;pointer-events:none;transition:opacity .7s var(--ease),scale 1s var(--expo)}
+  .rh-col.is-hot .rh-col__glow {opacity:1;scale:1}
+  /* the focus frame: pointing at a flacon dims the rest of the scene (a huge soft shadow outside the frame's box) and sets four
+     fine brackets around the flacon and its pedestal. Opacity only, so nothing moves; a mouse on a wide screen only. */
+  .rh-col__frame {display:none}
+  @media(min-width:1024px) and (hover:hover) {
+    .rh-col__frame {--c:rgba(250,250,247,.95);--l:18px;display:block;position:absolute;inset:-6px;border-radius:3px;pointer-events:none;opacity:0;box-shadow:0 0 0 100vmax rgba(16,14,12,.34);background:linear-gradient(var(--c),var(--c)) 0 0/var(--l) 1px no-repeat,linear-gradient(var(--c),var(--c)) 0 0/1px var(--l) no-repeat,linear-gradient(var(--c),var(--c)) 100% 0/var(--l) 1px no-repeat,linear-gradient(var(--c),var(--c)) 100% 0/1px var(--l) no-repeat,linear-gradient(var(--c),var(--c)) 0 100%/var(--l) 1px no-repeat,linear-gradient(var(--c),var(--c)) 0 100%/1px var(--l) no-repeat,linear-gradient(var(--c),var(--c)) 100% 100%/var(--l) 1px no-repeat,linear-gradient(var(--c),var(--c)) 100% 100%/1px var(--l) no-repeat;transition:opacity .6s var(--ease)}
+    .rh-col.is-hot .rh-col__frame {opacity:1}
+  }
+  .rh-col__dot {position:absolute;left:50%;top:var(--dy);width:13px;height:13px;margin:-6.5px 0 0 -6.5px;border-radius:50%;background:var(--onyx);box-shadow:0 0 0 3px rgba(250,250,247,.92),0 6px 16px rgba(16,14,12,.35);transition:scale .55s var(--spring),opacity .4s var(--ease),box-shadow .4s var(--ease)}
+  .rh-col__dot::before {content:"";position:absolute;inset:-6px;border-radius:50%;border:1px solid var(--onyx);opacity:0;pointer-events:none}
+  .rh-col.is-hot .rh-col__dot {scale:1.35;box-shadow:0 0 0 3px rgba(250,250,247,.95),0 0 0 4.5px var(--brass),0 8px 20px rgba(16,14,12,.4)}
+  .rh-hero[data-hot] .rh-col:not(.is-hot) .rh-col__dot {opacity:.4}
+  @media(prefers-reduced-motion:no-preference) {
+    .rh-col__dot {animation:rh-hero-pop .9s var(--spring) calc(1.5s + var(--i,0)*.16s) backwards}
+    .rh-col__dot::before {animation:rh-hero-ping 3.2s ease-out calc(2.4s + var(--i,0)*.5s) infinite}
+    .rh-col.is-hot .rh-col__dot::before {animation:none}
+  }
+
+  /* the plaques: centred on each pedestal, pinned to the bottom of the VISIBLE hero, just above the launch pass that overlaps its
+     foot (54px), so they are never hidden by it at any window size. A mouse on a wide screen only (a touch screen gets the dots and
+     the link). Horizontal position = the picture's own cover arithmetic (--W, --ox) + the column's centre (--cx), scaled with the picture (--drift). */
+  .rh-plaques {display:none}
+  @media(min-width:1024px) and (hover:hover) {
+    .rh-plaques {display:block;position:absolute;inset:0;z-index:4;pointer-events:none}
+    .rh-plaque {position:absolute;left:calc(100cqw * var(--ox) - var(--W) * var(--ox) + var(--W) * 0.5 + var(--W) * (var(--cx) - 0.5) * var(--drift));bottom:calc(54px + clamp(16px,3cqh,34px));display:grid;gap:7px;width:clamp(148px,13.4cqw,232px);padding:clamp(11px,1cqw,15px) clamp(12px,1.1cqw,16px) clamp(10px,.9cqw,14px);translate:-50% 14px;background:var(--onyx);color:var(--champagne);border:1px solid color-mix(in srgb,var(--brass) 35%,transparent);box-shadow:0 24px 40px -22px rgba(16,14,12,.7);opacity:0;transition:opacity .45s var(--ease),translate .8s var(--expo)}
+    .rh-plaque.is-hot {opacity:1;translate:-50% 0}
+    .rh-plaque b {font:500 clamp(9.5px,.75cqw,11px)/1.2 var(--f-label);letter-spacing:.24em;text-transform:uppercase;color:var(--brass)}
+    .rh-plaque em {font:italic 400 clamp(12px,.95cqw,14px)/1.25 var(--f-serif);color:color-mix(in srgb,var(--champagne) 82%,transparent)}
+    .rh-plaque__p {display:flex;align-items:baseline;gap:9px;padding-top:9px;border-top:1px solid color-mix(in srgb,var(--champagne) 16%,transparent);font:300 clamp(1.15rem,1.55cqw,1.5rem)/1 var(--f-sans);letter-spacing:.01em}
+    .rh-plaque__p s {font-size:.62em;color:color-mix(in srgb,var(--champagne) 52%,transparent)}
+    .rh-plaque__go {display:flex;align-items:center;gap:7px;font:500 clamp(9px,.7cqw,10.5px)/1 var(--f-label);letter-spacing:.24em;text-transform:uppercase;color:var(--brass)}
+    .rh-plaque__go .rh-ico {width:13px;height:13px;transition:translate .5s var(--expo)}
+    .rh-plaque.is-hot .rh-plaque__go .rh-ico {translate:4px 0}
+  }
+  /* a short window has little foot to spare: the plaque drops its "View" line */
+  @media(min-width:1024px) and (max-height:820px) {
+    .rh-plaque__go {display:none}
+  }
+
+  /* a soft warm light that follows the mouse across the scene (wide, mouse, motion allowed) */
+  .rh-hero__light, .rh-hero__cue {display:none}
+  @media(min-width:1024px) and (hover:hover) and (prefers-reduced-motion:no-preference) {
+    .rh-hero[data-layout="stage"] .rh-hero__light {display:block;position:absolute;left:0;top:0;z-index:2;width:680px;height:680px;margin:-340px 0 0 -340px;border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(255,236,200,.3),rgba(255,236,200,0));translate:var(--lx,50%) var(--ly,50%);opacity:0;transition:translate .45s var(--expo),opacity .7s var(--ease)}
+    .rh-hero[data-layout="stage"][data-pointer] .rh-hero__light {opacity:1}
+  }
+
+  /* ------------------------------------------------------------------
+     Stage layout, 1024px and up: the headline stands on the wall
+     ------------------------------------------------------------------ */
+  @media(min-width:1024px) {
+    .rh-hero[data-layout="stage"] {--hl:max(var(--gutter),calc((100vw - var(--maxw))/2 + var(--gutter)));display:block;min-height:0;height:clamp(600px,min(calc(100svh - var(--announce-h) - var(--header-h)),56.25vw),900px)}
+    .rh-hero[data-layout="stage"] .rh-hero__media {position:absolute;inset:0;aspect-ratio:auto}
+    .rh-hero[data-layout="stage"] .rh-hero__text {position:relative;z-index:3;height:100%;padding:0 0 0 var(--hl);background:none;pointer-events:none}
+    .rh-hero[data-layout="stage"] .rh-hero__copy {width:min(500px,calc(35.5vw - var(--hl)));max-width:none;gap:clamp(14px,2.1vh,26px);pointer-events:none}
+    .rh-hero[data-layout="stage"] .rh-hero__copy :is(a, .rh-hero__tag) {pointer-events:auto}
+    .rh-hero[data-layout="stage"] .rh-display {font-size:clamp(3rem,4.5vw,5rem)}
+    .rh-hero[data-layout="stage"] .rh-hero__index {margin-top:clamp(6px,1.6vh,22px);width:100%}
+    .rh-hero[data-layout="stage"] .rh-hero__index a {padding-block:clamp(10px,1.5vh,14px)}
+    .rh-hero[data-layout="stage"] .rh-hero__cue {display:flex;align-items:center;gap:14px;position:absolute;z-index:3;left:var(--hl);bottom:30px;font:500 10px/1 var(--f-label);letter-spacing:.3em;text-transform:uppercase;color:var(--ink-3);pointer-events:none}
+    .rh-hero__cue i {display:block;width:1px;height:42px;background:currentColor;transform-origin:top}
+  }
+  @media(min-width:1024px) and (prefers-reduced-motion:no-preference) {
+    .rh-hero__cue i {animation:rh-hero-cue 2.6s var(--expo) 2.4s infinite}
+  }
+  /* short windows: the index steps aside (the dots and the plaques do its work) */
+  @media(min-width:1024px) and (max-height:780px) {
+    .rh-hero[data-layout="stage"] .rh-hero__index, .rh-hero[data-layout="stage"] .rh-hero__cue {display:none}
+  }
+  /* stacked: the index is shown from tablet up, the phone relies on the dots */
+  @media(max-width:599px) {
+    .rh-hero[data-layout="stage"] .rh-hero__index {display:none}
+  }
+  @media(min-width:600px) and (max-width:1023px) {
+    .rh-hero[data-layout="stage"] .rh-hero__index {display:block}
+    /* a tablet has the width: the index sits beside the headline instead of under it */
+    .rh-hero[data-layout="stage"] .rh-hero__text {padding-block:clamp(36px,6vw,56px)}
+    .rh-hero[data-layout="stage"] .rh-hero__copy {max-width:none;width:100%;grid-template-columns:minmax(0,1fr) minmax(230px,340px);column-gap:clamp(32px,7vw,72px);align-items:start}
+    .rh-hero[data-layout="stage"] .rh-hero__copy > * {grid-column:1}
+    .rh-hero[data-layout="stage"] .rh-hero__copy > .rh-hero__index {grid-column:2;grid-row:1 / span 5;align-self:center;margin-top:0;width:100%}
+  }
+
+  /* ------------------------------------------------------------------
+     The launch pass: dark, on a light page; the one place the price is the subject
+     ------------------------------------------------------------------ */
+  .rh-pass-wrap {position:relative;z-index:4;display:flex;justify-content:center;margin-top:-54px;padding-inline:max(var(--gutter),env(safe-area-inset-left,0px)) max(var(--gutter),env(safe-area-inset-right,0px));background:linear-gradient(to bottom,transparent 54px,var(--paper) 54px)}
+  .rh-pass {--mx:50%;--my:50%;--bd:color-mix(in srgb,var(--champagne) 14%,transparent);position:relative;isolation:isolate;overflow:hidden;width:min(100%,1060px);border-radius:3px;background:var(--onyx);color:var(--champagne);border:1px solid color-mix(in srgb,var(--brass) 30%,transparent);box-shadow:0 40px 70px -40px rgba(16,14,12,.75)}
+  .rh-pass::after {content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .6s var(--ease);background:radial-gradient(460px 280px at var(--mx) var(--my),color-mix(in srgb,var(--brass) 24%,transparent),transparent 72%)}
+  @media(hover:hover) {
+    .rh-pass:hover::after {opacity:1}
+  }
+
+  /* the belt: what the price is, said slowly and without stopping */
+  .rh-pass__belt {position:relative;z-index:1;overflow:hidden;border-bottom:1px solid var(--bd);background:color-mix(in srgb,var(--champagne) 4%,transparent)}
+  .rh-pass__belt-in {display:flex;width:max-content;padding-block:10px;animation:rh-belt 42s linear infinite}
+  .rh-pass:hover .rh-pass__belt-in {animation-play-state:paused}
+  .rh-pass__belt-set {display:flex;flex:none}
+  .rh-pass__belt-set > span {display:inline-flex;align-items:center;gap:22px;padding-right:22px;font:500 10px/1 var(--f-label);letter-spacing:.3em;text-transform:uppercase;white-space:nowrap;color:var(--brass)}
+  .rh-pass__belt-set i {display:block;width:5px;height:5px;rotate:45deg;background:currentColor;opacity:.7}
+  @keyframes rh-belt {to {transform:translateX(-50%)}}
+
+  .rh-pass__body {position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"lead seal" "side side";align-items:center;gap:22px clamp(16px,3vw,40px);padding:clamp(22px,3.4vw,36px) clamp(20px,3.4vw,40px) clamp(18px,3vw,30px)}
+  .rh-pass__lead {grid-area:lead;min-width:0}
+  .rh-pass__seal {grid-area:seal}
+  .rh-pass__side {grid-area:side;min-width:0}
+  @media(min-width:900px) {
+    .rh-pass__body {grid-template-columns:minmax(0,1.2fr) auto minmax(0,1fr);grid-template-areas:"lead seal side"}
+  }
+
+  .rh-pass__kicker {display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;font:500 10.5px/1.4 var(--f-label);letter-spacing:.24em;text-transform:uppercase;color:var(--brass)}
+  .rh-pass__dot {flex:none;width:7px;height:7px;border-radius:50%;background:var(--gilt);animation:rh-dot 2.8s ease-out infinite}
+  .rh-pass__ends {font-style:normal;padding:5px 9px 4px;border:1px solid color-mix(in srgb,var(--brass) 45%,transparent);border-radius:99px;letter-spacing:.16em;color:var(--champagne)}
+  .rh-pass__price {display:flex;align-items:flex-end;flex-wrap:wrap;gap:6px 18px;margin-top:14px}
+  .rh-pass__price b {font:300 clamp(3.2rem,6.4vw,5.3rem)/.95 var(--f-sans);letter-spacing:-.005em;color:var(--champagne);background:linear-gradient(100deg,transparent 42%,color-mix(in srgb,var(--brass) 55%,#fff) 50%,transparent 58%) 160% 0/260% 100% no-repeat,linear-gradient(var(--champagne),var(--champagne));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:rh-sheen 7s ease-in-out 2.4s infinite}
+  @keyframes rh-sheen {0%,55% {background-position:160% 0,0 0}100% {background-position:-60% 0,0 0}}
+  .rh-pass__was {display:grid;justify-items:start;gap:3px;padding-bottom:.5rem}
+  .rh-pass__was s {position:relative;text-decoration:none;font:300 clamp(1.15rem,1.7vw,1.5rem)/1 var(--f-sans);color:color-mix(in srgb,var(--champagne) 58%,transparent)}
+  .rh-pass__was s::after {content:"";position:absolute;left:-4px;right:-4px;top:52%;height:1.5px;background:var(--gilt);transform-origin:left center;transition:transform .7s var(--expo) 1.7s}
+  .rh-pass__was small {font:500 9.5px/1 var(--f-label);letter-spacing:.22em;text-transform:uppercase;color:color-mix(in srgb,var(--champagne) 44%,transparent)}
+  .rh-pass__save {margin-top:14px;max-width:38ch;font-size:14px;line-height:1.55;color:color-mix(in srgb,var(--champagne) 76%,transparent)}
+  .rh-pass__save b {font-weight:500;color:var(--brass)}
+
+  /* the seal: the percentage, ringed by words that keep turning */
+  .rh-pass__seal {position:relative;display:grid;place-items:center;width:clamp(92px,11vw,128px);aspect-ratio:1}
+  .rh-pass__ring {position:absolute;inset:0;width:100%;height:100%;overflow:visible;animation:rh-spin 30s linear infinite}
+  .rh-pass__ring text {font:500 8.6px/1 var(--f-label);letter-spacing:.3em;fill:var(--brass)}
+  @keyframes rh-spin {to {transform:rotate(360deg)}}
+  .rh-pass__pct {display:flex;align-items:center;justify-content:center;width:62%;aspect-ratio:1;border-radius:50%;background:var(--champagne);color:var(--onyx);font:400 clamp(1.4rem,2.5vw,2rem)/1 var(--f-sans);letter-spacing:-.01em;box-shadow:0 0 0 5px var(--onyx),0 0 0 6px color-mix(in srgb,var(--brass) 60%,transparent)}
+  .rh-pass__pct small {display:inline;font-size:.55em;margin-left:1px}
+  @media(hover:hover) {
+    .rh-pass:hover .rh-pass__ring {animation-duration:12s}
+  }
+
+  .rh-pass__meter {position:relative;height:5px;border-radius:99px;background:color-mix(in srgb,var(--champagne) 14%,transparent);overflow:hidden}
+  .rh-pass__meter i {position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,color-mix(in srgb,var(--brass) 70%,transparent),var(--brass) 60%,color-mix(in srgb,var(--brass) 55%,#fff));transform-origin:left center;transform:scaleX(var(--p,.47));transition:transform 1.4s var(--expo) .6s}
+  .rh-pass__scale {display:flex;justify-content:space-between;gap:12px;margin-top:9px;font:500 10px/1 var(--f-label);letter-spacing:.2em;text-transform:uppercase;color:color-mix(in srgb,var(--champagne) 54%,transparent)}
+  .rh-pass__scale b {font-weight:500;color:var(--brass)}
+  .rh-pass__chips {display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0;padding:0;list-style:none}
+  .rh-pass__chips a {display:inline-flex;align-items:baseline;gap:9px;padding:10px 14px 9px;border:1px solid color-mix(in srgb,var(--champagne) 26%,transparent);border-radius:99px;font:400 10.5px/1 var(--f-label);letter-spacing:.16em;text-transform:uppercase;color:var(--champagne);transition:background-color .3s var(--ease),border-color .3s var(--ease),color .3s var(--ease),transform .45s var(--ease)}
+  .rh-pass__chips em {font-style:normal;letter-spacing:.04em;color:var(--brass);transition:color .3s var(--ease)}
+  .rh-pass__chips a:hover, .rh-pass__chips a:focus-visible {background:var(--champagne);border-color:var(--champagne);color:var(--onyx);transform:translateY(-2px)}
+  .rh-pass__chips a:hover em, .rh-pass__chips a:focus-visible em {color:var(--onyx)}
+  .rh-pass__fine {position:relative;z-index:1;display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 24px;padding:13px clamp(20px,3.4vw,40px);border-top:1px solid var(--bd);font:500 10px/1.6 var(--f-label);letter-spacing:.16em;text-transform:uppercase;color:color-mix(in srgb,var(--champagne) 50%,transparent)}
+  @media(max-width:599px) {
+    .rh-pass-wrap {margin-top:-34px;background:linear-gradient(to bottom,transparent 34px,var(--paper) 34px)}
+    .rh-pass__chips a {padding:9px 11px 8px;font-size:10px;letter-spacing:.12em}
+    .rh-pass__chips em {display:none}
+    .rh-pass__fine span:last-child {max-width:34ch}
+  }
+
+  /* the sequence: the figure drops (the component counts it), the strike is drawn, the seal turns in, the meter fills,
+     the chips arrive. Idle (no script, reduced motion) shows everything at once. */
+  .rh-pass[data-state="pre"] .rh-pass__was s::after {transform:scaleX(0);transition:none}
+  .rh-pass[data-state="pre"] .rh-pass__meter i {transform:scaleX(0);transition:none}
+  .rh-pass[data-state="pre"] .rh-pass__seal {opacity:0;scale:.6;rotate:-50deg;transition:none}
+  .rh-pass[data-state="in"] .rh-pass__seal {transition:opacity .6s var(--ease) .9s,scale 1s var(--spring) .9s,rotate 1.2s var(--expo) .9s}
+  .rh-pass[data-state="pre"] .rh-pass__chips li {opacity:0;translate:0 10px;transition:none}
+  .rh-pass[data-state="in"] .rh-pass__chips li {transition:opacity .7s var(--ease) calc(1.2s + var(--i,0)*.1s),translate .9s var(--expo) calc(1.2s + var(--i,0)*.1s)}
+  .rh-pass[data-state="pre"] .rh-pass__save, .rh-pass[data-state="pre"] .rh-pass__scale {opacity:0;transition:none}
+  .rh-pass[data-state="in"] .rh-pass__save, .rh-pass[data-state="in"] .rh-pass__scale {transition:opacity .8s var(--ease) 1.1s}
+  @media(prefers-reduced-motion:reduce) {
+    .rh-pass__belt-in, .rh-pass__ring, .rh-pass__dot, .rh-pass__price b {animation:none}
+    .rh-pass__price b {-webkit-text-fill-color:currentColor;background:none}
+    .rh-pass, .rh-pass::after, .rh-pass__chips a {transition:none}
+  }
+}

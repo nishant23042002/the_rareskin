@@ -9,7 +9,7 @@ import path from "node:path";
  * social-share image. One artwork feeds all of them (`public/brand/`):
  *
  *   rareskin-wordmark.png   the wordmark — black on transparent, 1487 × 331
- *   mark-a-cream.png        its "A" glyph, cream on transparent (favicons)
+ *   mark-r-cream.png        its "R" glyph, cream on transparent (favicons)
  *   email-logo.png          the wordmark in ink on white, 648 × 144 (order emails)
  *
  * Callers that run per request (the invoice) must have these files bundled — see

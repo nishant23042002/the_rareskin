@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 
-import { Mark } from "@/components/ui/mark";
 import { AdminNav, type AdminNavItem } from "./admin-nav";
 import { AdminTopbar } from "./admin-topbar";
 import { AdminScrollGuard } from "./admin-scroll-guard";
@@ -48,7 +47,6 @@ export function AdminShell({
       {/* desktop left rail */}
       <aside className="hidden shrink-0 border-r border-line bg-surface md:flex md:w-56 md:flex-col">
         <div className="flex h-14 items-center gap-2 border-b border-line px-4">
-          <Mark className="w-4 text-ink" />
           <span className="text-[11px] font-medium tracking-[0.2em] text-ink uppercase">
             Studio
           </span>
@@ -63,7 +61,6 @@ export function AdminShell({
             desktop shows only the topbar */}
         <div className="sticky top-0 z-20 md:static">
           <div className="flex h-11 items-center gap-2 border-b border-line bg-surface px-4 md:hidden">
-            <Mark className="w-3.5 text-ink" />
             <span className="text-[10px] font-medium tracking-[0.22em] text-ink uppercase">
               Studio
             </span>

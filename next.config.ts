@@ -107,7 +107,19 @@ const nextConfig: NextConfig = {
     ];
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    // Files in /public are served `max-age=0, must-revalidate` by default, so a returning visitor pays a
+    // conditional request per picture (the logo, six product photos, ...). These do not change from one
+    // day to the next: a day in the browser, a week of stale-while-revalidate behind it. (A photograph
+    // replaced under the same name shows up within a day; homepage pictures are versioned with `?v=`.)
+    const assetCache = {
+      key: "Cache-Control",
+      value: "public, max-age=86400, stale-while-revalidate=604800",
+    };
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      { source: "/brand/:path*", headers: [assetCache] },
+      { source: "/images/:path*", headers: [assetCache] },
+    ];
   },
 };
 

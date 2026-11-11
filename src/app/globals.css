@@ -5,6 +5,15 @@
 @import "./themes.css";
 /* the tactile layer: button physics, card tilt, reveals, parallax, ticker (read only the tokens above) */
 @import "./motion.css";
+/* the route transition curtain ("The Aperture"): obsidian halves in the top layer, driven by the Web Animations API */
+@import "./route-transition.css";
+/* the account area: a dark band + dark accents on the light pages */
+@import "./account.css";
+/* the product page: the scent section, the Discovery Set band, the sticky buy bar */
+@import "./pdp.css";
+
+/* the hero (explorable picture, headline on its wall) and the launch pass */
+@import "./hero.css";
 
 /* ==========================================================================
    THE RARESKIN — design tokens
@@ -17,7 +26,7 @@
   --color-w0: #fafaf7;
   --color-w1: #efeeea;
   --color-w2: #cfcdc6;
-  --color-w4: #2c2a26;
+  --color-w4: #100e0c;
 
   /* surfaces + ink */
   --color-bg: #f2f1ed;
@@ -29,7 +38,7 @@
   --color-ink-3: #6c6960;
   --color-line: #dedcd5;
   --color-line-2: #cfcdc6;
-  --color-cta: #17140f;
+  --color-cta: #100e0c;
   --color-cta-hover: #000000;
 
   /* per-fragrance accents (index dots, focus rings, spec bars) */
@@ -41,7 +50,7 @@
   --color-gilt: #d89a4d;
 
   /* footer: obsidian block over a champagne band, with one brass accent */
-  --color-onyx: #0a0a0a;
+  --color-onyx: #100e0c;
   --color-champagne: #f5f2eb;
   --color-brass: #c5a880;
 
@@ -250,11 +259,6 @@
     background-image: var(--tri);
   }
 
-  /* route transition — parked from first paint; GSAP drives it via inline style */
-  .route-curtain {
-    opacity: 0;
-    visibility: hidden;
-  }
   /* gentle fade-up on the phone → code step change. Failure-safe: no fill mode,
      so the element always rests at its natural (visible) state — the keyframe
      only adds movement while it plays. */

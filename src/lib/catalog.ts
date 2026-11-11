@@ -31,7 +31,7 @@ export function isFragranceSlug(value: string): value is FragranceSlug {
   return (FRAGRANCE_SLUGS as readonly string[]).includes(value);
 }
 
-/** Paise-free INR the way the brand writes it: `₹799`, `₹1,199`. */
+/** Paise-free INR the way the brand writes it: `₹799`, `₹1,499`. */
 export function formatINR(rupees: number): string {
   return `₹${rupees.toLocaleString("en-IN")}`;
 }
@@ -193,21 +193,21 @@ export const FRAGRANCE_PALETTE: Record<
   { name: string; juice: string; ink: string; accent: string; volumeMl: number }
 > = {
   aurevan: {
-    name: "AURÉVAN",
+    name: "AUREVAN",
     juice: "#e0d7bf",
     ink: "#2b271f",
     accent: "var(--color-aurevan)",
     volumeMl: 50,
   },
   orvelis: {
-    name: "ORVÉLIS",
+    name: "ORVELIS",
     juice: "#c5872f",
     ink: "#2a2012",
     accent: "var(--color-orvelis)",
     volumeMl: 50,
   },
   vayren: {
-    name: "VAYRÉN",
+    name: "VAYREN",
     juice: "#3d2712",
     ink: "#ecdcc3",
     accent: "var(--color-vayren)",

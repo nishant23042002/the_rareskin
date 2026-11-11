@@ -22,6 +22,13 @@ export const SITE = {
   legalName: "Velocity Ventures Group",
 } as const;
 
+/**
+ * The wordmark as the screen paints it (`<Logo>`, a CSS mask): a 640 px lossless WebP derived from
+ * `public/brand/rareskin-wordmark.png` by `scripts/brand-assets/make_brand_assets.py`. The 1487 px
+ * PNG stays for the invoice, the emails and the share cards, which draw rasters at full size.
+ */
+export const WORDMARK_WEB_SRC = "/brand/rareskin-wordmark-web.webp";
+
 /** Real support + registered contact details. */
 export const CONTACT = {
   email: "therareskinsupport@velocityventuresgroup.in",

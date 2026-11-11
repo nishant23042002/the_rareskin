@@ -116,7 +116,7 @@ export async function openRazorpayCheckout(
       description: input.reference,
       prefill: input.prefill,
       notes: { reference: input.reference },
-      theme: { color: "#17140f" },
+      theme: { color: "#100e0c" },
       handler: (payload) => {
         // Only a complete, matching payload is even worth sending for
         // verification; anything else is treated as a failed attempt.

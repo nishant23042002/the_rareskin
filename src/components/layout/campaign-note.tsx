@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
-import { Mark } from "@/components/ui/mark";
 import { Icon } from "@/components/ui/icon";
 import { Flacon } from "@/components/ui/flacon";
 import { useCardConcept } from "@/components/home/card-concept";
@@ -120,6 +119,7 @@ export function CampaignNote({
 
   return (
     <div
+      data-campaign-note
       className={cn(
         "pointer-events-none fixed left-4 z-30 flex max-w-[min(340px,calc(100vw-2rem))] flex-col items-start gap-2 transition-[bottom] duration-300 sm:left-6",
         barUp ? "bottom-[84px]" : "bottom-4",
@@ -203,9 +203,7 @@ export function CampaignNote({
                         <span className="absolute inset-0 grid place-items-center">
                           {p.fragrance && isFragranceSlug(p.fragrance) ? (
                             <Flacon fragrance={p.fragrance} className="w-7" />
-                          ) : (
-                            <Mark className="w-4 text-ink-3" />
-                          )}
+                          ) : null}
                         </span>
                       )}
                       <span className="rh-offer__veil" aria-hidden="true" />
@@ -252,7 +250,7 @@ export function CampaignNote({
         className="campaign-pill pointer-events-auto group inline-flex items-center gap-2.5 rounded-full border border-line bg-surface py-2 pr-3.5 pl-2.5 text-left shadow-[0_10px_28px_-18px_rgba(35,33,32,0.5)]"
       >
         <span className="grid size-6 place-items-center rounded-full bg-w4 text-w0">
-          <Mark className="w-[11px]" strokeWidth={1.6} />
+          <Icon name="tag" className="size-[11px]" />
         </span>
         <span className="min-w-0">
           <span className="block truncate text-[11px] tracking-[0.04em] text-ink">

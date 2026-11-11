@@ -25,7 +25,7 @@ export const mockBase: OrderEmailBase = {
   customerName: "Aditi",
   items: [
     {
-      name: "AURÉVAN",
+      name: "AUREVAN",
       slug: "aurevan",
       concentration: "Extrait de Parfum · 50 ml",
       noteLine: "Citrus, bergamot, white florals",
@@ -75,7 +75,7 @@ export const mockReviewRequest: ReviewRequestProps = {
   deliveredAt: "1 Sep 2026, 2:14 pm",
   items: [
     {
-      name: "AURÉVAN",
+      name: "AUREVAN",
       slug: "aurevan",
       image: "https://www.therareskin.com/images/pdp/aurevan/item-thumb.jpg",
     },

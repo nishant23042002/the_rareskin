@@ -10,15 +10,15 @@
     "flacon": "50 ml heavy-base rectangular clear glass, thick solid base; solid cylindrical matte-black grained cap on a polished silver collar",
     "label": "straight-edged white matte label: THE RARESKIN® / NAME / ESSENTIALS | 50ml (approved art: design-explorations/packaging-renders/shot0x-<sku>/sources/approved_label_hero.png)",
     "liquid": "crystal-clear colourless (founder-frozen; the brief's champagne-to-amber liquid was NOT adopted)",
-    "spelling": "labels print AUREVAN / ORVÉLIS / VAYRÉN exactly as on the approved art; storefront copy and alt text use the catalogue names AURÉVAN, ORVÉLIS, VAYRÉN",
+    "spelling": "labels print AUREVAN / ORVELIS / VAYREN exactly as on the approved art; storefront copy and alt text use the catalogue names AUREVAN, ORVELIS, VAYREN",
     "briefDeviations": [
       "label text: the brief's 'EXTRAIT DE PARFUM · 50 ML / 1.7 FL. OZ.' is not used (approved mockups)",
       "liquid: crystal-clear, not champagne/amber/cognac",
       "cap: matte black grained, not a magnetic brushed-gunmetal cap",
       "the brief's '30%+ extrait' is not printed anywhere (the site deliberately states no concentration numbers; see why-extrait.tsx)",
-      "note props follow the catalogue (AURÉVAN: citrus, bergamot / white florals / musk, cedar; ORVÉLIS: spices / amber, woods / vanilla, patchouli; VAYRÉN: spices / leather, oud / smoke, amber)"
+      "note props follow the catalogue (AUREVAN: citrus, bergamot / white florals / musk, cedar; ORVELIS: spices / amber, woods / vanilla, patchouli; VAYREN: spices / leather, oud / smoke, amber)"
     ],
-    "photography": "commercial still life, 100 mm macro, f/8-f/11, directional window light with soft diffusion, real materials, no CGI gloss, no HDR halos, no teal-and-orange grade; 5000 K morning (AURÉVAN), 3400 K golden hour (ORVÉLIS), one low amber blade of light (VAYRÉN)"
+    "photography": "commercial still life, 100 mm macro, f/8-f/11, directional window light with soft diffusion, real materials, no CGI gloss, no HDR halos, no teal-and-orange grade; 5000 K morning (AUREVAN), 3400 K golden hour (ORVELIS), one low amber blade of light (VAYREN)"
   },
   "assets": [
     {
@@ -51,13 +51,13 @@
         "desktop": "72% 50%",
         "mobile": "50% 50%"
       },
-      "alt": "The three THE RARESKIN extraits, AURÉVAN, ORVÉLIS and VAYRÉN, standing side by side on stepped honed travertine pedestals in soft directional light.",
+      "alt": "The three THE RARESKIN extraits, AUREVAN, ORVELIS and VAYREN, standing side by side on stepped honed travertine pedestals in soft directional light.",
       "placeholderTone": [
         "#d9cfba",
         "#6f5a3f"
       ],
       "layoutNote": "The approved hero is a split (text panel + picture half), so the picture box is about square at >=1280px (it shows ~54% of the 16:9 frame's width) and 4:5-ish to landscape below. The three flacons stand on a low-middle-tall staircase of travertine pedestals spanning x 35-91% of the 16:9 frame, and the left 35% is empty wall (title space for a full-bleed layout). At >=1280px the box shows the part of the frame at object-position 72% 50% (about x 33-87%, which leaves ~50px of wall either side of the outer flacons at 1440x900); wider boxes show more wall at the left. Below 1280px the separate native 4:5 plate is used (three pedestals centred, tops in the central 62% vertically). The picture's focal point comes from this file (CSS custom properties --op-d / --op-m set by hero-media.tsx).",
-      "creativeDirection": "Sculptural lineup of all three flacons on stepped honed travertine pedestals (low, middle, high: AURÉVAN left, VAYRÉN centre-high, ORVÉLIS right), diffuse 45-degree directional light from upper left, warm limewashed wall, one soft shadow bar; calm, monolithic, quiet luxury.",
+      "creativeDirection": "Sculptural lineup of all three flacons on stepped honed travertine pedestals (low, middle, high: AUREVAN left, VAYREN centre-high, ORVELIS right), diffuse 45-degree directional light from upper left, warm limewashed wall, one soft shadow bar; calm, monolithic, quiet luxury.",
       "materials": [
         "honed travertine (cream, fine banding)",
         "limewashed plaster wall",
@@ -70,7 +70,7 @@
       "generation": {
         "desktop": "Kling plate Aagk1btE4ZuECAmxHMiv6zZvFDRrcche5ljpFTbbv2oOOSJktzoZQ9vHC37uMCzaS2fmXbtj (2720x1536, trimmed to 2524x1420 above the generator logo)",
         "mobile": "Kling plate AdausPJYBhUbAxUcEokF3mw4zlWZNNntaG2rh73wshdUtdSyFoJ5EJ9dEz8AAKISIwDz_Atg (1760x2368, 4:5 crop)",
-        "composite": "approved flacons AURÉVAN / VAYRÉN / ORVÉLIS at scale 0.42 (desktop) and 0.50 (mobile) via design-explorations/packaging-renders/homepage/build_all.py",
+        "composite": "approved flacons AUREVAN / VAYREN / ORVELIS at scale 0.42 (desktop) and 0.50 (mobile) via design-explorations/packaging-renders/homepage/build_all.py",
         "credits": 4
       },
       "sizesNote": "The 16:9 picture is cropped by an almost square box, so object-fit: cover scales it to box-height x 16/9 (about 1300px at 1440x900): `sizes` must describe that SCALED width (max(50vw, 146vh), capped at 1460px = the largest box), not the 50vw the box occupies; with 50vw the browser fetched a 720px file and stretched it."
@@ -107,16 +107,16 @@
           "media": "(max-width: 1279px)"
         }
       ],
-      "alt": "The three extraits, AURÉVAN, ORVÉLIS and VAYRÉN, standing side by side on a pale limestone floor in front of a plaster wall, a bar of morning sun falling diagonally across the wall behind them.",
+      "alt": "The three extraits, AUREVAN, ORVELIS and VAYREN, standing side by side on a pale limestone floor in front of a plaster wall, a bar of morning sun falling diagonally across the wall behind them.",
       "placeholderTone": [
         "#e6e0d3",
         "#b9ae98"
       ],
       "layoutNote": "Same box as the baseline hero (see the `hero` entry). Desktop: the box shows ~54% of the 16:9 frame; objectPosition 75% 50% centres the trio (frame x 39-84%) in it. Mobile: a 4:5 crop (1140 x 1425) shown as a landscape band; objectPosition 50% 80% keeps the bottle bases at ~76% of the band (at 375 wide: bases at 228 of 301 px, ticket from 255), above the LAUNCH OFFER ticket (it covers the bottom 15%). Bottom 18% (desktop 6% ticket overlap) is plain stone with a soft shadow band.",
-      "creativeDirection": "The trio stands directly on a honed pale limestone floor in early-morning light, ORVÉLIS a step further back between AURÉVAN and VAYRÉN. No pedestal, no stand. The plate's own bergamot half stays at the far left of the 16:9 plate, outside the hero box; the generator's cinnamon + jasmine cluster was cloned out so it does not show through the clear glass.",
+      "creativeDirection": "The trio stands directly on a honed pale limestone floor in early-morning light, ORVELIS a step further back between AUREVAN and VAYREN. No pedestal, no stand. The plate's own bergamot half stays at the far left of the 16:9 plate, outside the hero box; the generator's cinnamon + jasmine cluster was cloned out so it does not show through the clear glass.",
       "promptRef": "public/images/hero-manifest.json (grounded_stone)",
       "claimsToVerify": [
-        "the label reads AUREVAN (no accent) on the AURÉVAN flacon: approved art, spelling decision still open",
+        "the label reads AUREVAN (no accent) on the AUREVAN flacon: approved art, spelling decision still open",
         "the label stays ESSENTIALS | 50ml and the liquid crystal clear (approved mockups), not the brief's EXTRAIT DE PARFUM label / amber liquids",
         "no ingredient is visible in the hero box on desktop or mobile (the bergamot half sits outside the window): the alt text must not mention one",
         "the picture is a daylight scene lit from the right; the sun bar on the wall is a plate feature, not a claim about a place or time"
@@ -124,7 +124,7 @@
       "generation": {
         "desktop": "Kling plate AbQXruDfTRo0_IJcYAQ5phBx2RwUr6Ha-cek2bRNGADqcoWnTSdc158ZR3LYnJvNuiCjkAUc (2720x1536, 16:9), cropped to x 93-2626 / y 0-1425 (above the generator logo and a dark slab edge) = 2524x1420",
         "mobile": "NOT a separate plate: a 4:5 crop (x 1081-2221, y 0-1425, 1140x1425) of the same desktop plate, composited with its own bottle spacing. The 3:4 mobile plate ATUlBPc_m8NnxLZAIK36gNquBoJDYhqJUoGhbauhiBWn2BQfj3hYLxbGl98ReDcxfj0h-WU1 (2 credits) was rejected: a mosaic of tile seams with a vertical joint through the centre bottle's position",
-        "composite": "approved flacons at scale 0.47 (ORVÉLIS, base y 1040) and 0.50 (AURÉVAN, VAYRÉN, base y 1100) on the desktop plate; 0.43 / 0.46 for the mobile crop; light from the right, cast shadows fall left; design-explorations/packaging-renders/homepage/hero_build.py (gs_desktop, gs_mobile)",
+        "composite": "approved flacons at scale 0.47 (ORVELIS, base y 1040) and 0.50 (AUREVAN, VAYREN, base y 1100) on the desktop plate; 0.43 / 0.46 for the mobile crop; light from the right, cast shadows fall left; design-explorations/packaging-renders/homepage/hero_build.py (gs_desktop, gs_mobile)",
         "retouch": "generator cinnamon + petals replaced by a clone of the clean floor 600 px to the left (same rows, feathered)",
         "credits": 4
       },
@@ -173,24 +173,24 @@
           "media": "(max-width: 1279px)"
         }
       ],
-      "alt": "The three extraits, AURÉVAN, ORVÉLIS and VAYRÉN, standing side by side on a pale plaster floor, window light throwing long bars of shadow across the wall behind them.",
+      "alt": "The three extraits, AUREVAN, ORVELIS and VAYREN, standing side by side on a pale plaster floor, window light throwing long bars of shadow across the wall behind them.",
       "placeholderTone": [
         "#f1eee6",
         "#dcd6c8"
       ],
       "layoutNote": "Same box as the baseline hero (see the `hero` entry). Desktop: the box shows ~54% of the 16:9 frame; objectPosition 75% 50% centres the trio (frame x 39-84%). The window frame at the plate's left edge (frame x 0-5%) stays out of the box. Mobile: 1229 x 1536 (4:5) shown as a landscape band; objectPosition 50% 90% keeps the bases at ~76% of the band (at 375 wide: 229 of 301 px), above the LAUNCH OFFER ticket. The plate's bottom ~17% is a calm deep-grey shadow band.",
-      "creativeDirection": "The trio stands on a pale plaster floor in a high-key room: a tall window out of frame on the left throws bars of light and shadow across the wall and the floor (shadows fall right). ORVÉLIS a step further back. No pedestal, no stand, no ingredients.",
+      "creativeDirection": "The trio stands on a pale plaster floor in a high-key room: a tall window out of frame on the left throws bars of light and shadow across the wall and the floor (shadows fall right). ORVELIS a step further back. No pedestal, no stand, no ingredients.",
       "promptRef": "public/images/hero-manifest.json (chiaroscuro_studio)",
       "claimsToVerify": [
-        "the label reads AUREVAN (no accent) on the AURÉVAN flacon: approved art, spelling decision still open",
+        "the label reads AUREVAN (no accent) on the AUREVAN flacon: approved art, spelling decision still open",
         "the label stays ESSENTIALS | 50ml and the liquid crystal clear (approved mockups), not the brief's EXTRAIT DE PARFUM label / amber liquids",
         "the window at the left of the plate is not visible in the hero box on desktop; the alt text does not mention one"
       ],
       "generation": {
         "desktop": "Kling plate AVhYbQTywCGMmH6tIAniRP5WUBR-uiVUi3LAfmKPVUW2lRsk7vnR2VuJbx8LrF8e5xncD6k9 (2720x1536, 16:9), cropped to x 93-2626 / y 0-1425 (above the generator logo) = 2524x1420",
         "mobile": "NOT a separate plate: a 4:5 crop (x 1020-2249, y 0-1536, 1229x1536) of the same desktop plate, composited with its own bottle spacing (the crop stays left of the generator logo, which sits at x 2280-2660)",
-        "composite": "approved flacons at scale 0.47 (ORVÉLIS, a step further back) and 0.50 (AURÉVAN, VAYRÉN) on the desktop plate, trio at plate x 1245 / 1651 / 2056; 0.43 / 0.46 for the mobile crop; design-explorations/packaging-renders/homepage/hero_build.py (cs_desktop, cs_mobile)",
-        "retouch": "none (the plate had no props); wall/floor line at y 1133, bases at y 1190 (ORVÉLIS) and 1240 (AURÉVAN, VAYRÉN) inside the lit strip that ends at y ~1300",
+        "composite": "approved flacons at scale 0.47 (ORVELIS, a step further back) and 0.50 (AUREVAN, VAYREN) on the desktop plate, trio at plate x 1245 / 1651 / 2056; 0.43 / 0.46 for the mobile crop; design-explorations/packaging-renders/homepage/hero_build.py (cs_desktop, cs_mobile)",
+        "retouch": "none (the plate had no props); wall/floor line at y 1133, bases at y 1190 (ORVELIS) and 1240 (AUREVAN, VAYREN) inside the lit strip that ends at y ~1300",
         "credits": 2
       },
       "panel": {
@@ -238,16 +238,16 @@
           "media": "(max-width: 1279px)"
         }
       ],
-      "alt": "The three extraits, AURÉVAN, ORVÉLIS and VAYRÉN, standing in a low bed of white marble dust, ground spice and black volcanic sand in front of a terracotta wall lit from the right.",
+      "alt": "The three extraits, AUREVAN, ORVELIS and VAYREN, standing in a low bed of white marble dust, ground spice and black volcanic sand in front of a terracotta wall lit from the right.",
       "placeholderTone": [
         "#d9cdb4",
         "#4a3a2b"
       ],
-      "layoutNote": "Same box as the baseline hero (see the `hero` entry). Desktop: the box shows ~54% of the 16:9 frame; objectPosition 75% 50% centres the trio (frame x 39-84%): AURÉVAN and ORVÉLIS stand on the spice, VAYRÉN on the edge of the black sand; the pale marble dust is out of the box at 1440 and shows at the left on wide screens. Mobile: 1229 x 1536 (4:5) shown as a landscape band; objectPosition 50% 85% keeps the bases clear of the LAUNCH OFFER ticket.",
+      "layoutNote": "Same box as the baseline hero (see the `hero` entry). Desktop: the box shows ~54% of the 16:9 frame; objectPosition 75% 50% centres the trio (frame x 39-84%): AUREVAN and ORVELIS stand on the spice, VAYREN on the edge of the black sand; the pale marble dust is out of the box at 1440 and shows at the left on wide screens. Mobile: 1229 x 1536 (4:5) shown as a landscape band; objectPosition 50% 85% keeps the bases clear of the LAUNCH OFFER ticket.",
       "creativeDirection": "The trio low in a bed of grains that runs from pale marble dust through ground spice to black volcanic sand, the foot of each flacon sunk a little into the grains, in front of a terracotta wall with sun from the right. The plate's own jasmine (far left) and oud slivers (far right) stay outside the hero box.",
       "promptRef": "public/images/hero-manifest.json (mineral_bed)",
       "claimsToVerify": [
-        "the label reads AUREVAN (no accent) on the AURÉVAN flacon: approved art, spelling decision still open",
+        "the label reads AUREVAN (no accent) on the AUREVAN flacon: approved art, spelling decision still open",
         "the label stays ESSENTIALS | 50ml and the liquid crystal clear (approved mockups), not the brief's EXTRAIT DE PARFUM label / amber liquids",
         "the wall is terracotta red-brown, not the brief's umber: check it against the brand palette",
         "no ingredient is visible in the hero box (jasmine at frame x 0-3%, oud at x 97-100%): the alt text must not mention one"
@@ -255,8 +255,8 @@
       "generation": {
         "desktop": "Kling plate AZiHOMqcIHHmxH9XvBHZcChiFaYQpAseTf3GtTkQGpI94Hqr0EqIcHiH_mriHHnrAzTUHAQq (2720x1536, 16:9, second roll), cropped to x 93-2626 / y 0-1425 = 2524x1420. First roll AQ2FKp_f... discarded: three stone stools in the middle, tray slabs at the sides, a raked Zen pattern",
         "mobile": "NOT a separate plate: a 4:5 crop (x 1020-2249, y 0-1536, 1229x1536) of the same desktop plate, composited with its own bottle spacing (the crop stays left of the generator logo, which sits at x 2280-2660)",
-        "composite": "approved flacons at scale 0.47 (ORVÉLIS, a step further back) and 0.50 (AURÉVAN, VAYRÉN) on the desktop plate, trio at plate x 1245 / 1651 / 2056; 0.43 / 0.46 for the mobile crop; design-explorations/packaging-renders/homepage/hero_build.py (ms_desktop, ms_mobile)",
-        "retouch": "feet sunk into the grains with embed_foot (26 px pile); glass: posk .6 / negk .9 / rim .35 with the plate softened behind it at sigma 4 / mix .4 (the dark glass set and sigma 7 / mix .85 made the glass read smoky on this coarse bed); wall/floor line at y 850, bases at y 1140 (ORVÉLIS) and 1170",
+        "composite": "approved flacons at scale 0.47 (ORVELIS, a step further back) and 0.50 (AUREVAN, VAYREN) on the desktop plate, trio at plate x 1245 / 1651 / 2056; 0.43 / 0.46 for the mobile crop; design-explorations/packaging-renders/homepage/hero_build.py (ms_desktop, ms_mobile)",
+        "retouch": "feet sunk into the grains with embed_foot (26 px pile); glass: posk .6 / negk .9 / rim .35 with the plate softened behind it at sigma 4 / mix .4 (the dark glass set and sigma 7 / mix .85 made the glass read smoky on this coarse bed); wall/floor line at y 850, bases at y 1140 (ORVELIS) and 1170",
         "credits": 4
       },
       "panel": {
@@ -304,16 +304,16 @@
           "media": "(max-width: 1279px)"
         }
       ],
-      "alt": "The three extraits, AURÉVAN, ORVÉLIS and VAYRÉN, standing in a row on a pale stone ledge at the edge of still turquoise water, sunlight glittering on the shallow water behind them.",
+      "alt": "The three extraits, AUREVAN, ORVELIS and VAYREN, standing in a row on a pale stone ledge at the edge of still turquoise water, sunlight glittering on the shallow water behind them.",
       "placeholderTone": [
         "#cfe0dc",
         "#8fb0ab"
       ],
       "layoutNote": "Same box as the baseline hero (see the `hero` entry). Desktop: the box shows ~54% of the 16:9 frame; objectPosition 75% 50% centres the trio (frame x 39-84%). Mobile: 1229 x 1536 (4:5) shown as a landscape band; objectPosition 50% 45% frames the bottles (top ~42 px, bases ~213 px of 301) with the ledge edge and turquoise water under them, behind the LAUNCH OFFER ticket.",
-      "creativeDirection": "The trio stands on a pale stone ledge between shallow, sun-glittering water behind and still turquoise water in front, in front of a plain plaster wall. ORVÉLIS a step further back. The plate's jasmine (far left) stays outside the hero box; a thin bergamot-zest curl can show at the far right on wide screens.",
+      "creativeDirection": "The trio stands on a pale stone ledge between shallow, sun-glittering water behind and still turquoise water in front, in front of a plain plaster wall. ORVELIS a step further back. The plate's jasmine (far left) stays outside the hero box; a thin bergamot-zest curl can show at the far right on wide screens.",
       "promptRef": "public/images/hero-manifest.json (liquid_caustics)",
       "claimsToVerify": [
-        "the label reads AUREVAN (no accent) on the AURÉVAN flacon: approved art, spelling decision still open",
+        "the label reads AUREVAN (no accent) on the AUREVAN flacon: approved art, spelling decision still open",
         "the label stays ESSENTIALS | 50ml and the liquid crystal clear (approved mockups), not the brief's EXTRAIT DE PARFUM label / amber liquids",
         "the bottles do not stand IN the water (they stand on the ledge) and have no reflection: the picture does not claim otherwise",
         "a thin zest curl at frame x 87-100% shows in the right margin of boxes wider than ~65% of the frame (1920 px screens); the alt text does not mention it"
@@ -321,8 +321,8 @@
       "generation": {
         "desktop": "Kling plate Abe4NtvrEqDk_XmD4LPpHAaQqdUxRIlVLYb0CALdu_oU2PLNhiNI8yb0Q80JmM82RaIrEjL6 (2720x1536, 16:9, second roll), cropped to x 93-2626 / y 0-1425 = 2524x1420. First roll AemlxKLN... discarded: three men standing at the back and a tiled pool deck",
         "mobile": "NOT a separate plate: a 4:5 crop (x 1020-2249, y 0-1536, 1229x1536) of the same desktop plate, composited with its own bottle spacing (the crop stays left of the generator logo, which sits at x 2280-2660)",
-        "composite": "approved flacons at scale 0.47 (ORVÉLIS, a step further back) and 0.50 (AURÉVAN, VAYRÉN) on the desktop plate, trio at plate x 1245 / 1651 / 2056; 0.43 / 0.46 for the mobile crop; design-explorations/packaging-renders/homepage/hero_build.py (lq_desktop, lq_mobile)",
-        "retouch": "none; bases at y 895 (ORVÉLIS) and 945 on the ledge (top surface y 830-975), no reflection (the ledge is stone); the plate is softened behind the glass; the generator's glitter shows as bokeh through the glass",
+        "composite": "approved flacons at scale 0.47 (ORVELIS, a step further back) and 0.50 (AUREVAN, VAYREN) on the desktop plate, trio at plate x 1245 / 1651 / 2056; 0.43 / 0.46 for the mobile crop; design-explorations/packaging-renders/homepage/hero_build.py (lq_desktop, lq_mobile)",
+        "retouch": "none; bases at y 895 (ORVELIS) and 945 on the ledge (top surface y 830-975), no reflection (the ledge is stone); the plate is softened behind the glass; the generator's glitter shows as bokeh through the glass",
         "credits": 4
       },
       "panel": {
@@ -370,24 +370,24 @@
           "media": "(max-width: 1279px)"
         }
       ],
-      "alt": "A manicured hand lifts the black cap off the centre extrait, VAYRÉN, pinching it between thumb and finger above its black spray nozzle, between AURÉVAN and ORVÉLIS on a white studio floor.",
+      "alt": "A manicured hand lifts the black cap off the centre extrait, VAYREN, pinching it between thumb and finger above its black spray nozzle, between AUREVAN and ORVELIS on a white studio floor.",
       "placeholderTone": [
         "#f3f2ef",
         "#d6d5d1"
       ],
       "layoutNote": "Same box as the baseline hero (see the `hero` entry). Desktop: objectPosition 75% 50% (window 33-87%); the hand and cap sit over frame x 45-70%. Mobile: 4:5 crop, objectPosition 50% 76% keeps the bases at ~78% of the band (above the LAUNCH OFFER ticket) and the hand, cap and nozzle inside it; the forearm leaves through the band's top.",
-      "creativeDirection": "Three flacons aligned in a row on a seamless white reflective studio surface. A clean, manicured hand lifts the matte black cap off the centre flacon (VAYRÉN), revealing the black spray nozzle.",
+      "creativeDirection": "Three flacons aligned in a row on a seamless white reflective studio surface. A clean, manicured hand lifts the matte black cap off the centre flacon (VAYREN), revealing the black spray nozzle.",
       "promptRef": "public/images/hero-manifest.json (referenceVariants: variant_1_uncapping)",
       "claimsToVerify": [
         "the label reads ESSENTIALS | 50ml and the liquid is crystal clear (approved mockups): the brief's EXTRAIT DE PARFUM label and tinted liquids are NOT adopted (decision of 2026-11-06); AUREVAN is spelt without the accent on the approved art (open decision)",
         "the atomizer nozzle is drawn (the approved art has none: it is inside the cap): check it against a real unit",
         "the hand is generated; the cap it holds is the approved cap pixels (not the generated one)",
-        "the brief's order AURÉVAN | VAYRÉN | ORVÉLIS is used here, the other pictures use AURÉVAN | ORVÉLIS | VAYRÉN"
+        "the brief's order AUREVAN | VAYREN | ORVELIS is used here, the other pictures use AUREVAN | ORVELIS | VAYREN"
       ],
       "generation": {
         "desktop": "Kling plate AT0au7bsLorkX04sLXheooz6eDh_vqr93zZ1etcPda2w7e8yUDBju3F7pFjn-2hXGFvFJf9s (2720x1536, roll E of 6, 2026-11-07): ONLY the hand and forearm are used (cut out by skin chroma R-B). Earlier plates were discarded: the first (AXn8gCa1...) pinched a tiny cap from above over a light-box table, so the fingers read as claws once the approved cap was put between them; roll A (a good pinch but cut at the knuckles by the plate's top edge, so the arm ended mid-frame), roll C (a tube lying on a table), roll D (a forearm and a hand closing over a cylinder 4x too big for the hand: scaled to the cap the hand looked child-sized). Roll B/F unused",
         "mobile": "NOT a separate plate: the same hand, scaled to the smaller phone flacons (0.39) for a 4:5 crop (x 1020-2249, y 0-1536), so the band shows the whole hand above the cap",
-        "composite": "hero_hand.py (v1_desktop, v1_mobile): procedural white studio sweep; flacons at 0.49 (desktop) / 0.39 (mobile), AURÉVAN | VAYRÉN (centre, uncapped: the approved art minus its cap, a drawn nozzle) | ORVÉLIS; the approved VAYRÉN cap (trimmed at the collar line so no collar teeth show under it) hovers above the nozzle. The hand grips a small 110 px cylinder in the plate; it is scaled 1.25 x (1.0 x on the phone) so its thumb pad and index fingertip meet the approved cap's sides, its pinch point sits on the cap's centre, and it is laid OVER the cap",
+        "composite": "hero_hand.py (v1_desktop, v1_mobile): procedural white studio sweep; flacons at 0.49 (desktop) / 0.39 (mobile), AUREVAN | VAYREN (centre, uncapped: the approved art minus its cap, a drawn nozzle) | ORVELIS; the approved VAYREN cap (trimmed at the collar line so no collar teeth show under it) hovers above the nozzle. The hand grips a small 110 px cylinder in the plate; it is scaled 1.25 x (1.0 x on the phone) so its thumb pad and index fingertip meet the approved cap's sides, its pinch point sits on the cap's centre, and it is laid OVER the cap",
         "retouch": "the matte is the skin chroma with speckle holes closed, the edge pulled in 1 px and thin structures near the pinch removed; grain removed with a median over the hand's box; graded (gamma 0.92, slightly warmer); a faint soft shadow. The forearm comes from the plate's top edge and leaves the frame by itself at this size",
         "credits": 12
       },
@@ -436,7 +436,7 @@
           "media": "(max-width: 1279px)"
         }
       ],
-      "alt": "A fingertip touches the black spray nozzle of the right-hand extrait, VAYRÉN, its black cap standing on the white floor beside it, next to AURÉVAN and ORVÉLIS.",
+      "alt": "A fingertip touches the black spray nozzle of the right-hand extrait, VAYREN, its black cap standing on the white floor beside it, next to AUREVAN and ORVELIS.",
       "placeholderTone": [
         "#f3f2ef",
         "#d6d5d1"
@@ -453,7 +453,7 @@
       "generation": {
         "desktop": "Kling plate AZT1PUsCkAJf3_xU3ICSqng3-z_tIFjn5XLh_Wde_QaroqN-zohRalH0ahP-uFawBhFp7BoJ (2720x1536, 16:9, first roll): ONLY the hand and finger are used (cut out by skin chroma R-B)",
         "mobile": "NOT a separate plate: a 4:5 crop (1229x1536) of the same plate, composited with its own bottle spacing",
-        "composite": "hero_hand.py (v2_desktop, v2_mobile): procedural white studio sweep; AURÉVAN | ORVÉLIS | VAYRÉN (right, uncapped, scale 0.46 desktop / 0.40 mobile); the approved VAYRÉN cap upright on the floor beside it with its own contact shadow and reflection; the generated fingertip lands on the nozzle's top",
+        "composite": "hero_hand.py (v2_desktop, v2_mobile): procedural white studio sweep; AUREVAN | ORVELIS | VAYREN (right, uncapped, scale 0.46 desktop / 0.40 mobile); the approved VAYREN cap upright on the floor beside it with its own contact shadow and reflection; the generated fingertip lands on the nozzle's top",
         "retouch": "the hand is graded (gamma 0.72, warmer) and given a faint soft shadow; the finger's own floor reflection is left out of the matte",
         "credits": 2
       },
@@ -502,7 +502,7 @@
           "media": "(max-width: 1279px)"
         }
       ],
-      "alt": "The three extraits, AURÉVAN, ORVÉLIS and VAYRÉN, each on its own matte white cylindrical plinth of a different height, in soft studio light against a pale grey-white wall.",
+      "alt": "The three extraits, AUREVAN, ORVELIS and VAYREN, each on its own matte white cylindrical plinth of a different height, in soft studio light against a pale grey-white wall.",
       "placeholderTone": [
         "#efeeec",
         "#d3d2d0"
@@ -518,7 +518,7 @@
       "generation": {
         "desktop": "Kling plate AVB3GkaXBvlPRm2Lz1v6l422M55RYN6ixcCWfLkhaIPfzPdTRS9ynXXGJx7RrY7N5Lnkxz6W (2720x1536, 16:9, first roll), cropped to x 93-2626 / y 0-1425 = 2524x1420 (desktop); mobile x 1360-2589 / y 0-1536",
         "mobile": "NOT a separate plate: a 4:5 crop (1229x1536) of the same plate, composited with its own bottle spacing",
-        "composite": "hero_build.py (v3_desktop, v3_mobile): flacons at scale 0.30 (AURÉVAN, left, medium cylinder), 0.31 (ORVÉLIS, middle, low cylinder), 0.28 (VAYRÉN, right, tall cylinder), centred on the MEASURED top faces: left x 1640 / back edge y 587 / front edge y 647.5, middle x 1975 / 769 / 844.5, right x 2285 / 367 / 404; base_y = face centre + half the footprint depth seen from here. Mobile scale x 0.86",
+        "composite": "hero_build.py (v3_desktop, v3_mobile): flacons at scale 0.30 (AUREVAN, left, medium cylinder), 0.31 (ORVELIS, middle, low cylinder), 0.28 (VAYREN, right, tall cylinder), centred on the MEASURED top faces: left x 1640 / back edge y 587 / front edge y 647.5, middle x 1975 / 769 / 844.5, right x 2285 / 367 / 404; base_y = face centre + half the footprint depth seen from here. Mobile scale x 0.86",
         "retouch": "the generator logo filled out of the plate; a thin contact line under each base sized to the small flacon. 2026-11-07 fix: the first version put each base at (guessed centre + 14 px), 8-19 px toward the front lip, so the flacons looked pushed to the front edge of their cylinder",
         "credits": 2
       },
@@ -567,7 +567,7 @@
           "media": "(max-width: 1279px)"
         }
       ],
-      "alt": "The three extraits, AURÉVAN, ORVÉLIS and VAYRÉN, each on its own block of three off-white geometric steps in bright daylight, a halved green citrus fruit and a vanilla bean on the floor at the foot of the steps.",
+      "alt": "The three extraits, AUREVAN, ORVELIS and VAYREN, each on its own block of three off-white geometric steps in bright daylight, a halved green citrus fruit and a vanilla bean on the floor at the foot of the steps.",
       "placeholderTone": [
         "#f1eee7",
         "#d6d1c6"
@@ -585,7 +585,7 @@
       "generation": {
         "desktop": "Kling plate AV3i3zpaAWhLHMGlwL-Hs1bWTHCBnV3WTKtAuFQpQea3vIuhm1SguKf8dWZwSCwAc8L84mzW (2720x1536, roll B of 2, 2026-11-07), cropped to x 93-2626 / y 0-1425 = 2524x1420 (desktop). It replaces the first plate ASLXkfm4...: tall steps and a moulded wall with a fluted pilaster, which a landscape phone band could not hold with all three flacons",
         "mobile": "NOT a separate plate: a 4:5 crop (x 780-2009, y 0-1536, 1229x1536) of the same plate, the same three blocks centred on the middle one, flacons 0.9 x",
-        "composite": "hero_build.py (v4_desktop, v4_mobile): flacons 0.34 (AURÉVAN, low block), 0.33 (ORVÉLIS, middle block), 0.32 (VAYRÉN, tall block), centred on the measured top faces (933, 1043) / (1329, 913) / (1736, 790); base_y = face centre + half the footprint depth",
+        "composite": "hero_build.py (v4_desktop, v4_mobile): flacons 0.34 (AUREVAN, low block), 0.33 (ORVELIS, middle block), 0.32 (VAYREN, tall block), centred on the measured top faces (933, 1043) / (1329, 913) / (1736, 790); base_y = face centre + half the footprint depth",
         "retouch": "the generator logo filled out of the plate; none otherwise. The props (citrus half, vanilla bean) stay where the generator put them, left of the lowest block; on the phone crop they are outside",
         "credits": 4
       },
@@ -621,7 +621,7 @@
       "objectPosition": {
         "default": "50% 50%"
       },
-      "alt": "AURÉVAN extrait standing on a round pale marble pedestal, with a halved bergamot, a white gardenia and a sliver of cedar at its foot in morning sun.",
+      "alt": "AUREVAN extrait standing on a round pale marble pedestal, with a halved bergamot, a white gardenia and a sliver of cedar at its foot in morning sun.",
       "placeholderTone": [
         "#e8e1cf",
         "#b9ad8e"
@@ -643,7 +643,7 @@
       ],
       "generation": {
         "plate": "Kling Ab-XyW3Cao1JHcJsV60E7iQ12Y470UO6pzmGDy3YH6qjsS2AxHQeS1FplB2MZ9PRgHr4rwML (1760x2368, 4:5 crop above the generator logo)",
-        "notes": "round marble pedestal (the plate drew a disc stool, not a block); the plate's fruit was a round yellow-green lime, replaced by the real bergamot cut-out from the AURÉVAN Shot 02 re-roll; bottle at scale 0.66",
+        "notes": "round marble pedestal (the plate drew a disc stool, not a block); the plate's fruit was a round yellow-green lime, replaced by the real bergamot cut-out from the AUREVAN Shot 02 re-roll; bottle at scale 0.66",
         "credits": 2
       }
     },
@@ -666,7 +666,7 @@
       "objectPosition": {
         "default": "50% 50%"
       },
-      "alt": "VAYRÉN extrait on a black volcanic-stone pedestal in low amber light, with a piece of oud wood, a thread of smoke and scattered black pepper at its foot.",
+      "alt": "VAYREN extrait on a black volcanic-stone pedestal in low amber light, with a piece of oud wood, a thread of smoke and scattered black pepper at its foot.",
       "placeholderTone": [
         "#2a1c12",
         "#0f0a06"
@@ -709,7 +709,7 @@
       "objectPosition": {
         "default": "50% 50%"
       },
-      "alt": "ORVÉLIS extrait on a block of solid walnut in golden-hour light, with vanilla pods, cinnamon bark, star anise and honeycomb at its foot.",
+      "alt": "ORVELIS extrait on a block of solid walnut in golden-hour light, with vanilla pods, cinnamon bark, star anise and honeycomb at its foot.",
       "placeholderTone": [
         "#caa066",
         "#7a5428"
@@ -727,7 +727,7 @@
       "camera": "100 mm macro, f/8",
       "promptRef": "ASSET_PROMPT_SHEET.md#4-orvelis-product",
       "claimsToVerify": [
-        "the plate added a honeycomb with honey: not in ORVÉLIS's notes (spices / amber, woods / vanilla, patchouli); keep it only if 'amber' may be read as honey, otherwise re-roll the plate"
+        "the plate added a honeycomb with honey: not in ORVELIS's notes (spices / amber, woods / vanilla, patchouli); keep it only if 'amber' may be read as honey, otherwise re-roll the plate"
       ],
       "generation": {
         "plate": "Kling ATPrrRtLpeyISS7h8l1ANoUgbYmF8I25YOlbpR-A2wHlJ0mYlsIcSNjfPABb7ZJtlPlCBhra (1760x2368, 4:5 crop above the generator logo)",
@@ -810,7 +810,7 @@
       "camera": "85 mm, f/8, 45 degrees",
       "promptRef": "ASSET_PROMPT_SHEET.md#7-unboxing",
       "claimsToVerify": [
-        "the approved cartons are powder blue (AURÉVAN), pastel blue-to-pink (ORVÉLIS) and white (VAYRÉN); a midnight-black presentation box, velvet insert, debossed sleeve and wax-sealed note are NOT approved packaging. Confirm they exist (or are planned) before the picture goes live, and keep the section copy free of shipping promises until then"
+        "the approved cartons are powder blue (AUREVAN), pastel blue-to-pink (ORVELIS) and white (VAYREN); a midnight-black presentation box, velvet insert, debossed sleeve and wax-sealed note are NOT approved packaging. Confirm they exist (or are planned) before the picture goes live, and keep the section copy free of shipping promises until then"
       ]
     },
     {
@@ -871,25 +871,25 @@
       "objectPosition": {
         "default": "50% 50%"
       },
-      "alt": "AURÉVAN extrait standing in the centre of a pale limestone table in soft morning light, a halved bergamot at the table's front right and jasmine buds scattered beside it.",
+      "alt": "AUREVAN extrait standing in the centre of a pale limestone table in soft morning light, a halved bergamot at the table's front right and jasmine buds scattered beside it.",
       "placeholderTone": [
         "#e9e4da",
         "#cfc7b8"
       ],
       "overlayTone": "dark",
       "layoutNote": "The tile frame is 4:5 (aspect-ratio in .rh-tile__media). The 'How it unfolds' chevron and the two dots overlay the picture: keep the lower-right 12% and the vertical centre of the right edge quiet. The flacon stands on the ground, never on a pedestal.",
-      "creativeDirection": "Chosen AURÉVAN picture of the stone direction (2026-11-06): the flacon on a glossy pale limestone table, a halved bergamot at the front right and jasmine buds beside it. The other AURÉVAN plate (a full-width floor with macro props) was dropped from the site.",
-      "promptRef": "public/images/prompt-manifest.json (AURÉVAN / grounded_stone)",
+      "creativeDirection": "Chosen AUREVAN picture of the stone direction (2026-11-06): the flacon on a glossy pale limestone table, a halved bergamot at the front right and jasmine buds beside it. The other AUREVAN plate (a full-width floor with macro props) was dropped from the site.",
+      "promptRef": "public/images/prompt-manifest.json (AUREVAN / grounded_stone)",
       "claimsToVerify": [
         "chosen by the user over the floor version (2026-11-06)",
         "the plate shows a free-standing TABLE with its thick front edge in the lower 15% of the card: it reads as a surface the bottle stands on, but a console or table is close to the 'no pedestal / no stand' rule of the brief; the v3 floor has no such edge",
         "the bergamot is NOT the plate's own placement: the plate drew it at the back-centre where a centred bottle hides it (it showed through the glass as a pale green orb), so it was cut out by colour mask, lifted away with its reflection, and stood on the table's front right with a new contact shadow and a mirrored reflection clipped at the table lip; a tiny pale sliver remains under its base at 100%",
-        "bottle position identical to ORVÉLIS and AURÉVAN v3 (BOTTLE in card_build.py); plate softened behind the glass (sigma 7)",
+        "bottle position identical to ORVELIS and AUREVAN v3 (BOTTLE in card_build.py); plate softened behind the glass (sigma 7)",
         "the label reads AUREVAN (no accent): approved bottle art; the spelling decision is still open",
         "overlayTone dark was set by eye (light wall at the right edge): confirm on the tile"
       ],
       "generation": {
-        "plate": "Kling AQusi21pvXob9yFPz1bplN9x4JNjSc4Yc7NJtjHk6ZE5bwxTYHMgjJ8GGX_qxIiFLcjPtJAl (kling-image-v3_0_omni, 3:4, 1760x2368, cropped to 4:5 above the generator logo), the second AURÉVAN plate",
+        "plate": "Kling AQusi21pvXob9yFPz1bplN9x4JNjSc4Yc7NJtjHk6ZE5bwxTYHMgjJ8GGX_qxIiFLcjPtJAl (kling-image-v3_0_omni, 3:4, 1760x2368, cropped to 4:5 above the generator logo), the second AUREVAN plate",
         "notes": "build: design-explorations/packaging-renders/homepage/card_build.py gs_aurevan_v2 (fruit_mask + relocate, soften_behind_glass, BOTTLE)",
         "credits": 2
       }
@@ -914,22 +914,22 @@
       "objectPosition": {
         "default": "50% 50%"
       },
-      "alt": "ORVÉLIS extrait standing directly on a dark raw oak tabletop in front of a terracotta wall, Bourbon vanilla beans at the far left and cinnamon bark at the far right in low golden light.",
+      "alt": "ORVELIS extrait standing directly on a dark raw oak tabletop in front of a terracotta wall, Bourbon vanilla beans at the far left and cinnamon bark at the far right in low golden light.",
       "placeholderTone": [
         "#5a4630",
         "#2e2217"
       ],
       "overlayTone": "light",
       "layoutNote": "The tile frame is 4:5 (aspect-ratio in .rh-tile__media). The 'How it unfolds' chevron and the two dots overlay the picture: keep the lower-right 12% and the vertical centre of the right edge quiet. The flacon stands on the ground, never on a pedestal.",
-      "creativeDirection": "Concept 1, grounded stone: the flacon stands directly on honed limestone (AURÉVAN), raw oak (ORVÉLIS) or basalt (VAYRÉN), its ingredients lying beside the base.",
-      "promptRef": "public/images/prompt-manifest.json (ORVÉLIS / grounded_stone)",
+      "creativeDirection": "Concept 1, grounded stone: the flacon stands directly on honed limestone (AUREVAN), raw oak (ORVELIS) or basalt (VAYREN), its ingredients lying beside the base.",
+      "promptRef": "public/images/prompt-manifest.json (ORVELIS / grounded_stone)",
       "claimsToVerify": [
         "the plate drew the ingredients at the table's far edge, cut by the left and right frame edges (as asked), but small and far behind the flacon: they read as depth, not as 'lying at the base'; a re-roll with large foreground ingredients would be needed for that",
         "the wall is terracotta brown-red, not the muted umber the prompt asked for",
         "the vanilla beans are pale grey-brown with a frosted look (crystallised), not dark and oily",
         "the oak is seen head-on with one deep crack running under the flacon; light is soft and overhead rather than a low golden side light",
         "the busy oak grain showed through the clear glass pin-sharp (hologram look): the plate is blurred inside the bottle silhouette before compositing (soften_behind_glass in card_build.py)",
-        "the ORVÉLIS bottle source is 1254 px native and is enlarged here (scale 1.04 on a 2000 px canvas, sharpen 0.4): check the label at 200% on a retina screen",
+        "the ORVELIS bottle source is 1254 px native and is enlarged here (scale 1.04 on a 2000 px canvas, sharpen 0.4): check the label at 200% on a retina screen",
         "overlayTone light was set by eye (terracotta wall at the right edge): confirm on the tile"
       ],
       "generation": {
@@ -958,26 +958,26 @@
       "objectPosition": {
         "default": "50% 50%"
       },
-      "alt": "VAYRÉN extrait standing in the centre of a dark volcanic basalt surface, a stitched leather strip at the lower left, black peppercorns at the lower right and a thin wisp of white smoke rising behind the cap.",
+      "alt": "VAYREN extrait standing in the centre of a dark volcanic basalt surface, a stitched leather strip at the lower left, black peppercorns at the lower right and a thin wisp of white smoke rising behind the cap.",
       "placeholderTone": [
         "#3a3835",
         "#171614"
       ],
       "overlayTone": "light",
       "layoutNote": "The tile frame is 4:5 (aspect-ratio in .rh-tile__media). The 'How it unfolds' chevron and the two dots overlay the picture: keep the lower-right 12% and the vertical centre of the right edge quiet. The flacon stands on the ground, never on a pedestal.",
-      "creativeDirection": "Concept 1, grounded stone: the flacon stands directly on honed limestone (AURÉVAN), raw oak (ORVÉLIS) or basalt (VAYRÉN), its ingredients lying beside the base.",
-      "promptRef": "public/images/prompt-manifest.json (VAYRÉN / grounded_stone)",
+      "creativeDirection": "Concept 1, grounded stone: the flacon stands directly on honed limestone (AUREVAN), raw oak (ORVELIS) or basalt (VAYREN), its ingredients lying beside the base.",
+      "promptRef": "public/images/prompt-manifest.json (VAYREN / grounded_stone)",
       "claimsToVerify": [
-        "bottle position identical to ORVÉLIS and AURÉVAN (BOTTLE in card_build.py); measured on the exports: labels x 596-1003 of 1600 and top y 686 on all three cards",
+        "bottle position identical to ORVELIS and AUREVAN (BOTTLE in card_build.py); measured on the exports: labels x 596-1003 of 1600 and top y 686 on all three cards",
         "the plate drew a black basalt SLAB at a diagonal (its back edge slopes up to the right) rather than a borderless floor, with a small vent hole behind the bottle: the smoke column rises from it, so it passes BEHIND the bottle and shows above the cap and faintly through the glass (reads as smoke rising behind the cap, not curling beside it)",
         "the leather strip is a bright cognac tan with stitching, not dark brown, and larger than the 'small corner' the prompt asked for; the peppercorns are sharp macro props at the lower right",
-        "the first VAYRÉN plate (AfyYFwNy…) was discarded: a steeply tilted bordered strip of black gravel with the smoke ribbons running through the floor and a huge leather panel",
+        "the first VAYREN plate (AfyYFwNy…) was discarded: a steeply tilted bordered strip of black gravel with the smoke ribbons running through the floor and a huge leather panel",
         "the basalt is a matte, finely pitted honed stone with pores, not vesicular lava rock",
-        "the plate is blurred behind the glass (soften_behind_glass, sigma 9); glass edges posk 1.0 / rim 0.7 / negk 0.5 / neutk 0.5; the VAYRÉN cap sits 6 px lower than ORVÉLIS's because the approved art is cropped differently",
+        "the plate is blurred behind the glass (soften_behind_glass, sigma 9); glass edges posk 1.0 / rim 0.7 / negk 0.5 / neutk 0.5; the VAYREN cap sits 6 px lower than ORVELIS's because the approved art is cropped differently",
         "overlayTone light was set by eye (dark slab at the right edge): confirm on the tile"
       ],
       "generation": {
-        "plate": "Kling Ad-x7mMEFrjbGmGkC6S4uk4Jj0uwsdJy31lcSSD3KC94vQn4nfXyXn4VdI1xTCAN_W0U-fmk (kling-image-v3_0_omni, 3:4, 1760x2368, cropped to 4:5 above the generator logo), the second VAYRÉN plate",
+        "plate": "Kling Ad-x7mMEFrjbGmGkC6S4uk4Jj0uwsdJy31lcSSD3KC94vQn4nfXyXn4VdI1xTCAN_W0U-fmk (kling-image-v3_0_omni, 3:4, 1760x2368, cropped to 4:5 above the generator logo), the second VAYREN plate",
         "notes": "BOTTLE = x 880, y 1580, scale 1.04; build: design-explorations/packaging-renders/homepage/card_build.py gs_vayren",
         "credits": 4
       }
@@ -1002,7 +1002,7 @@
       "objectPosition": {
         "default": "50% 50%"
       },
-      "alt": "AURÉVAN extrait standing on a pale off-white plaster floor in a bright gallery, the shadows of a window frame falling across the curved plaster wall behind it.",
+      "alt": "AUREVAN extrait standing on a pale off-white plaster floor in a bright gallery, the shadows of a window frame falling across the curved plaster wall behind it.",
       "placeholderTone": [
         "#f4f1ea",
         "#e2ddd2"
@@ -1010,9 +1010,9 @@
       "overlayTone": "dark",
       "layoutNote": "The tile frame is 4:5 (aspect-ratio in .rh-tile__media). The 'How it unfolds' chevron and the two dots overlay the picture: keep the lower-right 12% and the vertical centre of the right edge quiet. The flacon stands on the ground, never on a pedestal.",
       "creativeDirection": "Concept 2, studio light: the flacon on an off-white plaster sweep with window-frame shadows across the backdrop; the picture merges with the page.",
-      "promptRef": "public/images/prompt-manifest.json (AURÉVAN / chiaroscuro_studio)",
+      "promptRef": "public/images/prompt-manifest.json (AUREVAN / chiaroscuro_studio)",
       "claimsToVerify": [
-        "bottle position identical to the grounded-stone cards (BOTTLE in card_build.py); the cap of AURÉVAN sits 12 px lower than ORVÉLIS's (approved art cropped differently)",
+        "bottle position identical to the grounded-stone cards (BOTTLE in card_build.py); the cap of AUREVAN sits 12 px lower than ORVELIS's (approved art cropped differently)",
         "the plate drew a bright gallery with a window at the LEFT frame edge, a plaster cove (the floor curving up into the wall, which reads a little like a skate-bowl ramp) and big diagonal window-bar shadows; it is a high-key picture but not the quiet four-pane parallelograms of the prompt",
         "the plate's floor carried a blotchy pixel-mosaic artefact: it is smoothed away (smooth_texture, sigma 40) and a soft cast shadow to the right plus the compositor's contact shadow ground the bottle (add_cast_shadow); both are synthetic",
         "page merge: the plate's own edges were 8-20% darker than the page; the outer 5% of the picture is blended into --paper (#fafaf7), measured on the export, so the card has no hard rectangle against the page; it reads as a soft white vignette when seen alone",
@@ -1046,7 +1046,7 @@
       "objectPosition": {
         "default": "50% 50%"
       },
-      "alt": "ORVÉLIS extrait standing on a smooth sand-coloured plaster floor in warm late-afternoon light, the shadows of a window frame and its mullion falling across the curved wall behind it.",
+      "alt": "ORVELIS extrait standing on a smooth sand-coloured plaster floor in warm late-afternoon light, the shadows of a window frame and its mullion falling across the curved wall behind it.",
       "placeholderTone": [
         "#f0e6d2",
         "#dccdae"
@@ -1054,12 +1054,12 @@
       "overlayTone": "dark",
       "layoutNote": "The tile frame is 4:5 (aspect-ratio in .rh-tile__media). The 'How it unfolds' chevron and the two dots overlay the picture: keep the lower-right 12% and the vertical centre of the right edge quiet. The flacon stands on the ground, never on a pedestal.",
       "creativeDirection": "Concept 2, studio light: the flacon on an off-white plaster sweep with window-frame shadows across the backdrop; the picture merges with the page.",
-      "promptRef": "public/images/prompt-manifest.json (ORVÉLIS / chiaroscuro_studio)",
+      "promptRef": "public/images/prompt-manifest.json (ORVELIS / chiaroscuro_studio)",
       "claimsToVerify": [
-        "bottle position identical to every other card (BOTTLE in card_build.py); the ORVÉLIS source is 1254 px native, enlarged here (sharpen 0.4, warm glass neutral 0.8): check the label on a retina screen",
+        "bottle position identical to every other card (BOTTLE in card_build.py); the ORVELIS source is 1254 px native, enlarged here (sharpen 0.4, warm glass neutral 0.8): check the label on a retina screen",
         "the plate's own floor started BELOW the shared base line (y 1690 vs 1580), so the bottle would have stood on the wall: the plate was shifted up 168 rows (shift_crop) after painting the generator logo out with a feathered patch; the floor's raked-sand ripples were smoothed away (smooth_texture) and two tiny dark specks remain on the floor at 100%",
         "the plate drew a warm amber-cream gallery with the window on the RIGHT edge, big window-pane rectangles with a mullion line and a plaster cove: close to the prompt (two panes, one mullion, 3400 K), plus a curved arc shadow",
-        "the plate's borders were dark (90-120 levels at the top and left): they were lifted (lift, edge_dodge) and the outer 5% is blended into --paper (#fafaf7), measured on the export; the picture is therefore warm cream at its edges, not pure white, so it does not dissolve into the page as completely as AURÉVAN's",
+        "the plate's borders were dark (90-120 levels at the top and left): they were lifted (lift, edge_dodge) and the outer 5% is blended into --paper (#fafaf7), measured on the export; the picture is therefore warm cream at its edges, not pure white, so it does not dissolve into the page as completely as AUREVAN's",
         "the soft cast shadow to the left of the base is synthetic (add_cast_shadow) next to the compositor's contact shadow",
         "overlayTone dark: the right edge is the pale window glass"
       ],
@@ -1089,7 +1089,7 @@
       "objectPosition": {
         "default": "50% 50%"
       },
-      "alt": "VAYRÉN extrait standing on a smooth taupe plaster floor in a pool of light from a narrow slit window at the right, the room around it falling into deep warm shadow.",
+      "alt": "VAYREN extrait standing on a smooth taupe plaster floor in a pool of light from a narrow slit window at the right, the room around it falling into deep warm shadow.",
       "placeholderTone": [
         "#d8d1c6",
         "#a89f92"
@@ -1097,11 +1097,11 @@
       "overlayTone": "light",
       "layoutNote": "The tile frame is 4:5 (aspect-ratio in .rh-tile__media). The 'How it unfolds' chevron and the two dots overlay the picture: keep the lower-right 12% and the vertical centre of the right edge quiet. The flacon stands on the ground, never on a pedestal.",
       "creativeDirection": "Concept 2, studio light: the flacon on an off-white plaster sweep with window-frame shadows across the backdrop; the picture merges with the page.",
-      "promptRef": "public/images/prompt-manifest.json (VAYRÉN / chiaroscuro_studio)",
+      "promptRef": "public/images/prompt-manifest.json (VAYREN / chiaroscuro_studio)",
       "claimsToVerify": [
-        "bottle position identical to every other card (BOTTLE in card_build.py); the VAYRÉN cap sits 6 px lower than ORVÉLIS's (approved art cropped differently)",
+        "bottle position identical to every other card (BOTTLE in card_build.py); the VAYREN cap sits 6 px lower than ORVELIS's (approved art cropped differently)",
         "the plate ignored 'no tiles' and drew a concave tiled floor with painterly patchy walls and a tiny text scribble on the wall: the scribble was cleaned out, the whole plate smoothed (smooth_texture sigma 30, keep 34) so the walls read as soft plaster; faint tile joints remain on the floor as hairline cracks",
-        "this is the darkest studio variant and is NOT blended into the page (edge_fade 0): a dark picture on the white page, like the pedestal card it replaces; the page-merge claim of concept 2 does not hold for VAYRÉN",
+        "this is the darkest studio variant and is NOT blended into the page (edge_fade 0): a dark picture on the white page, like the pedestal card it replaces; the page-merge claim of concept 2 does not hold for VAYREN",
         "the light is one hard blade from a slit at the upper right that ends in a pool on the floor around the bottle: it is the plate's own lighting; the approved bottle art is lit from the left, so its highlights do not follow the blade",
         "the glass reads milky-white in the pool of light (bright background behind clear glass); dark-set glass edges posk 1.0 / rim 0.7 / negk 0.5 / neutk 0.5, plate softened behind the glass (sigma 9)",
         "the soft cast shadow to the left of the base is synthetic (add_cast_shadow)",
@@ -1133,15 +1133,15 @@
       "objectPosition": {
         "default": "50% 50%"
       },
-      "alt": "AURÉVAN extrait with its foot sunk into a low mound of white marble granules, a white jasmine flower at the left and a curl of bergamot zest at the right, in soft morning light.",
+      "alt": "AUREVAN extrait with its foot sunk into a low mound of white marble granules, a white jasmine flower at the left and a curl of bergamot zest at the right, in soft morning light.",
       "placeholderTone": [
         "#efece6",
         "#cfcac0"
       ],
       "overlayTone": "dark",
       "layoutNote": "The tile frame is 4:5 (aspect-ratio in .rh-tile__media). The 'How it unfolds' chevron and the two dots overlay the picture: keep the lower-right 12% and the vertical centre of the right edge quiet. The flacon stands on the ground, never on a pedestal.",
-      "creativeDirection": "Concept 3, mineral bed: low-angle macro, the base slightly embedded in marble dust (AURÉVAN), crushed spice (ORVÉLIS) or volcanic sand (VAYRÉN).",
-      "promptRef": "public/images/prompt-manifest.json (AURÉVAN / mineral_bed)",
+      "creativeDirection": "Concept 3, mineral bed: low-angle macro, the base slightly embedded in marble dust (AUREVAN), crushed spice (ORVELIS) or volcanic sand (VAYREN).",
+      "promptRef": "public/images/prompt-manifest.json (AUREVAN / mineral_bed)",
       "claimsToVerify": [
         "the plate drew a MOUND of white granules on a glossy pale stone floor, not the asked edge-to-edge bed, and the granules read as salt or sugar crystals more than marble dust",
         "a real jasmine flower (not three petals) at the left edge and one curl of green zest at the right edge, as asked; the flower's right tip touches the bottle's left edge",
@@ -1175,19 +1175,19 @@
       "objectPosition": {
         "default": "50% 50%"
       },
-      "alt": "ORVÉLIS extrait with its foot sunk into a low mound of crushed cinnamon, vanilla seeds and spice grains, a star anise at the left and a cinnamon quill at the right, in warm golden light on dark walnut.",
+      "alt": "ORVELIS extrait with its foot sunk into a low mound of crushed cinnamon, vanilla seeds and spice grains, a star anise at the left and a cinnamon quill at the right, in warm golden light on dark walnut.",
       "placeholderTone": [
         "#8a6240",
         "#3b2a1b"
       ],
       "overlayTone": "light",
       "layoutNote": "The tile frame is 4:5 (aspect-ratio in .rh-tile__media). The 'How it unfolds' chevron and the two dots overlay the picture: keep the lower-right 12% and the vertical centre of the right edge quiet. The flacon stands on the ground, never on a pedestal.",
-      "creativeDirection": "Concept 3, mineral bed: low-angle macro, the base slightly embedded in marble dust (AURÉVAN), crushed spice (ORVÉLIS) or volcanic sand (VAYRÉN).",
-      "promptRef": "public/images/prompt-manifest.json (ORVÉLIS / mineral_bed)",
+      "creativeDirection": "Concept 3, mineral bed: low-angle macro, the base slightly embedded in marble dust (AUREVAN), crushed spice (ORVELIS) or volcanic sand (VAYREN).",
+      "promptRef": "public/images/prompt-manifest.json (ORVELIS / mineral_bed)",
       "claimsToVerify": [
         "the plate drew a peaked mound of ground spice with cinnamon bark chips, black seeds and pale grains (read as black peppercorn / nigella as much as vanilla seeds), a whole star anise cut by the left edge and a cinnamon quill cut by the right edge, on dark walnut with golden bokeh at the upper right",
         "the mound's crest is high (y ~1180), so the bottle stands in the lower slope of the pile and its foot is buried by embed_foot (depth 80); the spice mound seen through the glass is blurred (soften_behind_glass sigma 7) and reads as a slightly hazy glass body",
-        "the ORVÉLIS bottle art is 1254 px native, enlarged here (sharpen 0.4): check the label on a retina screen",
+        "the ORVELIS bottle art is 1254 px native, enlarged here (sharpen 0.4): check the label on a retina screen",
         "dark warm set: glass posk 1.0 / rim 0.7 / negk 0.5 / neutk 0.8",
         "star anise and quill are real spice, no honey in this plate",
         "overlayTone light: the bottom edge (where the two dots sit) is near-black, the right edge (chevron) is mid-bright golden bokeh: the chevron is white on gold at about 2:1, the dots are clearly visible; dark would hide the dots"
@@ -1218,20 +1218,20 @@
       "objectPosition": {
         "default": "50% 50%"
       },
-      "alt": "VAYRÉN extrait with its foot sunk into a dune of black volcanic sand, slivers of dark oud wood leaning on it at the left and a plume of white smoke rising at the right.",
+      "alt": "VAYREN extrait with its foot sunk into a dune of black volcanic sand, slivers of dark oud wood leaning on it at the left and a plume of white smoke rising at the right.",
       "placeholderTone": [
         "#2a2927",
         "#0f0f0e"
       ],
       "overlayTone": "light",
       "layoutNote": "The tile frame is 4:5 (aspect-ratio in .rh-tile__media). The 'How it unfolds' chevron and the two dots overlay the picture: keep the lower-right 12% and the vertical centre of the right edge quiet. The flacon stands on the ground, never on a pedestal.",
-      "creativeDirection": "Concept 3, mineral bed: low-angle macro, the base slightly embedded in marble dust (AURÉVAN), crushed spice (ORVÉLIS) or volcanic sand (VAYRÉN).",
-      "promptRef": "public/images/prompt-manifest.json (VAYRÉN / mineral_bed)",
+      "creativeDirection": "Concept 3, mineral bed: low-angle macro, the base slightly embedded in marble dust (AUREVAN), crushed spice (ORVELIS) or volcanic sand (VAYREN).",
+      "promptRef": "public/images/prompt-manifest.json (VAYREN / mineral_bed)",
       "claimsToVerify": [
         "the plate drew a diagonal dune of black sand (rising to the right) with a second drift in front, big wooden slats at the left that read as planks more than oud slivers, and a large hazy smoke plume along the right edge instead of a thin thread; the scene is a diagonal, dramatic composition and the bottle stands vertically in the dune",
         "a soft halo (14) lifts the black cap off the near-black wall; dark-set glass posk 1.0 / rim 0.7 / negk 0.5 / neutk 0.5; the glass body reads as dark translucent grey over the sand",
         "the foot is buried by embed_foot (depth 80); the smoke plume is the plate's own and stays beside the bottle, not behind the cap",
-        "the VAYRÉN cap sits 6 px lower than ORVÉLIS's (approved art cropped differently)"
+        "the VAYREN cap sits 6 px lower than ORVELIS's (approved art cropped differently)"
       ],
       "generation": {
         "plate": "Kling Adjov5MV1EB3H8yaQhBTnZRhKZj3-l1ZaNiwTt6MEuo69WcKo8Yldo1C5qY-J8RVNNvfHRMJ (kling-image-v3_0_omni, 3:4, 1760x2368, cropped to 4:5 above the generator logo), first try",
@@ -1259,7 +1259,7 @@
       "objectPosition": {
         "default": "50% 50%"
       },
-      "alt": "AURÉVAN extrait standing in the shallow water of a pale stone pool, its reflection beneath it and a golden-white net of light rippling on the pool floor, a jasmine flower and a curl of bergamot zest on the ledge behind.",
+      "alt": "AUREVAN extrait standing in the shallow water of a pale stone pool, its reflection beneath it and a golden-white net of light rippling on the pool floor, a jasmine flower and a curl of bergamot zest on the ledge behind.",
       "placeholderTone": [
         "#eee6d3",
         "#c4b48e"
@@ -1267,9 +1267,9 @@
       "overlayTone": "dark",
       "layoutNote": "The tile frame is 4:5 (aspect-ratio in .rh-tile__media). The 'How it unfolds' chevron and the two dots overlay the picture: keep the lower-right 12% and the vertical centre of the right edge quiet. The flacon stands on the ground, never on a pedestal.",
       "creativeDirection": "Concept 4, liquid light: the flacon on a shallow water film or an optical-glass plate, warm sun throwing golden caustics beside it.",
-      "promptRef": "public/images/prompt-manifest.json (AURÉVAN / liquid_caustics)",
+      "promptRef": "public/images/prompt-manifest.json (AUREVAN / liquid_caustics)",
       "claimsToVerify": [
-        "the second roll (the first drew a woman's face in the water): the plate is a level straight-on view of a shallow stone POOL, not a film of water on travertine: pale wall, a stone ledge behind (y ~1210-1370), turquoise tiled water; the turquoise is cooler than the other AURÉVAN cards",
+        "the second roll (the first drew a woman's face in the water): the plate is a level straight-on view of a shallow stone POOL, not a film of water on travertine: pale wall, a stone ledge behind (y ~1210-1370), turquoise tiled water; the turquoise is cooler than the other AUREVAN cards",
         "the caustic net is the plate's own, at the lower right, not refracted through the approved clear bottle; the liquid stays crystal clear",
         "the reflection under the foot is the compositor's mirrored fade (refl .40, fade 150) and is subtle; thin rings of disturbed water around the foot were added on the plate (add_water_rings)",
         "the jasmine flower sits on the ledge at the left edge and the zest on the ledge at the right edge",
@@ -1277,7 +1277,7 @@
       ],
       "generation": {
         "plate": "Kling AeoaD9O1PB3to1LJt1xp-3_VP24eygs2VqKxWyzg8sJwpmIHM6o8DyL7rygw2WOajd2r_OUP (kling-image-v3_0_omni, 3:4, 1760x2368, cropped to 4:5 above the generator logo), second roll",
-        "notes": "BOTTLE = x 880, y 1580, scale 1.04 shared with every card; build: design-explorations/packaging-renders/homepage/card_build.py lq_all (compositor reflection; add_water_rings for AURÉVAN)",
+        "notes": "BOTTLE = x 880, y 1580, scale 1.04 shared with every card; build: design-explorations/packaging-renders/homepage/card_build.py lq_all (compositor reflection; add_water_rings for AUREVAN)",
         "credits": 4
       }
     },
@@ -1301,7 +1301,7 @@
       "objectPosition": {
         "default": "50% 50%"
       },
-      "alt": "ORVÉLIS extrait standing in a still sheet of water over warm sand-coloured stone, concentric ripples and a net of amber light spreading around it, a vanilla bean at each edge, an umber wall behind.",
+      "alt": "ORVELIS extrait standing in a still sheet of water over warm sand-coloured stone, concentric ripples and a net of amber light spreading around it, a vanilla bean at each edge, an umber wall behind.",
       "placeholderTone": [
         "#d9bf8c",
         "#7a5a30"
@@ -1309,17 +1309,17 @@
       "overlayTone": "light",
       "layoutNote": "The tile frame is 4:5 (aspect-ratio in .rh-tile__media). The 'How it unfolds' chevron and the two dots overlay the picture: keep the lower-right 12% and the vertical centre of the right edge quiet. The flacon stands on the ground, never on a pedestal.",
       "creativeDirection": "Concept 4, liquid light: the flacon on a shallow water film or an optical-glass plate, warm sun throwing golden caustics beside it.",
-      "promptRef": "public/images/prompt-manifest.json (ORVÉLIS / liquid_caustics)",
+      "promptRef": "public/images/prompt-manifest.json (ORVELIS / liquid_caustics)",
       "claimsToVerify": [
         "the second roll (the first was a 45-degree view with a dark diagonal vein): a level view of a sand floor under water with HUGE concentric ripples centred near the bottle position although 'no waves' was asked: the bottle reads as standing in the water making them, which suits the direction",
         "the plate drew the caustic net across the whole floor, not only the left half; the vanilla beans at the edges are tiny (a cinnamon quill is not visible)",
-        "the ORVÉLIS bottle art is 1254 px native, enlarged here (sharpen 0.4): check the label on a retina screen",
+        "the ORVELIS bottle art is 1254 px native, enlarged here (sharpen 0.4): check the label on a retina screen",
         "chevron light (the right edge is the dark umber wall) and dots dark (the bottom is sand): dotsTone"
       ],
       "dotsTone": "dark",
       "generation": {
         "plate": "Kling AcgPts_HA4GjF2JFMiQAKt9rxKmB9K3JwQ7y390-H00PbYtL5JRK8uaFuAM7SQxSY7WkaBjF (kling-image-v3_0_omni, 3:4, 1760x2368, cropped to 4:5 above the generator logo), second roll",
-        "notes": "BOTTLE = x 880, y 1580, scale 1.04 shared with every card; build: design-explorations/packaging-renders/homepage/card_build.py lq_all (compositor reflection; add_water_rings for AURÉVAN)",
+        "notes": "BOTTLE = x 880, y 1580, scale 1.04 shared with every card; build: design-explorations/packaging-renders/homepage/card_build.py lq_all (compositor reflection; add_water_rings for AUREVAN)",
         "credits": 4
       }
     },
@@ -1343,7 +1343,7 @@
       "objectPosition": {
         "default": "50% 50%"
       },
-      "alt": "VAYRÉN extrait standing at the front edge of a long band of water lit amber, vertical threads of golden light glowing behind its clear glass, on black stone.",
+      "alt": "VAYREN extrait standing at the front edge of a long band of water lit amber, vertical threads of golden light glowing behind its clear glass, on black stone.",
       "placeholderTone": [
         "#262522",
         "#0c0c0b"
@@ -1351,18 +1351,18 @@
       "overlayTone": "dark",
       "layoutNote": "The tile frame is 4:5 (aspect-ratio in .rh-tile__media). The 'How it unfolds' chevron and the two dots overlay the picture: keep the lower-right 12% and the vertical centre of the right edge quiet. The flacon stands on the ground, never on a pedestal.",
       "creativeDirection": "Concept 4, liquid light: the flacon on a shallow water film or an optical-glass plate, warm sun throwing golden caustics beside it.",
-      "promptRef": "public/images/prompt-manifest.json (VAYRÉN / liquid_caustics)",
+      "promptRef": "public/images/prompt-manifest.json (VAYREN / liquid_caustics)",
       "claimsToVerify": [
         "the second roll (the first was a steep diagonal slab with a leather panel): the plate is NOT a floor of water but a flat black-stone surface with a long horizontal water band (y ~660-1590) whose amber caustic threads glow like a curtain, oud chips at the top-left corner; the bottle stands at the band's lower edge, in front of the glow",
         "the amber glow behind the clear glass is the plate's light, not refracted through the approved clear liquid",
         "dark-set glass (posk 1.0 / rim .7 / negk .5 / neutk .5), a halo lifts the black cap off the black stone, the mirrored reflection (refl .45, fade 170) is faint on the black stone",
         "chevron dark (the right edge is the bright band) and dots light (the bottom is black stone): dotsTone",
-        "the VAYRÉN cap sits 6 px lower than ORVÉLIS's (approved art cropped differently)"
+        "the VAYREN cap sits 6 px lower than ORVELIS's (approved art cropped differently)"
       ],
       "dotsTone": "light",
       "generation": {
         "plate": "Kling AV7_UPmP-jSyWPo3bbJc-DvzV3X3COhyfYAGex900v3MjkVnQboKAd3hNUfG-FfsOy2Izv8X (kling-image-v3_0_omni, 3:4, 1760x2368, cropped to 4:5 above the generator logo), second roll",
-        "notes": "BOTTLE = x 880, y 1580, scale 1.04 shared with every card; build: design-explorations/packaging-renders/homepage/card_build.py lq_all (compositor reflection; add_water_rings for AURÉVAN)",
+        "notes": "BOTTLE = x 880, y 1580, scale 1.04 shared with every card; build: design-explorations/packaging-renders/homepage/card_build.py lq_all (compositor reflection; add_water_rings for AUREVAN)",
         "credits": 4
       }
     }

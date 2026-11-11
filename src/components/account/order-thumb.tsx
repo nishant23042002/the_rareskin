@@ -1,5 +1,4 @@
 import { Flacon } from "@/components/ui/flacon";
-import { Mark } from "@/components/ui/mark";
 import { isFragranceSlug } from "@/lib/catalog";
 import { cn } from "@/lib/cn";
 
@@ -53,7 +52,6 @@ export function OrderThumb({
                 "linear-gradient(135deg, #e0d7bf 0%, #c5872f 52%, #3d2712 100%)",
             }}
           />
-          <Mark className="relative w-1/3 text-ink-2" />
         </span>
       )}
     </span>

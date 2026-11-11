@@ -24,7 +24,7 @@ export const fonts = {
 } as const;
 
 export const accent = {
-  /** aurévan · orvélis · vayrén juice, left→right */
+  /** aurevan · orvelis · vayren juice, left→right */
   gradient: "linear-gradient(90deg,#e0d7bf 0%,#c5872f 50%,#3d2712 100%)",
   solid: "#c5872f",
 } as const;

@@ -24,6 +24,8 @@ interface PdpSlide {
   full: string;
   /** the small file: a 640 px WebP for the official photographs, a 200 px Cloudinary variant for uploads */
   thumb: string;
+  /** the gallery strip's file (shown ~50 px square): 160 px WebP for the official photographs, else `thumb` */
+  tiny: string;
   /** `thumb` and `full` as a responsive set (official photographs only) */
   srcSet?: string;
   alt: string;
@@ -42,6 +44,7 @@ export function pdpSlides(
       key: `official-${i}`,
       full: pdpPhotoSrc(slug, p, "full"),
       thumb: pdpPhotoSrc(slug, p, "small"),
+      tiny: pdpPhotoSrc(slug, p, "tiny"),
       srcSet: `${pdpPhotoSrc(slug, p, "small")} ${p.small}w, ${pdpPhotoSrc(slug, p, "full")} ${p.width}w`,
       alt: p.alt,
       thumbWidth: p.small,
@@ -52,14 +55,16 @@ export function pdpSlides(
   const uploaded = (["flat", "hero", "box"] as const)
     .map((k) => images[k])
     .filter((url): url is string => Boolean(url))
-    .map(
-      (url, i): PdpSlide => ({
+    .map((url, i): PdpSlide => {
+      const thumb = cloudinaryVariant(url, { w: 200 }) ?? url;
+      return {
         key: `photo-${i}`,
         full: cloudinaryVariant(url, { w: 1000 }) ?? url,
-        thumb: cloudinaryVariant(url, { w: 200 }) ?? url,
+        thumb,
+        tiny: thumb,
         alt: name,
-      }),
-    );
+      };
+    });
 
   return [...official, ...uploaded];
 }

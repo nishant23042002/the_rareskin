@@ -15,13 +15,26 @@ import { CartToast } from "@/components/cart/cart-toast";
 import { CartBar } from "@/components/cart/cart-bar";
 import { CampaignNote } from "@/components/layout/campaign-note";
 import { BackToTop } from "@/components/layout/back-to-top";
-import { ThemeSwitcher } from "@/components/ui/theme-switcher";
-import { StaffOnly } from "@/components/auth/staff-only";
+import { StaffThemeSwitcher } from "@/components/auth/staff-tools";
 import { MotionLayer } from "@/components/providers/motion-layer";
 import { DISCOVERY_SET_SLUG } from "@/lib/catalog";
 import { getCatalogNav, getBagSuggestions } from "@/server/data/catalog";
 import { getSiteSettings } from "@/server/data/settings";
 import { getCurrentUser } from "@/server/auth";
+
+/**
+ * Rendered per request, on purpose. The pre-launch / maintenance gate below lets
+ * signed-in staff past a holding page, which needs the session cookie, so this
+ * shell can never be a statically generated (or ISR) page: a page prerendered
+ * while the store is open would keep serving the open store after
+ * `maintenanceMode` is switched on (the regeneration would hit `cookies()` and
+ * fail, and the stale copy would stay up). The catalogue and settings reads are
+ * cached (`unstable_cache`, tagged), so a render is cheap; what keeps a visitor's
+ * first paint fast is the HTML size, the critical-path bytes and the JS, not this.
+ * Nothing else may make the storefront dynamic by accident any more: the root
+ * `forbidden.tsx` used to (it read the session on every render, see `NoAccess`).
+ */
+export const dynamic = "force-dynamic";
 
 /**
  * Storefront shell. Everything the shopper-facing site shares — providers,
@@ -41,8 +54,8 @@ export default async function StoreLayout({
   // Pre-launch (`!storeLive`) or a planned outage (`maintenanceMode`): the whole
   // storefront becomes a holding page — except for signed-in staff, who keep
   // working the site while it's dark. `/admin` is a separate route group and is
-  // never affected. (The storefront is already dynamically rendered, so the
-  // `getCurrentUser()` cookie read costs nothing here.)
+  // never affected. (Only the closed store reads the cookie: an open one never
+  // calls `getCurrentUser()`, so a signed-in shopper costs no session lookup.)
   if (settings.flags.maintenanceMode || !settings.flags.storeLive) {
     const user = await getCurrentUser();
     if (!user?.isStaff) {
@@ -107,9 +120,7 @@ export default async function StoreLayout({
             <CartBar freeShippingAbove={freeShippingAbove} />
             <BackToTop />
             {/* founder preview: the colour themes (src/config/themes.ts, app/themes.css) — signed-in staff only */}
-            <StaffOnly>
-              <ThemeSwitcher />
-            </StaffOnly>
+            <StaffThemeSwitcher />
             {/* scroll reveals, card tilt, button pull: motion.css + this controller (nothing under reduced motion) */}
             <MotionLayer />
             <CampaignNote

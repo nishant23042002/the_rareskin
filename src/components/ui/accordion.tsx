@@ -13,11 +13,14 @@ type AccordionItem = { q: string; a: ReactNode };
 export function Accordion({
   items,
   className,
+  defaultOpen = null,
 }: {
   items: AccordionItem[];
   className?: string;
+  /** index of the panel that starts open (none by default) */
+  defaultOpen?: number | null;
 }) {
-  const [open, setOpen] = useState<number | null>(null);
+  const [open, setOpen] = useState<number | null>(defaultOpen);
   const baseId = useId();
 
   return (

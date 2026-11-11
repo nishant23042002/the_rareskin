@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { Mark } from "@/components/ui/mark";
 import { cloudinaryVariant } from "@/lib/catalog";
 
 /**
@@ -73,10 +72,8 @@ export function FounderPhoto({
     return (
       <span
         aria-hidden
-        className="flex min-h-[260px] w-full items-center justify-center"
-      >
-        <Mark className="w-14 text-ink/12" strokeWidth={1.4} />
-      </span>
+        className="block min-h-[260px] w-full"
+      />
     );
   }
 

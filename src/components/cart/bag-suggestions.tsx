@@ -9,7 +9,6 @@ import {
 } from "react";
 
 import { Flacon } from "@/components/ui/flacon";
-import { Mark } from "@/components/ui/mark";
 import { Icon } from "@/components/ui/icon";
 import { useCart } from "@/components/providers/cart-provider";
 import { cn } from "@/lib/cn";
@@ -278,9 +277,7 @@ function RangeRow({
               <span className="block w-[46%]">
                 <Flacon fragrance={s.fragrance} />
               </span>
-            ) : (
-              <Mark className="w-4 text-ink-3" />
-            )}
+            ) : null}
           </span>
         )}
       </div>

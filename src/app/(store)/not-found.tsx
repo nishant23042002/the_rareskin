@@ -1,5 +1,4 @@
 import { Container } from "@/components/ui/container";
-import { Mark } from "@/components/ui/mark";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -14,8 +13,7 @@ export default function StoreNotFound() {
       className="flex min-h-svh flex-col items-center justify-center pt-[calc(var(--announce-h)+var(--header-h))] text-center"
     >
       <Container className="max-w-[560px]">
-        <Mark className="mx-auto w-12 text-ink" />
-        <p className="eyebrow mt-6">404</p>
+        <p className="eyebrow">404</p>
         <h1 className="mt-3 text-[clamp(1.8rem,5vw,2.8rem)]">
           This page drifted off.
         </h1>

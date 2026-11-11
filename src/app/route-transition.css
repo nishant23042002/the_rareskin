@@ -1,0 +1,233 @@
+/* ==========================================================================
+   Route transition: "The Aperture"  (components/providers/route-transition.tsx)
+
+   Everything here is a static rule; the motion itself is the Web Animations API
+   on `transform` / `opacity`, which the browser runs on the compositor thread, so
+   the curtain stays smooth while the main thread is busy rendering the next page.
+
+   The ground is `--onyx`, the announcement bar's own obsidian, and the ink is
+   `--champagne`, so the curtain is the same material as the bar and follows the
+   colour theme (themes.css lists `.rh-curtain` among the dark scopes).
+
+   It is a `popover="manual"`: that puts it in the browser's top layer, above an
+   open modal <dialog> (menu, bag, sign-in), which no z-index can do. Browsers
+   without popovers fall back to a fixed layer and the component closes the
+   dialogs up front.
+   ========================================================================== */
+
+@layer components {
+  .rh-curtain {
+    --seam-y: 50%;
+    --seam-x: 50%;
+    --rule: var(--tri);
+
+    display: none;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    background: transparent;
+    color: var(--champagne);
+    /* fallback for a browser without the top layer; a popover ignores it */
+    z-index: 2147483000;
+    contain: layout paint style;
+    /* the curtain swallows taps while it is closed; a swipe on it must not scroll the page behind */
+    touch-action: none;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .rh-curtain[data-open] {
+    display: block;
+  }
+  /* once it starts to lift the page underneath is live again */
+  .rh-curtain.is-leaving {
+    pointer-events: none;
+  }
+  .rh-curtain::backdrop {
+    background: transparent;
+  }
+
+  /* a classic scrollbar's gutter lies outside every fixed layer, so while the page is locked it would show as a pale
+     strip down the edge of the dark curtain: paint the canvas in the curtain's own ground for that time */
+  :root:has(> body.route-locked) {
+    background-color: var(--onyx);
+  }
+
+  /* a soft shade over the page while the aperture closes: depth, and it dims anything that swaps behind the gap */
+  .rh-curtain__dim {
+    position: absolute;
+    inset: 0;
+    background: var(--onyx);
+    opacity: 0;
+    will-change: opacity;
+  }
+
+  /* two halves meeting at the seam (the tap's Y); parked off-screen until the animation drives them in. The top
+     half is 1px taller than the seam so the two never leave an anti-aliased gap between them. */
+  .rh-curtain__half {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background: var(--onyx);
+    will-change: transform;
+  }
+  .rh-curtain__half--top {
+    top: 0;
+    height: calc(var(--seam-y) + 1px);
+    transform: translate3d(0, -101%, 0);
+  }
+  .rh-curtain__half--bottom {
+    top: var(--seam-y);
+    bottom: 0;
+    transform: translate3d(0, 101%, 0);
+  }
+  /* the announcement bar's brass hairline, carried on the leading edge of each half */
+  .rh-curtain__half::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: color-mix(in srgb, var(--brass) 34%, transparent);
+  }
+  .rh-curtain__half--top::after {
+    bottom: 0;
+  }
+  .rh-curtain__half--bottom::after {
+    top: 0;
+  }
+  /* closed, the two edges coincide: no hairline across the middle of the wordmark */
+  .rh-curtain.is-closed .rh-curtain__half::after {
+    opacity: 0;
+  }
+
+  /* the hairline of light that draws outward from the tap as the halves meet, and again as they part */
+  .rh-curtain__seam {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: var(--seam-y);
+    height: 1px;
+    transform-origin: var(--seam-x) 50%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      color-mix(in srgb, var(--champagne) 70%, transparent) 30%,
+      color-mix(in srgb, var(--champagne) 70%, transparent) 70%,
+      transparent 100%
+    );
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  /* a soft brass glow where the finger / pointer landed */
+  .rh-curtain__glint {
+    position: absolute;
+    left: var(--seam-x);
+    top: var(--seam-y);
+    width: 240px;
+    height: 240px;
+    margin: -120px 0 0 -120px;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in srgb, var(--brass) 52%, transparent),
+      transparent
+    );
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  /* the wordmark, the rule, and (on the way to a fragrance) its name. The stage is only a layout box; the mark
+     inside it is the small layer that fades and drifts. */
+  .rh-curtain__stage {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    pointer-events: none;
+  }
+  .rh-curtain__mark {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(14px, 2.4vw, 22px);
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  .rh-curtain__logo {
+    width: clamp(150px, 42vw, 224px);
+  }
+  /* a faint champagne track under the rule, so a dark scent colour (vayren's brown) still reads on the obsidian */
+  .rh-curtain__track {
+    display: block;
+    width: min(300px, 62vw);
+    height: 2px;
+    border-radius: 2px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--champagne) 14%, transparent);
+  }
+  .rh-curtain__rule {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--rule);
+    transform-origin: left center;
+    will-change: transform;
+  }
+  /* a slow glint along the rule, only if the page is taking a moment: the curtain is "working", not frozen */
+  .rh-curtain__rule::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 45%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--champagne) 85%, transparent),
+      transparent
+    );
+    transform: translate3d(-100%, 0, 0);
+    opacity: 0;
+  }
+  .rh-curtain.is-waiting .rh-curtain__rule::after {
+    opacity: 1;
+    animation: rh-curtain-wait 1.15s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  .rh-curtain__label {
+    font: 400 10px/1 var(--f-label);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--champagne) 62%, transparent);
+  }
+  .rh-curtain__label[hidden] {
+    display: none;
+  }
+
+  /* reduced motion: no movement, a dissolve. The component fades the root; the halves sit closed. */
+  .rh-curtain.is-reduced .rh-curtain__half {
+    transform: none;
+  }
+  .rh-curtain.is-reduced .rh-curtain__dim,
+  .rh-curtain.is-reduced .rh-curtain__seam,
+  .rh-curtain.is-reduced .rh-curtain__glint {
+    display: none;
+  }
+
+  @keyframes rh-curtain-wait {
+    to {
+      transform: translate3d(320%, 0, 0);
+    }
+  }
+}

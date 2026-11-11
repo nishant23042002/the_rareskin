@@ -147,7 +147,7 @@ function discoverySetToProduct(order: number): ProductCreateInput {
 function buildSettings() {
   return siteSettingsInput.parse({
     announcements: [
-      { text: "Launch offer — ₹799 (was ₹1,199)", active: true },
+      { text: "Launch offer — ₹799 (was ₹1,499)", active: true },
       { text: "Free shipping across India", active: true },
       { text: "Cash on delivery available", active: true },
       { text: "Discovery Set — all three for ₹799", active: true },
@@ -159,7 +159,7 @@ function buildSettings() {
       code: "launch-799",
       label: "Launch offer — ₹799",
       detail:
-        "Each of the three extraits is ₹799 through launch, down from ₹1,199. Free shipping, cash on delivery, 7-day returns.",
+        "Each of the three extraits is ₹799 through launch, down from ₹1,499. Free shipping, cash on delivery, 7-day returns.",
       href: "/#shop",
       endsAt: "",
     },

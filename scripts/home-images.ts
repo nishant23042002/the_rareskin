@@ -189,7 +189,7 @@ function checkPrompts(m: { assets: Asset[] }): number {
     if (!m.assets.some((a) => a.id === p.asset_id)) err(`prompt-manifest: ${key} points at "${p.asset_id}", which is not in assets-manifest.json`);
   }
   for (const c of CARD_CONCEPTS) for (const f of CARD_SLUGS) {
-    const name = { aurevan: "AURÉVAN", orvelis: "ORVÉLIS", vayren: "VAYRÉN" }[f];
+    const name = { aurevan: "AUREVAN", orvelis: "ORVELIS", vayren: "VAYREN" }[f];
     if (!seen.has(`${name}/${c}`)) err(`prompt-manifest: no prompt for ${name} / ${c}`);
   }
   return errors;

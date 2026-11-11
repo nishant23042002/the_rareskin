@@ -29,9 +29,9 @@
       "label": "Grounded stone",
       "direction": "Concept 1 - Grounded Seamless Surface (Direct Earth & Stone): the flacon stands directly on honed limestone, raw oak or basalt with its ingredients lying beside the base.",
       "assets": {
-        "AURÉVAN": "cards/grounded_stone/aurevan.webp",
-        "ORVÉLIS": "cards/grounded_stone/orvelis.webp",
-        "VAYRÉN": "cards/grounded_stone/vayren.webp"
+        "AUREVAN": "cards/grounded_stone/aurevan.webp",
+        "ORVELIS": "cards/grounded_stone/orvelis.webp",
+        "VAYREN": "cards/grounded_stone/vayren.webp"
       }
     },
     {
@@ -39,9 +39,9 @@
       "label": "Studio light",
       "direction": "Concept 2 - Architectural Chiaroscuro & Studio Bleed: the flacon on an off-white plaster sweep, window-frame shadows across the backdrop, merging with the page.",
       "assets": {
-        "AURÉVAN": "cards/chiaroscuro_studio/aurevan.webp",
-        "ORVÉLIS": "cards/chiaroscuro_studio/orvelis.webp",
-        "VAYRÉN": "cards/chiaroscuro_studio/vayren.webp"
+        "AUREVAN": "cards/chiaroscuro_studio/aurevan.webp",
+        "ORVELIS": "cards/chiaroscuro_studio/orvelis.webp",
+        "VAYREN": "cards/chiaroscuro_studio/vayren.webp"
       }
     },
     {
@@ -49,9 +49,9 @@
       "label": "Mineral bed",
       "direction": "Concept 3 - Raw Mineral & Botanical Bed: low-angle macro, the base slightly embedded in marble dust, crushed spice or volcanic sand.",
       "assets": {
-        "AURÉVAN": "cards/mineral_bed/aurevan.webp",
-        "ORVÉLIS": "cards/mineral_bed/orvelis.webp",
-        "VAYRÉN": "cards/mineral_bed/vayren.webp"
+        "AUREVAN": "cards/mineral_bed/aurevan.webp",
+        "ORVELIS": "cards/mineral_bed/orvelis.webp",
+        "VAYREN": "cards/mineral_bed/vayren.webp"
       }
     },
     {
@@ -59,15 +59,15 @@
       "label": "Liquid light",
       "direction": "Concept 4 - Optical Caustics & Liquid Refraction: the flacon on a shallow water film or an optical-glass plate, warm sun throwing golden caustics beside it.",
       "assets": {
-        "AURÉVAN": "cards/liquid_caustics/aurevan.webp",
-        "ORVÉLIS": "cards/liquid_caustics/orvelis.webp",
-        "VAYRÉN": "cards/liquid_caustics/vayren.webp"
+        "AUREVAN": "cards/liquid_caustics/aurevan.webp",
+        "ORVELIS": "cards/liquid_caustics/orvelis.webp",
+        "VAYREN": "cards/liquid_caustics/vayren.webp"
       }
     }
   ],
   "prompts": [
     {
-      "fragrance": "AURÉVAN",
+      "fragrance": "AUREVAN",
       "concept_id": "grounded_stone",
       "aspect_ratio": "4:5",
       "asset": "cards/grounded_stone/aurevan.webp",
@@ -83,14 +83,14 @@
       "composite": "Approved AUREVAN flacon, about 64% of the frame height, centred (x 50%), base resting on the slab at y about 80%. Contact shadow: tight dark core plus a long soft falloff to the right (light from the upper left), opacity about .35. The left glass edge catches the sun bar. Both ingredient groups stay more than 12% of the frame width away from the bottle.",
       "verify": [
         "jasmine is this brief's reading of the catalogue's 'White Florals'; swap to gardenia if the founder prefers",
-        "v2 (2026-11-06): the first plate drew a slab at a diagonal with the props in the middle, which pushed the bottle off-centre; this version uses a tabletop to the bottom edge and edge-cut props so the bottle can stand exactly where the ORVÉLIS bottle stands (x 50%, same size, same base)",
+        "v2 (2026-11-06): the first plate drew a slab at a diagonal with the props in the middle, which pushed the bottle off-centre; this version uses a tabletop to the bottom edge and edge-cut props so the bottle can stand exactly where the ORVELIS bottle stands (x 50%, same size, same base)",
         "v3 (2026-11-06): v2 drew a free-standing table with a corner and the bergamot at the back-centre (unusable for a centred bottle); v3 asks for a full-width floor and corner foreground props",
-        "final picture = the table plate AQusi21p… (second AURÉVAN plate); the full-width floor plate was dropped"
+        "final picture = the table plate AQusi21p… (second AUREVAN plate); the full-width floor plate was dropped"
       ],
       "asset_id": "aurevan-card-grounded_stone"
     },
     {
-      "fragrance": "ORVÉLIS",
+      "fragrance": "ORVELIS",
       "concept_id": "grounded_stone",
       "aspect_ratio": "4:5",
       "asset": "cards/grounded_stone/orvelis.webp",
@@ -103,15 +103,15 @@
       ],
       "light": "3200 K golden hour, low raking light from the right",
       "camera": "tabletop height, 12 degree downward tilt, 100 mm macro, f/5.6",
-      "composite": "Approved ORVÉLIS flacon, about 64% of the frame height, centred, base resting on the oak at y about 80%. Contact shadow falls LEFT (light from the right), opacity about .45, warm brown rather than black. Rim light on the right glass edge; glass neutral factor about .8 on this warm set; sharpen about .35 (the source is 1254 px native).",
+      "composite": "Approved ORVELIS flacon, about 64% of the frame height, centred, base resting on the oak at y about 80%. Contact shadow falls LEFT (light from the right), opacity about .45, warm brown rather than black. Rim light on the right glass edge; glass neutral factor about .8 on this warm set; sharpen about .35 (the source is 1254 px native).",
       "verify": [
-        "the previous ORVÉLIS plate added a honeycomb that is not in the notes: reject any plate that shows honey or comb",
-        "the AURÉVAN plate clumped its ingredients in the middle although told 'left quarter / right quarter': the oak prompt pushes them to the frame edges ('partly cut by the frame edge') and drops the word 'honey' from the palette"
+        "the previous ORVELIS plate added a honeycomb that is not in the notes: reject any plate that shows honey or comb",
+        "the AUREVAN plate clumped its ingredients in the middle although told 'left quarter / right quarter': the oak prompt pushes them to the frame edges ('partly cut by the frame edge') and drops the word 'honey' from the palette"
       ],
       "asset_id": "orvelis-card-grounded_stone"
     },
     {
-      "fragrance": "VAYRÉN",
+      "fragrance": "VAYREN",
       "concept_id": "grounded_stone",
       "aspect_ratio": "4:5",
       "asset": "cards/grounded_stone/vayren.webp",
@@ -125,16 +125,16 @@
       ],
       "light": "5600 K cool key from the upper left, 3000 K warm edge from the right",
       "camera": "tabletop height, 12 degree downward tilt, 100 mm macro, f/5.6",
-      "composite": "Approved VAYRÉN flacon, about 64% of the frame height, centred, base resting on the basalt at y about 80%. Dark set: glass positive-light factor about .5 to .8, rim light about .5 on the cap and both glass edges (0.34 left the clear glass nearly invisible). The smoke thread passes just right of the cap and stays behind the bottle.",
+      "composite": "Approved VAYREN flacon, about 64% of the frame height, centred, base resting on the basalt at y about 80%. Dark set: glass positive-light factor about .5 to .8, rim light about .5 on the cap and both glass edges (0.34 left the clear glass nearly invisible). The smoke thread passes just right of the cap and stays behind the bottle.",
       "verify": [
         "generators tend to draw a brass scoop or a bowl instead of a plain leather strip: if so, cut the strip from a re-roll",
-        "v2 (2026-11-06): rewritten with the lessons of the AURÉVAN v3 plate: full-width corner-free floor, whole middle empty, props large at the lower corners; peppercorns added (the catalogue's 'Spices'); the bottle stands at the shared BOTTLE position (x 880, base 1580, scale 1.04)",
+        "v2 (2026-11-06): rewritten with the lessons of the AUREVAN v3 plate: full-width corner-free floor, whole middle empty, props large at the lower corners; peppercorns added (the catalogue's 'Spices'); the bottle stands at the shared BOTTLE position (x 880, base 1580, scale 1.04)",
         "v3 (2026-11-06): the v2 prompt ('finely pitted ... vesicles', props 'large') made Kling draw a steeply tilted bordered strip of black gravel with smoke ribbons running THROUGH the floor, a huge leather panel and the peppercorns in a tray (plate AfyYFwNy…, discarded); v3 asks for one continuous honed floor with no borders, a grazing camera, smoke against the wall only, and only a corner of leather plus a dozen peppercorns"
       ],
       "asset_id": "vayren-card-grounded_stone"
     },
     {
-      "fragrance": "AURÉVAN",
+      "fragrance": "AUREVAN",
       "concept_id": "chiaroscuro_studio",
       "aspect_ratio": "4:5",
       "asset": "cards/chiaroscuro_studio/aurevan.webp",
@@ -154,7 +154,7 @@
       "asset_id": "aurevan-card-chiaroscuro_studio"
     },
     {
-      "fragrance": "ORVÉLIS",
+      "fragrance": "ORVELIS",
       "concept_id": "chiaroscuro_studio",
       "aspect_ratio": "4:5",
       "asset": "cards/chiaroscuro_studio/orvelis.webp",
@@ -166,15 +166,15 @@
       ],
       "light": "3400 K late-afternoon amber through a two-pane window, upper right",
       "camera": "tabletop height, 10 degree downward tilt, 85 mm, f/4",
-      "composite": "Approved ORVÉLIS flacon, about 64% of the frame height, centred, base on the plaster at y about 80%. Light comes from the RIGHT: contact shadow falls left, opacity about .26, warm taupe. Glass neutral about .8, sharpen about .35. Keep the plate warm but high-key so it still merges with the page.",
+      "composite": "Approved ORVELIS flacon, about 64% of the frame height, centred, base on the plaster at y about 80%. Light comes from the RIGHT: contact shadow falls left, opacity about .26, warm taupe. Glass neutral about .8, sharpen about .35. Keep the plate warm but high-key so it still merges with the page.",
       "verify": [
         "the sand tint lowers the page-merge: check the edge colour against --paper",
-        "v2 (2026-11-06): rewritten with the AURÉVAN studio lessons (continuous surface, nothing standing on it, smooth floor to avoid the mosaic artefact); the bottle stands at the shared BOTTLE position; light from the RIGHT so the shadows fall left"
+        "v2 (2026-11-06): rewritten with the AUREVAN studio lessons (continuous surface, nothing standing on it, smooth floor to avoid the mosaic artefact); the bottle stands at the shared BOTTLE position; light from the RIGHT so the shadows fall left"
       ],
       "asset_id": "orvelis-card-chiaroscuro_studio"
     },
     {
-      "fragrance": "VAYRÉN",
+      "fragrance": "VAYREN",
       "concept_id": "chiaroscuro_studio",
       "aspect_ratio": "4:5",
       "asset": "cards/chiaroscuro_studio/vayren.webp",
@@ -186,7 +186,7 @@
       ],
       "light": "4500 K hard blade from a slit window, upper right, deep fill-less shadow on the left",
       "camera": "tabletop height, 10 degree downward tilt, 85 mm, f/4",
-      "composite": "Approved VAYRÉN flacon, about 64% of the frame height, centred or 4% left of centre so the light blade grazes its right shoulder, base on the plaster at y about 80%. Rim light about .5 on the right glass edge and cap. Contact shadow falls left, opacity about .4. This is the darkest studio variant and will not dissolve into the page: judge it in the switcher.",
+      "composite": "Approved VAYREN flacon, about 64% of the frame height, centred or 4% left of centre so the light blade grazes its right shoulder, base on the plaster at y about 80%. Rim light about .5 on the right glass edge and cap. Contact shadow falls left, opacity about .4. This is the darkest studio variant and will not dissolve into the page: judge it in the switcher.",
       "verify": [
         "checks: the page-merge claim of this concept is weakest here",
         "v2 (2026-11-06): rewritten with the lessons of the two earlier studio cards; the bottle stands at the shared BOTTLE position; light from the RIGHT so shadows fall left; the plate may need shift_crop (floor must start above y 1580) and the logo painted out first (box clears the logo by > 14 px feather)"
@@ -194,7 +194,7 @@
       "asset_id": "vayren-card-chiaroscuro_studio"
     },
     {
-      "fragrance": "AURÉVAN",
+      "fragrance": "AUREVAN",
       "concept_id": "mineral_bed",
       "aspect_ratio": "4:5",
       "asset": "cards/mineral_bed/aurevan.webp",
@@ -216,7 +216,7 @@
       "asset_id": "aurevan-card-mineral_bed"
     },
     {
-      "fragrance": "ORVÉLIS",
+      "fragrance": "ORVELIS",
       "concept_id": "mineral_bed",
       "aspect_ratio": "4:5",
       "asset": "cards/mineral_bed/orvelis.webp",
@@ -230,15 +230,15 @@
       ],
       "light": "3200 K low side light from the right",
       "camera": "ground level, 100 mm macro, f/3.2",
-      "composite": "Approved ORVÉLIS flacon, about 62% of the frame height, centred. Embed it as for the other mineral beds (base sunk about 4%, foreground ridge pasted over it with a wavy mask, tight occlusion shadow). Light from the RIGHT: shadow falls left, warm brown. Glass neutral about .8, sharpen about .35.",
+      "composite": "Approved ORVELIS flacon, about 62% of the frame height, centred. Embed it as for the other mineral beds (base sunk about 4%, foreground ridge pasted over it with a wavy mask, tight occlusion shadow). Light from the RIGHT: shadow falls left, warm brown. Glass neutral about .8, sharpen about .35.",
       "verify": [
         "star anise is the catalogue's 'Spices' made literal; drop it if it reads as a different scent",
-        "v2 (2026-11-06): same structure as the AURÉVAN mineral-bed plate that worked (a low mound with its crest three fifths down so the shared BOTTLE position sits inside it, props at the frame edges); no 'honey' anywhere"
+        "v2 (2026-11-06): same structure as the AUREVAN mineral-bed plate that worked (a low mound with its crest three fifths down so the shared BOTTLE position sits inside it, props at the frame edges); no 'honey' anywhere"
       ],
       "asset_id": "orvelis-card-mineral_bed"
     },
     {
-      "fragrance": "VAYRÉN",
+      "fragrance": "VAYREN",
       "concept_id": "mineral_bed",
       "aspect_ratio": "4:5",
       "asset": "cards/mineral_bed/vayren.webp",
@@ -252,15 +252,15 @@
       ],
       "light": "5600 K hard rim light skimming from the left",
       "camera": "ground level, 100 mm macro, f/3.2",
-      "composite": "Approved VAYRÉN flacon, about 62% of the frame height, centred. Embed it as for the other mineral beds. Dark set: glass positive-light about .5 to .8, rim light about .5 on the left glass edge and cap (the hard light comes from the left). Keep the smoke thread right of the cap.",
+      "composite": "Approved VAYREN flacon, about 62% of the frame height, centred. Embed it as for the other mineral beds. Dark set: glass positive-light about .5 to .8, rim light about .5 on the left glass edge and cap (the hard light comes from the left). Keep the smoke thread right of the cap.",
       "verify": [
         "dark on dark: verify the clear glass edge stays visible at 375 px",
-        "v2 (2026-11-06): same structure as the AURÉVAN mineral-bed plate that worked; the smoke must stay against the wall above the mound and never cross the sand"
+        "v2 (2026-11-06): same structure as the AUREVAN mineral-bed plate that worked; the smoke must stay against the wall above the mound and never cross the sand"
       ],
       "asset_id": "vayren-card-mineral_bed"
     },
     {
-      "fragrance": "AURÉVAN",
+      "fragrance": "AUREVAN",
       "concept_id": "liquid_caustics",
       "aspect_ratio": "4:5",
       "asset": "cards/liquid_caustics/aurevan.webp",
@@ -277,12 +277,12 @@
       "verify": [
         "the caustics are painted by the generator, not refracted through the approved bottle; the brief's amber liquid is NOT part of the approved mockups",
         "v2 (2026-11-06): rewritten with the lessons of concepts 1-3 (borderless surface to the bottom edge, empty middle, props partly cut at the frame edges, caustic pool on the side AWAY from the light so it lands beside the shared BOTTLE position); reflection is composited (compositor refl), the clear liquid stays clear",
-        "v3 (2026-11-06): the first attempt (a tilted floor-and-ripple prompt) gave a woman's face in the water (AURÉVAN), a 45-degree view with a dark diagonal vein and concentric ripples (ORVÉLIS), and a steeply diagonal black slab with a big leather panel (VAYRÉN); v3 asks for a perfectly level straight-on view, a plain evenly toned floor, no people, props small at the frame edges; plate ids of the discarded first rolls are in homepage/plate_ids.txt"
+        "v3 (2026-11-06): the first attempt (a tilted floor-and-ripple prompt) gave a woman's face in the water (AUREVAN), a 45-degree view with a dark diagonal vein and concentric ripples (ORVELIS), and a steeply diagonal black slab with a big leather panel (VAYREN); v3 asks for a perfectly level straight-on view, a plain evenly toned floor, no people, props small at the frame edges; plate ids of the discarded first rolls are in homepage/plate_ids.txt"
       ],
       "asset_id": "aurevan-card-liquid_caustics"
     },
     {
-      "fragrance": "ORVÉLIS",
+      "fragrance": "ORVELIS",
       "concept_id": "liquid_caustics",
       "aspect_ratio": "4:5",
       "asset": "cards/liquid_caustics/orvelis.webp",
@@ -295,16 +295,16 @@
       ],
       "light": "3200 K low sun from the right, caustics on the left",
       "camera": "tabletop height, 12 degree downward tilt, 100 mm macro, f/5.6",
-      "composite": "Approved ORVÉLIS flacon, about 62% of the frame height, centred, standing on the glass at y about 80%. Light from the RIGHT, so the caustic pool lies to the LEFT of the base (line it up). Reflection as for AURÉVAN (flip, fade, tiny refraction offset because the plate is thick). Glass neutral about .8, sharpen about .35. The liquid stays crystal clear.",
+      "composite": "Approved ORVELIS flacon, about 62% of the frame height, centred, standing on the glass at y about 80%. Light from the RIGHT, so the caustic pool lies to the LEFT of the base (line it up). Reflection as for AUREVAN (flip, fade, tiny refraction offset because the plate is thick). Glass neutral about .8, sharpen about .35. The liquid stays crystal clear.",
       "verify": [
-        "same caveat as AURÉVAN: caustics are painted, not refracted; check the glass plate does not read as a pedestal (it must be a thin plate)",
+        "same caveat as AUREVAN: caustics are painted, not refracted; check the glass plate does not read as a pedestal (it must be a thin plate)",
         "v2 (2026-11-06): the optical-glass plate of the first prompt was replaced by a water film over limestone (a thick glass slab would read as a pedestal); light from the RIGHT so the caustics land on the left; no honey",
-        "v3 (2026-11-06): the first attempt (a tilted floor-and-ripple prompt) gave a woman's face in the water (AURÉVAN), a 45-degree view with a dark diagonal vein and concentric ripples (ORVÉLIS), and a steeply diagonal black slab with a big leather panel (VAYRÉN); v3 asks for a perfectly level straight-on view, a plain evenly toned floor, no people, props small at the frame edges; plate ids of the discarded first rolls are in homepage/plate_ids.txt"
+        "v3 (2026-11-06): the first attempt (a tilted floor-and-ripple prompt) gave a woman's face in the water (AUREVAN), a 45-degree view with a dark diagonal vein and concentric ripples (ORVELIS), and a steeply diagonal black slab with a big leather panel (VAYREN); v3 asks for a perfectly level straight-on view, a plain evenly toned floor, no people, props small at the frame edges; plate ids of the discarded first rolls are in homepage/plate_ids.txt"
       ],
       "asset_id": "orvelis-card-liquid_caustics"
     },
     {
-      "fragrance": "VAYRÉN",
+      "fragrance": "VAYREN",
       "concept_id": "liquid_caustics",
       "aspect_ratio": "4:5",
       "asset": "cards/liquid_caustics/vayren.webp",
@@ -316,11 +316,11 @@
       ],
       "light": "3000 K low sun from the upper left, caustics on the right",
       "camera": "tabletop height, 12 degree downward tilt, 100 mm macro, f/5.6",
-      "composite": "Approved VAYRÉN flacon, about 62% of the frame height, centred, standing in the water film at y about 80%. Dark set: glass positive-light about .5 to .8, rim light about .5. Mirror reflection fades faster (25% to 0 over about 14% of the frame height). The caustic pool lies to the right of the base. The liquid stays crystal clear.",
+      "composite": "Approved VAYREN flacon, about 62% of the frame height, centred, standing in the water film at y about 80%. Dark set: glass positive-light about .5 to .8, rim light about .5. Mirror reflection fades faster (25% to 0 over about 14% of the frame height). The caustic pool lies to the right of the base. The liquid stays crystal clear.",
       "verify": [
         "same caveat: painted caustics; the mirror makes the contact line the hardest edge to get right",
         "v2 (2026-11-06): only a small corner of leather (a larger leather panel took over the lower-left of an earlier basalt plate); caustics on the right, away from the light",
-        "v3 (2026-11-06): the first attempt (a tilted floor-and-ripple prompt) gave a woman's face in the water (AURÉVAN), a 45-degree view with a dark diagonal vein and concentric ripples (ORVÉLIS), and a steeply diagonal black slab with a big leather panel (VAYRÉN); v3 asks for a perfectly level straight-on view, a plain evenly toned floor, no people, props small at the frame edges; plate ids of the discarded first rolls are in homepage/plate_ids.txt"
+        "v3 (2026-11-06): the first attempt (a tilted floor-and-ripple prompt) gave a woman's face in the water (AUREVAN), a 45-degree view with a dark diagonal vein and concentric ripples (ORVELIS), and a steeply diagonal black slab with a big leather panel (VAYREN); v3 asks for a perfectly level straight-on view, a plain evenly toned floor, no people, props small at the frame edges; plate ids of the discarded first rolls are in homepage/plate_ids.txt"
       ],
       "asset_id": "vayren-card-liquid_caustics"
     }

@@ -1,11 +1,12 @@
 "use client";
 
 import { getImageProps } from "next/image";
-import { useState, type CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { Flacon } from "@/components/ui/flacon";
 import { cloudinaryVariant, FRAGRANCE_SLUGS } from "@/lib/catalog";
 import { DEFAULT_HERO_CONCEPT, HERO_FOLLOWS_CARD_CONCEPT } from "@/config/hero.config";
+import { HERO_WIDE_FROM } from "@/config/hero-spots";
 import {
   getHomeAsset,
   getVariant,
@@ -15,6 +16,7 @@ import {
   type HomeAsset,
 } from "@/lib/home-images";
 import { useCardConcept } from "./card-concept";
+import { useHero } from "./hero-frame";
 import { useHeroVariant } from "./hero-variant";
 
 /**
@@ -98,13 +100,32 @@ function Trio() {
  * deprecated in Next 16; `fetchPriority` is the documented replacement). The
  * intrinsic width/height give the browser the ratio; the box has a fixed height in
  * CSS, so nothing shifts.
+ *
+ * In the "stage" layout (see `HeroFrame`) the picture is not cropped by CSS `object-fit` but drawn
+ * at its own aspect ratio inside `.rh-hero__stage`, a box that reproduces `cover` with container
+ * units (app/hero.css); the flacon hotspots passed as `children` sit in that same box, so they are
+ * pinned to the bottles at every screen size. The 16:9 master is used from `HERO_WIDE_FROM` px up
+ * (a tablet gets the whole wide picture), the 4:5 crop below, and the picture spans the full width
+ * of the hero, so its `sizes` is 100vw.
  */
-function ShippedHero({ asset, onError }: { asset: HomeAsset; onError: () => void }) {
+function ShippedHero({
+  asset,
+  onError,
+  stage,
+  children,
+  overlay,
+}: {
+  asset: HomeAsset;
+  onError: () => void;
+  stage: boolean;
+  children?: ReactNode;
+  overlay?: ReactNode;
+}) {
   const desktop = getVariant(asset, "desktop");
   const mobile = getVariant(asset, "mobile");
   const common = {
     alt: asset.alt,
-    sizes: asset.sizes,
+    sizes: stage ? "100vw" : asset.sizes,
     quality: 85,
     loading: "eager" as const,
     fetchPriority: "high" as const,
@@ -121,9 +142,13 @@ function ShippedHero({ asset, onError }: { asset: HomeAsset; onError: () => void
     width: mobile.width,
     height: mobile.height,
   });
-  return (
+  const picture = (
     <picture>
-      <source media={desktop.media} srcSet={d.props.srcSet} sizes={asset.sizes} />
+      <source
+        media={stage ? `(min-width: ${HERO_WIDE_FROM}px)` : desktop.media}
+        srcSet={d.props.srcSet}
+        sizes={common.sizes}
+      />
       <img
         {...m.props}
         alt={asset.alt}
@@ -140,10 +165,40 @@ function ShippedHero({ asset, onError }: { asset: HomeAsset; onError: () => void
       />
     </picture>
   );
+  if (!stage) return picture;
+  return (
+    <div
+      className="rh-hero__art"
+      style={
+        {
+          "--ar-w": desktop.width / desktop.height,
+          "--ar-t": mobile.width / mobile.height,
+        } as CSSProperties
+      }
+    >
+      <div className="rh-hero__stage">
+        <div className="rh-hero__drift">
+          {picture}
+          {children}
+        </div>
+      </div>
+      {overlay}
+    </div>
+  );
 }
 
-export function HeroMedia({ photo }: { photo?: HeroPhotoSource | null }) {
-  const [failed, setFailed] = useState(false);
+export function HeroMedia({
+  photo,
+  children,
+  overlay,
+}: {
+  photo?: HeroPhotoSource | null;
+  /** the flacon hotspots: drawn only in the stage layout, inside the picture's own box */
+  children?: ReactNode;
+  /** drawn only in the stage layout, over the picture and pinned to the visible hero rather than to the picture (the plaques) */
+  overlay?: ReactNode;
+}) {
+  const { failed, setFailed, layout } = useHero();
   // the art direction chosen in the preview bar (src/config/hero.config.ts); the baseline hero until a direction's pictures are final
   const cardConcept = useCardConcept();
   // a reference variant (?hero=1..4, or `activeHeroVariant`) beats the card direction; a variant that is still a placeholder falls back to it
@@ -153,7 +208,17 @@ export function HeroMedia({ photo }: { photo?: HeroPhotoSource | null }) {
   // manifest once it is final; 3. the illustrated trio
   if (!photo?.url || failed) {
     if (!failed && isFinal(getHomeAsset("hero"))) {
-      return <ShippedHero key={heroAsset.id} asset={heroAsset} onError={() => setFailed(true)} />;
+      return (
+        <ShippedHero
+          key={heroAsset.id}
+          asset={heroAsset}
+          onError={() => setFailed(true)}
+          stage={layout === "stage"}
+          overlay={overlay}
+        >
+          {children}
+        </ShippedHero>
+      );
     }
     return <Trio />;
   }

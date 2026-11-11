@@ -12,7 +12,7 @@ import { toPaise, toRupees } from "@/lib/money";
  *
  *   pnpm catalog list
  *   pnpm catalog set <slug> price 749          # rupees
- *   pnpm catalog set <slug> mrp 1199
+ *   pnpm catalog set <slug> mrp 1499
  *   pnpm catalog set <slug> stock 40
  *   pnpm catalog set <slug> status draft|active|archived
  *   pnpm catalog set <slug> title "New tagline"

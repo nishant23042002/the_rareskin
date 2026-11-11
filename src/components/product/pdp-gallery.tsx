@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Flacon } from "@/components/ui/flacon";
 import { Carousel } from "@/components/ui/carousel";
 import { cn } from "@/lib/cn";
@@ -36,6 +36,32 @@ export function PdpGallery({
   images: FragranceImages;
 }) {
   const [active, setActive] = useState(0);
+  // The slides whose pictures are fetched. Only the first is, to begin with: the others are 100-550 KB
+  // each (about 1.1 MB for the set) and every byte of them competes with the picture the page is waiting
+  // on. The next one is warmed when the browser is idle or on the first touch / hover / focus (a drag
+  // shows the neighbour, so it has to be there), and each swipe or thumbnail tap loads that slide and its
+  // neighbours. Slides never un-load, so going back never flashes.
+  const [wanted, setWanted] = useState<number[]>([0]);
+  const want = (...at: number[]) =>
+    setWanted((w) => {
+      const next = new Set(w);
+      for (const i of at) if (i >= 0) next.add(i);
+      return next.size === w.length ? w : [...next];
+    });
+  const go = (i: number) => {
+    setActive(i);
+    want(i - 1, i, i + 1);
+  };
+
+  useEffect(() => {
+    const warm = () => setWanted((w) => (w.includes(1) ? w : [...w, 1]));
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(warm, { timeout: 4000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(warm, 2500);
+    return () => window.clearTimeout(id);
+  }, []);
 
   // the order lives in `@/lib/pdp-images`, shared with every other surface that
   // shows this product's first picture
@@ -43,12 +69,17 @@ export function PdpGallery({
   const slides = all.length > 0 ? all : null;
 
   return (
-    <div className="grid gap-3 lg:sticky lg:top-[calc(var(--announce-h)+var(--header-h)+24px)]">
+    <div
+      className="grid gap-3 lg:sticky lg:top-[calc(var(--announce-h)+var(--header-h)+24px)]"
+      onPointerDownCapture={() => want(active - 1, active + 1)}
+      onPointerEnter={() => want(active + 1)}
+      onFocusCapture={() => want(active - 1, active + 1)}
+    >
       <Carousel
         ariaLabel={`${name} images`}
         dotsInside
         activeIndex={active}
-        onActiveChange={setActive}
+        onActiveChange={go}
         viewportClassName="rounded-[3px] border border-line"
       >
         {slides
@@ -58,17 +89,21 @@ export function PdpGallery({
                 className="relative aspect-[1/1.06] overflow-hidden"
                 style={{ background: FRAME_BG }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={s.full}
-                  srcSet={s.srcSet}
-                  sizes={s.srcSet ? "(min-width: 1024px) 560px, 100vw" : undefined}
-                  alt={s.alt}
-                  className="h-full w-full object-cover"
-                  loading={idx === 0 ? "eager" : "lazy"}
-                  fetchPriority={idx === 0 ? "high" : undefined}
-                  decoding="async"
-                />
+                {wanted.includes(idx) && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={s.full}
+                    srcSet={s.srcSet}
+                    sizes={s.srcSet ? "(min-width: 1024px) 560px, 100vw" : undefined}
+                    alt={s.alt}
+                    className="h-full w-full object-cover"
+                    // a slide that was asked for is fetched now (a lazy image inside a clipped, sliding
+                    // track is not reliably "near"); the one on show is the priority, a neighbour is not
+                    loading="eager"
+                    fetchPriority={idx === active ? "high" : "low"}
+                    decoding="async"
+                  />
+                )}
               </div>
             ))
           : VECTOR_VIEWS.map((v) => (
@@ -97,7 +132,8 @@ export function PdpGallery({
               <button
                 key={s.key}
                 type="button"
-                onClick={() => setActive(i)}
+                onClick={() => go(i)}
+                onPointerEnter={() => want(i)}
                 aria-label={`${name} — view ${i + 1}`}
                 aria-current={i === active}
                 className={cn(
@@ -107,7 +143,7 @@ export function PdpGallery({
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={s.thumb}
+                  src={s.tiny}
                   alt=""
                   className="h-full w-full object-cover"
                   loading="lazy"

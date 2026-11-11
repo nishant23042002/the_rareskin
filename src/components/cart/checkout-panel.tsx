@@ -11,7 +11,6 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Flacon } from "@/components/ui/flacon";
-import { Mark } from "@/components/ui/mark";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { PaymentBadges, UpiAppStrip } from "@/components/ui/payment-marks";
 import { useAuth } from "@/components/providers/auth-provider";
@@ -347,7 +346,7 @@ export function CheckoutPanel() {
   if (!hydrated || status === "loading") {
     return (
       <div className="flex flex-1 items-center justify-center px-8">
-        <Mark className="w-5 animate-pulse text-ink-3" />
+        <span aria-hidden className="size-2 animate-pulse rounded-full bg-ink-3" />
       </div>
     );
   }
@@ -355,7 +354,6 @@ export function CheckoutPanel() {
   if (cartLines.length === 0 && view === "checkout") {
     return (
       <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
-        <Mark className="mb-5 w-6 text-ink-3" />
         <p className="serif-italic text-[1.35rem] leading-snug text-ink-2">
           Your bag emptied out.
         </p>
@@ -745,9 +743,7 @@ export function CheckoutPanel() {
                     />
                   ) : isFragranceSlug(l.slug) ? (
                     <Flacon fragrance={l.slug} className="w-5" />
-                  ) : (
-                    <Mark className="w-4 text-ink-3" />
-                  )}
+                  ) : null}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-[13.5px] tracking-[0.02em] text-ink">

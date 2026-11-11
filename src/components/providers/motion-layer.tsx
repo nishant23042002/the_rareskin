@@ -28,19 +28,19 @@ const TILT = ".rh-tile__media, .rh-offer__tile, .rh-ig__tile, [data-tilt]";
 /** the buttons that lean toward the pointer */
 const MAGNET = ".rh-btn:not(.rh-btn--block)";
 /** the selectable chips that pulse when chosen */
-const CHIP = '.rh-q-opt, .rh-ticket__chips a, [role="tab"], [role="radio"]';
+const CHIP = '.rh-q-opt, .rh-pass__chips a, [role="tab"], [role="radio"]';
 /** where reveals happen: the homepage sections under the hero, or anything marked */
 const REVEAL_ROOT = ".rh-main > *:not(.rh-hero), [data-reveal]";
 /** what rises in inside them */
 const REVEAL_ITEM =
   ".rh-eyebrow, .rh-display, .rh-h2, .rh-sub, .rh-lede, .rh-btn, .rh-link-u, .rh-tile, [data-rv]";
 /**
- * never touched: the ticket runs its own sequence, drawers and dialogs are not page content, and anything inside a
+ * never touched: the launch pass runs its own sequence, drawers and dialogs are not page content, and anything inside a
  * sideways-scrolling row (the collection rail, the In Focus carousel, the @therareskin strip) is already "on screen" as
  * far as its own scroller is concerned: revealing a card that is merely scrolled out of view made it rise 24px into
  * place as it was swiped in, out of line with its neighbours
  */
-const REVEAL_SKIP = ".rh-ticket, .rh-rail, .rh-focus, .rh-ig__row, dialog, [data-no-motion]";
+const REVEAL_SKIP = ".rh-pass, .rh-rail, .rh-focus, .rh-ig__row, dialog, [data-no-motion]";
 
 const MAX_TILT = 4; // degrees
 const MAX_PULL = 3; // px

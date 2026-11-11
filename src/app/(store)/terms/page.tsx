@@ -123,9 +123,8 @@ export default function TermsPage() {
           h: "Intellectual property",
           body: (
             <p>
-              The name THE RARESKIN, the crossbar-less mark, and all text,
-              imagery, layout and design on this site belong to Velocity Ventures
-              Group. You may not copy, reproduce, or use them for any commercial
+              The name THE RARESKIN, its wordmark, and all text, imagery, layout
+              and design on this site belong to Velocity Ventures Group. You may not copy, reproduce, or use them for any commercial
               purpose without our written permission.
             </p>
           ),

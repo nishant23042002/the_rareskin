@@ -7,7 +7,6 @@ import {
   Text,
   Image,
   Svg,
-  Path,
   Rect,
   Defs,
   LinearGradient,
@@ -20,7 +19,7 @@ import type { InvoiceData, InvoiceLine } from "./data";
 /**
  * THE RARESKIN invoice — a fragrance house's document, not a spreadsheet.
  * The line items show the flacon in its own juice; each fragrance carries its
- * three headline notes; the tri-juice rule (aurévan · orvélis · vayrén) is the
+ * three headline notes; the tri-juice rule (aurevan · orvelis · vayren) is the
  * same signature that runs through the site and the order emails. One page for
  * a normal order.
  */
@@ -139,22 +138,6 @@ const s = StyleSheet.create({
 
 // ── vector glyphs ─────────────────────────────────────────────────────
 
-/** The crossbar-less "A" — the brand device. */
-function Mark({ size = 15, color = c.ink }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={(size * 8) / 12} viewBox="0 0 12 8">
-      <Path
-        d="M1 7 L6 1.4 L11 7"
-        stroke={color}
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-      />
-    </Svg>
-  );
-}
-
 function JuiceRule() {
   return (
     <View style={s.rule}>
@@ -206,9 +189,7 @@ function ItemGlyph({ line }: { line: InvoiceLine }) {
   }
   if (line.juice) return <Flacon juice={line.juice} />;
   return (
-    <View style={{ width: 34, height: 46, alignItems: "center", justifyContent: "center", backgroundColor: c.faint, borderRadius: 2 }}>
-      <Mark size={16} color={c.muted} />
-    </View>
+    <View style={{ width: 34, height: 46, backgroundColor: c.faint, borderRadius: 2 }} />
   );
 }
 
@@ -236,7 +217,6 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
             ) : (
               // only if the artwork file is missing from the bundle
               <View style={s.wordmark}>
-                <Mark size={16} />
                 <Text style={s.brandName}>THE RARESKIN</Text>
               </View>
             )}
@@ -414,7 +394,6 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
 
         {/* closing mark */}
         <View style={s.close} wrap={false}>
-          <Mark size={13} color={c.muted} />
           <Text style={s.closeLine}>Thank you for choosing {brand.name}.</Text>
         </View>
 

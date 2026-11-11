@@ -5,7 +5,7 @@ import { STOCK_LEDGER_REASONS } from "@/lib/validation/commerce";
 /**
  * Append-only record of every stock movement. The guarded `$inc` on the product
  * is the source of truth for the *level*; this collection is the audit trail —
- * "why is AURÉVAN at 41?" is answered by replaying these rows. Written inside
+ * "why is AUREVAN at 41?" is answered by replaying these rows. Written inside
  * the same transaction as the movement it records.
  */
 export interface StockLedgerDoc {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { useLenis } from "lenis/react";
 
 import { useCart } from "@/components/providers/cart-provider";
@@ -8,13 +9,20 @@ import { useRouteTransition } from "@/components/providers/route-transition";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useSlideDialog } from "@/hooks/use-slide-dialog";
 import { Button } from "@/components/ui/button";
-import { Mark } from "@/components/ui/mark";
 import { Icon } from "@/components/ui/icon";
 import { Logo } from "@/components/ui/logo";
 import { unlockScroll } from "@/lib/scroll-lock";
 import { BagView } from "./bag-view";
 import { CartMarquee } from "./cart-marquee";
-import { CheckoutPanel } from "./checkout-panel";
+
+// The checkout (forms, validation, the payment hand-off) is the biggest single piece of the bag and nobody
+// needs it until they tap Checkout, so it is its own chunk: not in the bundle every page loads. It is
+// warmed once the page is idle (below), so by the time the drawer opens it is already in the cache.
+const loadCheckoutPanel = () => import("./checkout-panel");
+const CheckoutPanel = dynamic(() => loadCheckoutPanel().then((m) => m.CheckoutPanel), {
+  ssr: false,
+  loading: () => <div className="flex-1" />,
+});
 
 const TRI_JUICE =
   "linear-gradient(90deg, #e0d7bf 0%, #c5872f 52%, #3d2712 100%)";
@@ -28,8 +36,9 @@ const TRI_JUICE =
  *   checkout  the existing `CheckoutPanel` under a "Back to Bag" bar
  *   done      the order confirmation, with its auto-redirect to the order
  *
- * Native <dialog> + showModal() for the focus trap / ESC. The drawer is dark
- * (`.rh-dk`, like the announcement bar) and opens exactly like the menu drawer:
+ * Native <dialog> + showModal() for the focus trap / ESC. The drawer is light
+ * (`.rh-lt`: paper and ink, with the ticker ribbon and the buttons in onyx) and
+ * opens exactly like the menu drawer:
  * the same CSS slide, driven by the same hook (`useSlideDialog`, which also
  * holds the page's scroll lock). While Razorpay's own overlay is up
  * (`modalSuspended`) the dialog drops to a non-modal `show()` so that overlay
@@ -68,6 +77,17 @@ export function CartDrawer({
     if (isOpen) lenis?.stop();
     else lenis?.start();
   }, [isOpen, lenis]);
+
+  // fetch the checkout chunk once the browser is idle: off the critical path, in the cache before it is asked for
+  useEffect(() => {
+    const warm = () => void loadCheckoutPanel();
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(warm, { timeout: 4000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(warm, 2500);
+    return () => window.clearTimeout(id);
+  }, []);
 
   // A top-layer modal paints above every z-indexed element on the page, so a
   // third-party payment overlay (Razorpay Checkout) would open *behind* the
@@ -133,7 +153,7 @@ export function CartDrawer({
     >
       <div onClick={closeCart} aria-hidden className="rh-scrim" />
       <aside
-        className={`rh-cart rh-dk ui-surface absolute inset-y-0 right-0 flex w-[min(480px,100vw)] flex-col border-l border-line text-ink${shown ? " is-open" : ""}`}
+        className={`rh-cart rh-lt ui-surface absolute inset-y-0 right-0 flex w-[min(480px,100vw)] flex-col border-l border-line text-ink${shown ? " is-open" : ""}`}
       >
         {view !== "done" && <CartMarquee freeShippingAbove={freeShippingAbove} />}
 
@@ -156,7 +176,6 @@ export function CartDrawer({
             </button>
           ) : (
             <h2 className="flex items-center gap-3 text-[12px] leading-none font-medium tracking-[0.2em] uppercase">
-              <Mark className="w-3 text-ink" />
               {view === "done" ? "Order confirmed" : "Shopping Bag"}
               {view === "bag" && count > 0 && (
                 <span

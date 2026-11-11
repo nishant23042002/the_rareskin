@@ -15,7 +15,7 @@ import { SignInForm } from "./sign-in-form";
  * THE RARESKIN sign-in — a modal, not a page.
  *
  * A dark "crown" carries the real wordmark and a plain heading; its lower edge
- * is the three-fragrance hairline (aurévan cream → orvélis gold → vayrén dark),
+ * is the three-fragrance hairline (aurevan cream → orvelis gold → vayren dark),
  * the house signature. Below, the phone → one-time-code form sits on paper.
  * Centred card from 640px up, a bottom sheet below it. On success the modal
  * hands straight off to the page transition ("The Aperture"), which carries you

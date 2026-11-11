@@ -21,11 +21,13 @@ import {
  * champagne bar; from 900px it is a three-column composition.
  */
 
-// the dark room each fragrance sits in — base colour + the glow behind the bottle
+// The room each fragrance sits in: always the site's one dark (the announcement bar's obsidian, `--onyx`), with
+// the scent's own colour as a faint glow behind the bottle (home.css mixes it down to about a third). The rooms
+// used to have their own brown bases, so In Focus read as a different dark from the rest of the page.
 const TONE: Record<FragranceSlug, { base: string; glow: string }> = {
-  aurevan: { base: "#171510", glow: "#5f5742" },
-  orvelis: { base: "#1b1208", glow: "#80581a" },
-  vayren: { base: "#100a06", glow: "#52361f" },
+  aurevan: { base: "var(--onyx)", glow: "#8c8466" },
+  orvelis: { base: "var(--onyx)", glow: "#b0782a" },
+  vayren: { base: "var(--onyx)", glow: "#7a5638" },
 };
 
 export function InFocus({ fragrances }: { fragrances: Fragrance[] }) {

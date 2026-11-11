@@ -103,10 +103,10 @@
 .rh-glide {
   position: absolute;
   left: 0;
-  bottom: 9px;
+  bottom: 7px;
   width: 1px;
-  height: 1px;
-  background: currentColor;
+  height: 2px;
+  background: color-mix(in srgb, var(--brass) 62%, var(--ink));
   opacity: 0;
   pointer-events: none;
   transform: translate3d(var(--gx, 0px), 0, 0) scaleX(var(--gw, 0));
@@ -192,7 +192,7 @@
   }
 
   /* ---- chips, tabs, swatches: a press, a spring, a soft pulse when chosen (class set by motion-layer), a glowing ring ---- */
-  :is(.rh-q-opt, .rh-ticket__chips a, [role="tab"], [role="radio"]) {
+  :is(.rh-q-opt, .rh-pass__chips a, [role="tab"], [role="radio"]) {
     transition:
       transform 0.4s var(--spring),
       scale 0.3s var(--spring),
@@ -202,7 +202,7 @@
       box-shadow 0.4s var(--expo),
       opacity 0.3s;
   }
-  :is(.rh-q-opt, .rh-ticket__chips a, [role="tab"], [role="radio"]):active {
+  :is(.rh-q-opt, .rh-pass__chips a, [role="tab"], [role="radio"]):active {
     scale: 0.96;
     transition-duration: 0.12s;
   }
@@ -225,7 +225,7 @@
 }
 
 /* glowing focus ring on chips (keyboard only) */
-:is(.rh-q-opt, .rh-ticket__chips a, [role="tab"], [role="radio"]):focus-visible {
+:is(.rh-q-opt, .rh-pass__chips a, [role="tab"], [role="radio"]):focus-visible {
   outline: 2px solid var(--brass);
   outline-offset: 3px;
   box-shadow: 0 0 0 7px color-mix(in srgb, var(--brass) 20%, transparent);
@@ -243,7 +243,7 @@
     transform: translate3d(330%, 0, 0) skewX(-18deg);
     transition: transform 0.95s var(--expo);
   }
-  :is(.rh-q-opt, .rh-ticket__chips a):hover {
+  :is(.rh-q-opt, .rh-pass__chips a):hover {
     transform: translateY(-1px);
   }
 
@@ -336,6 +336,23 @@
     /* the hero picture drifts less: it is the one the product shots are framed in */
     .rh-hero__media picture {
       animation: rh-px-hero linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+    /* the explorable hero: the picture and its hotspots drift together (one layer), so the picture alone must not move */
+    @keyframes rh-px-stage {
+      from {
+        transform: translate3d(0, -2%, 0);
+      }
+      to {
+        transform: translate3d(0, 2%, 0);
+      }
+    }
+    .rh-hero[data-layout="stage"] .rh-hero__media picture {
+      animation: none;
+    }
+    .rh-hero[data-layout="stage"] .rh-hero__drift {
+      animation: rh-px-stage linear both;
       animation-timeline: view();
       animation-range: cover;
     }

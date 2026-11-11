@@ -6,7 +6,7 @@ export const size = { width: 512, height: 512 };
 export const contentType = "image/png";
 
 /** Favicon / app icon — the brand's own "A" (cut from the wordmark artwork,
- *  `public/brand/mark-a-cream.png`, 176 × 180) in cream on ink. */
+ *  `public/brand/mark-r-cream.png`, 141 × 178) in cream on ink. */
 export default function Icon() {
   return new ImageResponse(
     (
@@ -17,11 +17,11 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#232120",
+          background: "#100e0c",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={brandDataUrl("mark-a-cream.png")} width={264} height={270} alt="" />
+        <img src={brandDataUrl("mark-r-cream.png")} width={214} height={270} alt="" />
       </div>
     ),
     size,

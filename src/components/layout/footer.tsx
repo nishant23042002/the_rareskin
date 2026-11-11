@@ -157,7 +157,7 @@ export async function Footer() {
               </p>
               {/* phones keep the line above and the sign-up; the blurb is for larger screens */}
               <p className="mt-4 max-w-[46ch] text-[14px] leading-[1.7] text-champagne/60 max-md:hidden md:text-[13.5px]">
-                Home to bespoke scents — Aurévan, Vayrén and Orvélis —
+                Home to bespoke scents — Aurevan, Vayren and Orvelis —
                 companion travel editions, and curated gift boxes.
               </p>
             </div>

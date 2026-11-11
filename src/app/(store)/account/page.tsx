@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Container } from "@/components/ui/container";
+import { AccountHero, AccountStats } from "@/components/account/account-hero";
 import { AccountActions } from "@/components/account/account-actions";
 import { SignInMethods } from "@/components/account/sign-in-methods";
 import { ProfilePhoto } from "@/components/account/profile-photo";
@@ -47,49 +48,44 @@ export default async function AccountPage() {
   const defaultAddress = addresses.find((a) => a.isDefault) ?? addresses[0];
 
   return (
-    <main
-      id="main"
-      className="ui-surface min-h-svh pt-[calc(var(--announce-h)+var(--header-h)+clamp(2rem,6vw,4rem))] pb-24"
-    >
-      <Container className="max-w-[860px]">
-        <p className="eyebrow mb-3">Account</p>
-        <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-4">
-          <div className="min-w-0">
-            <h1 className="text-[clamp(1.9rem,4.4vw,2.7rem)] leading-[1.1] tracking-[-0.01em]">
-              {user.name ? user.name : "Welcome"}
-            </h1>
-            <p className="mt-2.5 text-[13.5px] text-ink-2">
-              {overview.memberSince
-                ? `Member since ${overview.memberSince} · `
-                : ""}
-              {maskPhone(user.phone)}
-              {user.email ? ` · ${user.email}` : ""}
-            </p>
-          </div>
-          <ProfilePhoto initial={user.avatarUrl} name={user.name} />
-        </div>
+    <main id="main" className="ui-surface min-h-svh pb-24">
+      <AccountHero
+        width="max-w-[860px]"
+        crumbs="Account"
+        title={user.name ? user.name : "Welcome"}
+        meta={
+          <>
+            {overview.memberSince ? `Member since ${overview.memberSince} · ` : ""}
+            {maskPhone(user.phone)}
+            {user.email ? ` · ${user.email}` : ""}
+          </>
+        }
+        aside={<ProfilePhoto initial={user.avatarUrl} name={user.name} />}
+      />
 
-        {/* ── at-a-glance ─────────────────────────────────────────── */}
-        <div className="mt-8 grid grid-cols-3 divide-x divide-line border-y border-line">
-          <Stat label="Orders" value={String(overview.orderCount)} />
-          <Stat
-            label="In progress"
-            value={String(overview.inProgress)}
-            muted={overview.inProgress === 0}
-          />
-          <Stat
-            label={creditPaise > 0 ? "Store credit" : "Lifetime"}
-            value={
-              creditPaise > 0
-                ? formatPaise(creditPaise)
-                : formatPaise(Math.round(overview.lifetimeSpend * 100))
-            }
-            accent={creditPaise > 0}
-          />
-        </div>
+      <Container className="max-w-[860px]">
+        {/* ── at-a-glance: dark tiles straddling the band's lower edge ───── */}
+        <AccountStats
+          items={[
+            { label: "Orders", value: String(overview.orderCount) },
+            {
+              label: "In progress",
+              value: String(overview.inProgress),
+              muted: overview.inProgress === 0,
+            },
+            {
+              label: creditPaise > 0 ? "Store credit" : "Lifetime",
+              value:
+                creditPaise > 0
+                  ? formatPaise(creditPaise)
+                  : formatPaise(Math.round(overview.lifetimeSpend * 100)),
+              accent: creditPaise > 0,
+            },
+          ]}
+        />
 
         {/* ── recent orders ──────────────────────────────────────── */}
-        <section className="mt-10">
+        <section className="mt-12">
           <div className="flex items-baseline justify-between">
             <h2 className="text-[11px] font-medium tracking-[0.16em] text-ink-3 uppercase">
               Recent orders
@@ -136,14 +132,14 @@ export default async function AccountPage() {
         {reviewable.length > 0 && (
           <Link
             href="/account/reviews"
-            className="mt-8 flex items-center justify-between gap-3 border border-line bg-surface px-5 py-4 transition-colors hover:border-ink"
+            className="ac-bar ac-dark group mt-8 flex items-center justify-between gap-3 px-5 py-4"
           >
             <span className="text-[12.5px] text-ink-2">
               {reviewable.length === 1
                 ? `Share how ${reviewable[0].name} is wearing`
                 : `${reviewable.length} pieces from your orders are waiting for a review`}
             </span>
-            <span className="shrink-0 text-[10.5px] font-medium tracking-[0.12em] text-ink-3 uppercase">
+            <span className="shrink-0 text-[10.5px] font-medium tracking-[0.12em] text-gilt uppercase transition-transform duration-300 group-hover:translate-x-1">
               Review →
             </span>
           </Link>
@@ -180,14 +176,14 @@ export default async function AccountPage() {
             )}
           </section>
 
-          <section className="bg-surface p-5">
+          <section className="ac-card ac-dark p-5">
             <h2 className="text-[11px] font-medium tracking-[0.16em] text-ink-3 uppercase">
               Store credit
             </h2>
             <p className="mt-3 text-[12.5px] leading-relaxed text-ink-2">
               {creditPaise > 0 ? (
                 <>
-                  <span className="serif text-[1.4rem] text-ink">
+                  <span className="serif text-[1.7rem] leading-none text-gilt">
                     {formatPaise(creditPaise)}
                   </span>
                   <br />
@@ -220,7 +216,7 @@ export default async function AccountPage() {
                   {[s.device.browser, s.device.os].filter(Boolean).join(" · ") ||
                     "Unknown device"}
                   {s.current && (
-                    <span className="ml-2 text-[10px] font-medium tracking-[0.12em] text-ink-3 uppercase">
+                    <span className="ml-2 inline-block bg-ink px-1.5 py-[3px] align-[1px] text-[9px] leading-none font-medium tracking-[0.12em] text-w0 uppercase">
                       This device
                     </span>
                   )}
@@ -243,32 +239,5 @@ export default async function AccountPage() {
         </div>
       </Container>
     </main>
-  );
-}
-
-function Stat({
-  label,
-  value,
-  muted,
-  accent,
-}: {
-  label: string;
-  value: string;
-  muted?: boolean;
-  accent?: boolean;
-}) {
-  return (
-    <div className="px-2.5 py-4 text-center first:pl-0 last:pr-0 sm:px-6">
-      <div
-        className={`serif text-[1.45rem] leading-none tabular-nums sm:text-[1.6rem] ${
-          accent ? "text-ok" : muted ? "text-ink-3" : "text-ink"
-        }`}
-      >
-        {value}
-      </div>
-      <div className="mt-1.5 text-[9px] font-medium tracking-[0.08em] text-ink-3 uppercase sm:text-[9.5px] sm:tracking-[0.14em]">
-        {label}
-      </div>
-    </div>
   );
 }

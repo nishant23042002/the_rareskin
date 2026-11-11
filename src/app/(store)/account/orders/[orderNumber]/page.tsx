@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AccountHero } from "@/components/account/account-hero";
 import { Container } from "@/components/ui/container";
 import { Icon } from "@/components/ui/icon";
 import { pageMeta } from "@/lib/seo";
@@ -56,69 +57,64 @@ export default async function OrderDetailPage({
   const paid = order.paymentStatus === "paid";
 
   return (
-    <main
-      id="main"
-      className="ui-surface min-h-svh pt-[calc(var(--announce-h)+var(--header-h)+clamp(2rem,6vw,4rem))] pb-24"
-    >
-      <Container className="max-w-[780px]">
-        <p className="eyebrow mb-4">
-          <Link href="/account" className="hover:text-ink">
-            Account
-          </Link>{" "}
-          /{" "}
-          <Link href="/account/orders" className="hover:text-ink">
-            Orders
-          </Link>{" "}
-          / <span className="text-ink-2">{order.orderNumber}</span>
-        </p>
-
-        {/* ── header ─────────────────────────────────────────────── */}
-        <header className="border-b border-line pb-7">
-          <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2">
-            <div>
-              <h1 className="serif text-[clamp(1.7rem,4vw,2.3rem)] leading-[1.05] tracking-[-0.01em]">
-                {order.orderNumber}
-              </h1>
-              <p className="mt-2 text-[12.5px] text-ink-3">
-                {order.itemCount} {order.itemCount === 1 ? "item" : "items"} ·
-                placed {fmtDay(order.placedAt)}
-              </p>
-            </div>
-            <div className="flex flex-col items-end gap-1.5">
-              <StatusPill status={order.status} />
-              <span
-                className={`text-[10px] font-medium tracking-[0.12em] uppercase ${
-                  paid ? "text-ok" : "text-ink-3"
-                }`}
-              >
-                {paid
-                  ? "Paid"
-                  : order.method === "cod"
-                    ? "Cash on delivery"
-                    : order.paymentStatus}
-              </span>
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <OrderProgress status={order.status} />
-          </div>
-
-          {order.status !== "cancelled" && (
-            <a
-              href={`/api/account/orders/${encodeURIComponent(
-                order.orderNumber,
-              )}/invoice`}
-              className="mt-6 inline-flex items-center gap-2 border border-line px-3.5 py-2 text-[10.5px] font-medium tracking-[0.12em] text-ink-2 uppercase transition-colors hover:border-ink hover:text-ink"
+    <main id="main" className="ui-surface min-h-svh pb-24">
+      {/* the dark band: the order number, where it stands, the invoice */}
+      <AccountHero
+        width="max-w-[780px]"
+        crumbs={
+          <>
+            <Link href="/account" className="hover:text-ink">
+              Account
+            </Link>{" "}
+            /{" "}
+            <Link href="/account/orders" className="hover:text-ink">
+              Orders
+            </Link>{" "}
+            / <span className="text-ink-2">{order.orderNumber}</span>
+          </>
+        }
+        title={<span className="serif">{order.orderNumber}</span>}
+        meta={
+          <>
+            {order.itemCount} {order.itemCount === 1 ? "item" : "items"} · placed{" "}
+            {fmtDay(order.placedAt)}
+          </>
+        }
+        aside={
+          <div className="flex flex-col items-start gap-1.5 sm:items-end">
+            <StatusPill status={order.status} />
+            <span
+              className={`text-[10px] font-medium tracking-[0.12em] uppercase ${
+                paid ? "text-ok" : "text-ink-3"
+              }`}
             >
-              <Icon name="download" className="size-[15px]" />
-              Download invoice
-            </a>
-          )}
-        </header>
+              {paid
+                ? "Paid"
+                : order.method === "cod"
+                  ? "Cash on delivery"
+                  : order.paymentStatus}
+            </span>
+          </div>
+        }
+      >
+        <OrderProgress status={order.status} onDark />
 
+        {order.status !== "cancelled" && (
+          <a
+            href={`/api/account/orders/${encodeURIComponent(
+              order.orderNumber,
+            )}/invoice`}
+            className="mt-7 inline-flex items-center gap-2 border border-line-2 px-3.5 py-2 text-[10.5px] font-medium tracking-[0.12em] text-ink-2 uppercase transition-colors hover:border-ink hover:bg-ink hover:text-bg"
+          >
+            <Icon name="download" className="size-[15px]" />
+            Download invoice
+          </a>
+        )}
+      </AccountHero>
+
+      <Container className="max-w-[780px]">
         {/* ── the pieces ─────────────────────────────────────────── */}
-        <section className="mt-9">
+        <section className="mt-10">
           <h2 className="text-[11px] font-medium tracking-[0.16em] text-ink-3 uppercase">
             {order.lineCount === 1 ? "Your piece" : "Your pieces"}
           </h2>
@@ -212,7 +208,8 @@ export default async function OrderDetailPage({
           </ul>
 
           {/* ── total ────────────────────────────────────────────── */}
-          <dl className="mt-4 space-y-2 border border-line bg-surface px-5 py-4 text-[12.5px]">
+          <div className="mt-4 border border-line bg-surface">
+          <dl className="space-y-2 px-5 py-4 text-[12.5px]">
             <Row label="Subtotal" value={P(order.pricing.itemsSubtotal)} />
             {order.pricing.discount > 0 && (
               <Row
@@ -242,24 +239,26 @@ export default async function OrderDetailPage({
             {order.pricing.codFee > 0 && (
               <Row label="Cash-on-delivery fee" value={P(order.pricing.codFee)} />
             )}
-            <div className="!mt-3 flex items-baseline justify-between border-t border-line pt-3">
-              <span className="text-[11px] tracking-[0.16em] text-ink-3 uppercase">
-                {paid ? "Paid" : "Total"}
-              </span>
-              <span className="serif text-[1.5rem] tabular-nums text-ink">
-                {P(order.pricing.grandTotal)}
-              </span>
-            </div>
-            {showTax && (
-              <p className="!mt-2 text-[11px] leading-relaxed text-ink-3">
-                Inclusive of {g.ratePercent}% GST
-                {g.igst > 0
-                  ? ` — IGST ${P(g.igst)}`
-                  : ` — CGST ${P(g.cgst)} + SGST ${P(g.sgst)}`}
-                . Taxable value {P(order.pricing.taxableValue)}.
-              </p>
-            )}
           </dl>
+          {/* the figure that matters, on the obsidian */}
+          <div className="ac-card ac-dark flex items-baseline justify-between px-5 py-4">
+            <span className="text-[11px] tracking-[0.16em] text-ink-3 uppercase">
+              {paid ? "Paid" : "Total"}
+            </span>
+            <span className="serif text-[1.7rem] leading-none tabular-nums text-gilt">
+              {P(order.pricing.grandTotal)}
+            </span>
+          </div>
+          {showTax && (
+            <p className="px-5 py-3 text-[11px] leading-relaxed text-ink-3">
+              Inclusive of {g.ratePercent}% GST
+              {g.igst > 0
+                ? ` — IGST ${P(g.igst)}`
+                : ` — CGST ${P(g.cgst)} + SGST ${P(g.sgst)}`}
+              . Taxable value {P(order.pricing.taxableValue)}.
+            </p>
+          )}
+          </div>
         </section>
 
         {/* ── delivery + payment ─────────────────────────────────── */}

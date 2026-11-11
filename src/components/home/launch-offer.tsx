@@ -1,49 +1,54 @@
 import { RhIcon, type RhIconName } from "@/components/ui/rh-icon";
-import { LaunchTicket, type TicketItem } from "./launch-ticket";
+import { formatINR } from "@/lib/catalog";
+import { LaunchPass, type PassItem } from "./launch-pass";
 
 /**
- * The launch-offer ticket straddling the hero's seam, then the four promises.
- * The ticket exists only while the launch price is genuinely below the list
- * price — set both in the catalogue and this follows. On a phone it becomes a
- * two-tier stub (price + a round "−33%" seal, a dashed perforation, the saving).
+ * The launch pass straddling the hero's lower edge, then the four promises. The pass exists only while
+ * the launch price is genuinely below the list price: set both in the catalogue and this follows.
+ * On a phone it is a full-width card, the figure and the round seal first.
  */
-
-const PROMISES: { icon: RhIconName; label: string }[] = [
-  { icon: "truck", label: "Free shipping" },
-  { icon: "cash", label: "Cash on delivery" },
-  { icon: "returns", label: "7-day returns" },
-  { icon: "lock", label: "Secured by Razorpay" },
-];
 
 export function LaunchOffer({
   price,
   mrp,
   volumeMl,
   items,
+  freeShippingAbove = 0,
+  endsAt = null,
 }: {
   price: number;
   mrp: number;
   volumeMl: number;
-  /** the fragrances the launch price applies to (name + slug), for the ticket's links */
-  items: TicketItem[];
+  /** the fragrances the launch price applies to (name + slug), for the pass's links */
+  items: PassItem[];
+  /** order value (rupees) from which delivery is free; 0 = always free */
+  freeShippingAbove?: number;
+  /** ISO date the launch pricing ends (Site Settings → Campaign), when one is set and still ahead */
+  endsAt?: string | null;
 }) {
   const hasOffer = mrp > price;
+  // the shipping promise says what the checkout does (the store's own threshold), never more
+  const promises: { icon: RhIconName; label: string }[] = [
+    {
+      icon: "truck",
+      label: freeShippingAbove > 0 ? `Free shipping above ${formatINR(freeShippingAbove)}` : "Free shipping",
+    },
+    { icon: "cash", label: "Cash on delivery" },
+    { icon: "returns", label: "7-day returns" },
+    { icon: "lock", label: "Secured by Razorpay" },
+  ];
 
   return (
     <>
       {hasOffer && (
-        <div className="rh-ticket-wrap" id="offer">
-          <LaunchTicket price={price} mrp={mrp} volumeMl={volumeMl} items={items} />
+        <div className="rh-pass-wrap" id="offer">
+          <LaunchPass price={price} mrp={mrp} volumeMl={volumeMl} items={items} endsAt={endsAt} />
         </div>
       )}
-      <section
-        className="rh-promises"
-        id="promises"
-        aria-label="Why shop with us"
-      >
+      <section className="rh-promises" id="promises" aria-label="Why shop with us">
         <div className="rh-wrap">
           <ul>
-            {PROMISES.map((p) => (
+            {promises.map((p) => (
               <li key={p.label}>
                 <RhIcon name={p.icon} />
                 {p.label}

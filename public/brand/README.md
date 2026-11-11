@@ -11,10 +11,11 @@ Everything below is **derived from this one file** — never redrawn or retyped:
 
 | file | made by | used for |
 | --- | --- | --- |
-| `rareskin-wordmark.png` | the original | header, menu, footer, sign-in, holding page (`<Logo>`), the invoice masthead, the share cards, JSON-LD |
+| `rareskin-wordmark.png` | the original | the invoice masthead, the share cards, JSON-LD |
+| `rareskin-wordmark-web.webp` | 640 px lossless WebP of the alpha | header, menu, footer, sign-in, holding page, the route-transition curtain (`<Logo>`, a CSS mask; 8 KB instead of 42 KB, preloaded from the root layout) |
 | `rareskin-wordmark-cream.png` | recoloured cream | the product share cards on a dark ground |
 | `email-logo.png` | 648 × 144, ink on white | the masthead of every order email (shown 216 × 48) |
-| `mark-a-cream.png` | the "A" of the wordmark, cut out, cream | favicon (`src/app/icon.tsx`) and Apple touch icon |
+| `mark-r-cream.png` | the "R" of the wordmark, cut out, cream | favicon (`src/app/icon.tsx`) and Apple touch icon |
 
 Re-make the derived files after replacing the wordmark:
 
@@ -33,8 +34,8 @@ Ideal: a real **vector** wordmark. Provide an SVG with actual `<path>` outlines
 `viewBox`. Then:
 
 1. save it as `rareskin-wordmark.svg`
-2. in `src/components/ui/logo.tsx` set `SRC` back to the `.svg` and update
-   `ASPECT` to the viewBox ratio
+2. in `src/lib/site.ts` set `WORDMARK_WEB_SRC` to the `.svg` and, in
+   `src/components/ui/logo.tsx`, update `ASPECT` to the viewBox ratio
 3. keep a black-on-transparent PNG of it here too — the invoice PDF, the email
    logo and the share cards read the PNG (react-pdf and satori draw rasters)
 
@@ -43,6 +44,7 @@ update `ASPECT` if the proportions change, and re-run the script above.
 
 ### Later
 
-- `public/bimi/logo.svg` is still a placeholder (the ∧ on black). BIMI needs a
-  real SVG Tiny-PS of the logo plus a VMC certificate and an enforced DMARC
-  policy — do it when you move DMARC off `p=none`.
+- BIMI (the logo beside the sender in some mail clients) needs a real SVG Tiny-PS
+  of the logo at `public/bimi/logo.svg`, plus a VMC certificate and an enforced
+  DMARC policy. The old placeholder there was removed with the chevron mark; add
+  the real file when you move DMARC off `p=none`.

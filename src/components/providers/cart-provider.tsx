@@ -9,6 +9,7 @@ import {
   useReducer,
   useRef,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import {
@@ -24,6 +25,8 @@ import {
 } from "@/lib/cart";
 import { useAuth } from "@/components/providers/auth-provider";
 import { isFragranceSlug, type BagSuggestion } from "@/lib/catalog";
+
+const noopSubscribe = () => () => {};
 
 /** The drawer is one panel that slides between three views. */
 type CartView = "bag" | "checkout" | "done";
@@ -115,7 +118,16 @@ export function CartProvider({
   // On sign-in, fold the guest bag into the account's server cart (which may
   // hold items added on another device) and adopt the union locally.
   const { status, user } = useAuth();
-  const checkoutAvailable = checkoutEnabled || Boolean(user?.isStaff);
+  // The auth state can already be known on the first client render (it is read from the session cache), but
+  // the server never knows it. If staff status counted from that first render, a signed-in staff account would
+  // hydrate "Checkout" over the server's "Opens at launch" (the sticky bag bar, the bag), and React would throw
+  // the tree away and rebuild it on the client. So it counts only once hydrated: the server snapshot is `false`.
+  const mounted = useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
+  const checkoutAvailable = checkoutEnabled || (mounted && Boolean(user?.isStaff));
   const prevStatus = useRef(status);
   const stateRef = useRef(state);
   const mergingRef = useRef(false);

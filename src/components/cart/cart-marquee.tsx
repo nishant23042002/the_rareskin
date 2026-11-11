@@ -4,7 +4,6 @@ import { useRef } from "react";
 
 import { gsap, useGSAP } from "@/lib/gsap";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
-import { Mark } from "@/components/ui/mark";
 import { formatINR } from "@/lib/catalog";
 
 /**
@@ -31,7 +30,7 @@ function Group({ notes }: { notes: string[] }) {
           <span className="px-5 text-[10.5px] leading-none font-light tracking-[0.16em] whitespace-nowrap uppercase">
             {note}
           </span>
-          <Mark className="w-[9px] shrink-0 text-gilt/70" strokeWidth={1.6} />
+          <span aria-hidden className="size-[3px] shrink-0 rounded-full bg-gilt/70" />
         </span>
       ))}
     </div>
@@ -76,7 +75,7 @@ export function CartMarquee({
     <div
       ref={rootRef}
       aria-hidden
-      className="shrink-0 overflow-hidden border-b border-brass/20 bg-[var(--onyx)] text-champagne"
+      className="rh-dark shrink-0 overflow-hidden border-b border-brass/20 bg-[var(--onyx)] text-champagne"
       style={{ height: "var(--announce-h)" }}
     >
       <div

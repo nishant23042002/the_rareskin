@@ -1,0 +1,240 @@
+/* ==========================================================================
+   The account area (/account, /account/orders, /account/orders/[n], /account/addresses, /account/reviews)
+
+   The pages read light (paper and ink) so the long lists stay easy to read, and the dark is placed where it
+   earns attention, about a sixth of the page: a band at the top (the title, who you are, and on an order the
+   progress), the three figures that straddle its lower edge, the store-credit card, the "Paid" total, the
+   review prompt and the small chips. The ground is `--onyx`, the announcement bar's obsidian, and nothing else.
+
+   `.ac-dark` re-points the storefront's colour tokens, so the components that are written with Tailwind
+   (`text-ink`, `border-line`, `bg-surface`, the status pill, the order progress, the avatar uploader ...) draw
+   themselves correctly inside a dark block without a dark variant each. (themes.css lists `.ac-dark` among
+   the dark scopes, so the brass and gilt accents take their on-dark form there too.)
+   ========================================================================== */
+
+@layer components {
+  .ac-dark {
+    color-scheme: dark;
+    color: var(--champagne);
+    --color-w0: var(--onyx);
+    --color-w1: color-mix(in srgb, var(--champagne) 5%, var(--onyx));
+    --color-w2: color-mix(in srgb, var(--champagne) 24%, var(--onyx));
+    --color-w4: var(--onyx);
+    --color-bg: var(--onyx);
+    --color-surface: var(--onyx);
+    --color-surface-2: color-mix(in srgb, var(--champagne) 7%, var(--onyx));
+    --color-ink: var(--champagne);
+    --color-ink-2: color-mix(in srgb, var(--champagne) 78%, var(--onyx));
+    --color-ink-3: color-mix(in srgb, var(--champagne) 62%, var(--onyx));
+    --color-line: color-mix(in srgb, var(--champagne) 13%, var(--onyx));
+    --color-line-2: color-mix(in srgb, var(--champagne) 24%, var(--onyx));
+    --color-cta: var(--champagne);
+    --color-cta-hover: color-mix(in srgb, var(--champagne) 84%, var(--paper));
+    --color-error: #e58573;
+    --color-ok: #7fb392;
+    --color-warn: #dba64e;
+  }
+  .ac-dark :focus-visible {
+    outline-color: var(--champagne);
+  }
+
+  /* ---- the band at the top of every account page ---- */
+  .ac-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: var(--onyx);
+    /* the fixed announcement bar + header sit over its top; the band starts under them */
+    padding: calc(var(--announce-h) + var(--header-h) + clamp(2rem, 5.4vw, 3.6rem)) 0 clamp(3.4rem, 7vw, 5.2rem);
+  }
+  .ac-hero--sm {
+    padding-bottom: clamp(2.2rem, 4.6vw, 3.4rem);
+  }
+  .ac-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(70% 90% at 100% 0%, color-mix(in srgb, var(--champagne) 7%, transparent), transparent 62%),
+      radial-gradient(50% 80% at 0% 100%, color-mix(in srgb, var(--champagne) 4%, transparent), transparent 70%);
+  }
+  /* the announcement bar's brass hairline, along the band's lower edge */
+  .ac-hero::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--brass-d) 42%, transparent) 30%,
+      color-mix(in srgb, var(--brass-d) 42%, transparent) 70%,
+      transparent
+    );
+  }
+  .ac-hero__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px 28px;
+  }
+  .ac-hero__title {
+    margin: 0;
+    font-weight: 300;
+    font-size: clamp(2rem, 5vw, 3.1rem);
+    line-height: 1.06;
+    letter-spacing: -0.012em;
+    color: var(--champagne);
+    overflow-wrap: anywhere;
+  }
+  .ac-hero__meta {
+    margin-top: 12px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--champagne) 68%, transparent);
+  }
+  /* the band settles in: each part rises a little after the one before */
+  .ac-rise {
+    animation: ac-rise 0.85s var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 85ms);
+  }
+  @keyframes ac-rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  /* ---- the three figures, straddling the band's lower edge ---- */
+  .ac-stats {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(8px, 1.6vw, 14px);
+    margin-top: calc(clamp(2.3rem, 4.6vw, 3.2rem) * -1);
+  }
+  .ac-stat {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(14px, 2.2vw, 22px) clamp(8px, 1.6vw, 18px);
+    text-align: center;
+    background: color-mix(in srgb, var(--champagne) 5%, var(--onyx));
+    border: 1px solid color-mix(in srgb, var(--champagne) 13%, transparent);
+    box-shadow: 0 20px 36px -26px rgba(16, 14, 12, 0.55);
+    transition:
+      transform 0.5s var(--ease),
+      border-color 0.4s,
+      box-shadow 0.5s var(--ease);
+  }
+  .ac-stat::after {
+    content: "";
+    position: absolute;
+    left: 22%;
+    right: 22%;
+    bottom: 0;
+    height: 1px;
+    background: var(--brass-d);
+    transform: scaleX(0);
+    transition: transform 0.6s var(--ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ac-stat:hover {
+      transform: translateY(-3px);
+      border-color: color-mix(in srgb, var(--brass-d) 55%, transparent);
+      box-shadow: 0 26px 44px -24px rgba(16, 14, 12, 0.7);
+    }
+    .ac-stat:hover::after {
+      transform: scaleX(1);
+    }
+  }
+
+  /* ---- smaller dark accents ---- */
+  /* a card on the light page: the store credit, the order's "Paid" total */
+  .ac-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: var(--onyx);
+  }
+  .ac-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(80% 120% at 100% 0%, color-mix(in srgb, var(--champagne) 8%, transparent), transparent 60%);
+  }
+  /* an action bar: dark, with a brass edge that draws in on hover and an arrow that leans forward */
+  .ac-bar {
+    position: relative;
+    overflow: hidden;
+    background: var(--onyx);
+    border: 1px solid var(--onyx);
+    transition: border-color 0.4s;
+  }
+  .ac-bar::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--brass-d);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.7s var(--ease);
+  }
+  .ac-bar:hover::after,
+  .ac-bar:focus-visible::after {
+    transform: scaleX(1);
+  }
+  /* an order in a list: a dark bar slides in at its left edge and the row leans toward it */
+  .ac-row {
+    position: relative;
+    transition:
+      padding 0.5s var(--ease),
+      background-color 0.4s;
+  }
+  .ac-row::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 16%;
+    bottom: 16%;
+    width: 2px;
+    background: var(--onyx);
+    transform: scaleY(0);
+    transition: transform 0.5s var(--ease);
+  }
+  .ac-row:hover,
+  .ac-row:focus-visible {
+    padding-left: 14px;
+  }
+  .ac-row:hover::before,
+  .ac-row:focus-visible::before {
+    transform: scaleY(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ac-rise {
+      animation: none;
+    }
+    .ac-stat,
+    .ac-stat::after,
+    .ac-bar::after,
+    .ac-row,
+    .ac-row::before {
+      transition: none;
+    }
+    .ac-row:hover,
+    .ac-row:focus-visible {
+      padding-left: 0;
+    }
+  }
+}

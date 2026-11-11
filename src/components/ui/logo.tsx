@@ -2,10 +2,11 @@
 
 import { useEffect, useState, type CSSProperties } from "react";
 import { cn } from "@/lib/cn";
+import { WORDMARK_WEB_SRC } from "@/lib/site";
 import { Wordmark } from "./wordmark";
 
-const SRC = "/brand/rareskin-wordmark.png";
-/** cropped artwork: 1487 x 331 (black-on-transparent, tinted via currentColor) */
+const SRC = WORDMARK_WEB_SRC;
+/** cropped artwork: 1487 x 331 (black-on-transparent, tinted via currentColor); the web file is the same art at 640 px */
 const ASPECT = "1487 / 331";
 
 /**

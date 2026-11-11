@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AccountHero } from "@/components/account/account-hero";
 import { Container } from "@/components/ui/container";
 import { AccountReviews } from "@/components/account/account-reviews";
 import { pageMeta } from "@/lib/seo";
@@ -23,27 +24,24 @@ export default async function AccountReviewsPage() {
   ]);
 
   return (
-    <main
-      id="main"
-      className="ui-surface min-h-svh pt-[calc(var(--announce-h)+var(--header-h)+clamp(2rem,6vw,4rem))] pb-24"
-    >
-      <Container className="max-w-[760px]">
-        <p className="eyebrow mb-3">
-          <Link href="/account" className="hover:text-ink">
-            Account
-          </Link>{" "}
-          / Reviews
-        </p>
-        <h1 className="text-[clamp(1.7rem,4vw,2.4rem)] leading-[1.1] tracking-[-0.01em]">
-          Reviews
-        </h1>
-        <p className="mt-2 text-[13px] text-ink-2">
-          Share how a fragrance wears once you&rsquo;ve lived in it. Only
-          delivered orders can be reviewed, and our team checks each one before
-          it goes live.
-        </p>
+    <main id="main" className="ui-surface min-h-svh pb-24">
+      <AccountHero
+        size="sm"
+        width="max-w-[760px]"
+        crumbs={
+          <>
+            <Link href="/account" className="hover:text-ink">
+              Account
+            </Link>{" "}
+            / Reviews
+          </>
+        }
+        title="Reviews"
+        meta="Share how a fragrance wears once you’ve lived in it. Only delivered orders can be reviewed, and our team checks each one before it goes live."
+      />
 
-        <div className="mt-9">
+      <Container className="max-w-[760px] pt-9">
+        <div>
           <AccountReviews
             reviewable={reviewable}
             mine={mine}

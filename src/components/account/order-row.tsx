@@ -40,7 +40,7 @@ export function OrderRow({ order }: { order: OrderSummary }) {
   return (
     <Link
       href={`/account/orders/${order.orderNumber}`}
-      className="group block py-4 transition-colors hover:bg-surface"
+      className="ac-row group block py-4 hover:bg-surface"
     >
       {/* ── phone: stacked ─────────────────────────────────────────── */}
       <div className="flex gap-3 sm:hidden">

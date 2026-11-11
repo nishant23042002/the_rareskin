@@ -35,7 +35,7 @@ export function toRupees(paise: Paise): number {
 }
 
 /**
- * Format paise the way the brand writes prices: `₹799`, `₹1,199`, `₹79,900`.
+ * Format paise the way the brand writes prices: `₹799`, `₹1,499`, `₹79,900`.
  * Whole rupees show no decimals; a fractional remainder shows exactly two.
  */
 export function formatPaise(paise: Paise): string {

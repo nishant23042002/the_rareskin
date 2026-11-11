@@ -12,7 +12,7 @@
                                   -onyx / -champagne / -brass / -gilt / -w0 .. -w4
      - the homepage + chrome set  --bg / --paper / --stone / --ink / --ink-2 / --ink-3 /
                                   --line / --line-2 / --onyx / --champagne / --brass /
-                                  --gilt (+ --onyx-2, --tri, --brass-d, --gilt-d)
+                                  --gilt (+ --tri, --brass-d, --gilt-d)
 
    `data-theme` is set on <html> by the Theme Switcher dock and, before first paint,
    by the inline script in `app/layout.tsx` (zero flash). `[data-theme="default"]`
@@ -51,15 +51,16 @@
        (3.95:1 on Botanical's --onyx) and gilt (2.23:1) are below 4.5:1 there, so they are
        lifted toward --champagne to 5.4:1 (so they also hold 4.5:1 on the lifted card
        surfaces inside the drawers). The dark scopes below
-       (.rh-announce, .rh-dark, .rs-dark, .rh-dk, .rh-sb) read these instead.
+       (.rh-announce, .rh-curtain, .rh-dark, .rs-dark, .rh-sb__set, .ac-dark) read these instead.
    ========================================================================== */
 
 /* dark grounds read the accents in their on-dark form (equal to the accent in the default theme) */
 .rh-announce,
+.rh-curtain,
 .rh-dark,
 .rs-dark,
-.rh-dk,
-.rh-sb {
+.rh-sb__set,
+.ac-dark {
   --brass: var(--brass-d);
   --gilt: var(--gilt-d);
   --color-brass: var(--brass-d);
@@ -69,8 +70,6 @@
 /* ---- shared by every theme here: the Tailwind tokens follow the set below, one source per theme ---- */
 :root[data-theme="botanical"],
 :root[data-theme="verdant"] {
-  /* a slightly lifted dark for the dark blocks that sit one step above --onyx */
-  --onyx-2: color-mix(in srgb, var(--champagne) 4%, var(--onyx));
   /* the brand rule: champagne, the accent, then ink (the default theme keeps its tri-juice) */
   --tri: linear-gradient(90deg, var(--champagne) 0%, var(--brass) 52%, var(--ink) 100%);
 
@@ -182,11 +181,6 @@
 }
 :root:is([data-theme="botanical"], [data-theme="verdant"]) footer [class*="text-onyx/65"] {
   color: color-mix(in srgb, var(--color-onyx) 80%, transparent);
-}
-
-/* the drawers' quiet text (ink-3) sits on lifted card surfaces as well as on --onyx: a little more weight in the darker champagne */
-:root:is([data-theme="botanical"], [data-theme="verdant"]) .rh-dk {
-  --color-ink-3: color-mix(in srgb, var(--champagne) 74%, var(--onyx));
 }
 
 /* ---- native controls and the sign-in sheet: no browser white ------------------- */

@@ -33,7 +33,7 @@ export const FAQ_GROUPS: { title: string; items: Faq[] }[] = [
       },
       {
         q: "How different are the three scents from each other?",
-        a: "Distinct. AURÉVAN is fresh and composed, ORVÉLIS is warm and rounded, VAYRÉN is dark and intense. The Discovery Set is the easiest way to try all three before committing to a full bottle.",
+        a: "Distinct. AUREVAN is fresh and composed, ORVELIS is warm and rounded, VAYREN is dark and intense. The Discovery Set is the easiest way to try all three before committing to a full bottle.",
       },
       {
         q: "What size are the bottles?",
@@ -46,7 +46,7 @@ export const FAQ_GROUPS: { title: string; items: Faq[] }[] = [
     items: [
       {
         q: "What's in the Discovery Set?",
-        a: "Three 10 ml extraits — AURÉVAN, ORVÉLIS and VAYRÉN — in the exact full-size formula, not a diluted sample.",
+        a: "Three 10 ml extraits — AUREVAN, ORVELIS and VAYREN — in the exact full-size formula, not a diluted sample.",
       },
       {
         q: "How does the launch credit work?",
@@ -63,7 +63,7 @@ export const FAQ_GROUPS: { title: string; items: Faq[] }[] = [
     items: [
       {
         q: "How much does a fragrance cost?",
-        a: "₹799 during launch (MRP ₹1,199) for a 50 ml extrait. Prices shown are all-inclusive.",
+        a: "₹799 during launch (MRP ₹1,499) for a 50 ml extrait. Prices shown are all-inclusive.",
       },
       {
         q: "Which payment methods do you accept?",

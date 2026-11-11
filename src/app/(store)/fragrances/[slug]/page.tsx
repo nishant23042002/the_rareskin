@@ -1,17 +1,20 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/container";
+import { Button } from "@/components/ui/button";
 import { Flacon } from "@/components/ui/flacon";
-import { Icon } from "@/components/ui/icon";
+import { Icon, type IconName } from "@/components/ui/icon";
 import { AddToBagButton } from "@/components/cart/add-to-bag-button";
 import { PdpGallery } from "@/components/product/pdp-gallery";
+import { PdpScent } from "@/components/product/pdp-scent";
+import { PdpStickyBar } from "@/components/product/pdp-sticky-bar";
 import { Accordion } from "@/components/ui/accordion";
 import { Stars } from "@/components/ui/stars";
 import { PdpReviews } from "@/components/product/pdp-reviews";
-import { cn } from "@/lib/cn";
-import { formatINR, type Fragrance } from "@/lib/catalog";
+import { FAQ_GROUPS } from "@/lib/faq";
+import { FRAGRANCE_PALETTE, formatINR, type Fragrance } from "@/lib/catalog";
 import { pdpCover } from "@/lib/pdp-images";
 import { Ticker } from "@/components/ui/ticker";
 import { SITE, absoluteUrl } from "@/lib/site";
@@ -20,6 +23,7 @@ import {
   getFragranceBySlug,
   getFragranceSlugs,
   getRelatedFragrances,
+  getStorefrontCatalog,
 } from "@/server/data/catalog";
 import { getProductReviews } from "@/server/data/reviews";
 import { getSiteSettings } from "@/server/data/settings";
@@ -55,26 +59,9 @@ export async function generateMetadata({
   };
 }
 
-const REASSURE = [
-  { label: "Ships in 24–48 hrs", icon: "truck" },
-  { label: "Cash on delivery", icon: "banknote" },
-  { label: "Easy returns", icon: "returns" },
-] as const;
-
-const DETAILS = [
-  {
-    q: "How to wear",
-    a: "Two or three sprays to pulse points, from about 15 cm. Don’t rub — extrait sits close, so let it settle rather than reapplying.",
-  },
-  {
-    q: "What’s in the box",
-    a: "One 50 ml Extrait de Parfum in the THE RARESKIN flacon, inside a recyclable outer carton with a short card on how to wear it.",
-  },
-  {
-    q: "Shipping & returns",
-    a: "Free shipping across India, dispatched within 24–48 hours, cash on delivery available. Unopened bottles can be returned within 7 days; opened bottles only if faulty or damaged. Full detail on the Shipping and Returns pages.",
-  },
-];
+/** An answer from the FAQ, so the page and /faq say the same thing in the same words. */
+const faqAnswer = (q: string): string | undefined =>
+  FAQ_GROUPS.flatMap((g) => g.items).find((i) => i.q === q)?.a;
 
 export default async function FragrancePage({
   params,
@@ -83,12 +70,53 @@ export default async function FragrancePage({
   const f = await getFragranceBySlug(slug);
   if (!f) notFound();
 
-  const [related, reviews, settings] = await Promise.all([
+  const [related, reviews, settings, catalog] = await Promise.all([
     getRelatedFragrances(slug),
     getProductReviews(slug),
     getSiteSettings(),
+    getStorefrontCatalog(),
   ]);
   const reviewsEnabled = settings.flags.reviewsEnabled;
+
+  // Delivery and payment facts come from the admin settings, so the page can never promise
+  // something the checkout does not do.
+  const freeAbove = settings.shipping.freeAbovePaise / 100;
+  const flatRate = settings.shipping.flatRatePaise / 100;
+  const codOn = settings.cod.enabled;
+  const deliveryTitle =
+    freeAbove > 0 ? `Free delivery above ${formatINR(freeAbove)}` : "Free delivery on every order";
+  const deliverySub = freeAbove > 0 && flatRate > 0 ? `${formatINR(flatRate)} below that` : "Across India";
+  const trust: { icon: IconName; title: string; sub: string }[] = [
+    { icon: "truck", title: deliveryTitle, sub: deliverySub },
+    { icon: "clock", title: "Ships in 24–48 hrs", sub: "Packed by hand in Roha" },
+    ...(codOn ? [{ icon: "banknote" as const, title: "Cash on delivery", sub: "Pay when it arrives" }] : []),
+    { icon: "returns", title: "7-day returns", sub: "For unopened bottles" },
+  ];
+  const savePct = f.mrp > f.price ? Math.round(((f.mrp - f.price) / f.mrp) * 100) : 0;
+
+  const set = settings.flags.discoverySetEnabled ? catalog.discoverySet : null;
+  const cover = pdpCover(f.slug, f.images, f.name);
+
+  const details = [
+    {
+      q: "How to wear",
+      a: "Two or three sprays to pulse points, from about 15 cm. Don’t rub — extrait sits close, so let it settle rather than reapplying.",
+    },
+    { q: "How long does it last?", a: faqAnswer("How long does the fragrance last?") },
+    { q: "Is it for men or women?", a: faqAnswer("Are the fragrances for men or women?") },
+    {
+      q: "What’s in the box",
+      a: `One ${f.volumeMl} ml Extrait de Parfum in the THE RARESKIN flacon, inside a recyclable outer carton with a short card on how to wear it.`,
+    },
+    {
+      q: "Shipping & returns",
+      a: `${
+        freeAbove > 0
+          ? `Delivery is free above ${formatINR(freeAbove)}${flatRate > 0 ? ` and ${formatINR(flatRate)} below that` : ""}`
+          : "Delivery is free across India"
+      }, dispatched within 24–48 hours${codOn ? ", and cash on delivery is available" : ""}. Unopened bottles can be returned within 7 days; opened bottles only if faulty or damaged. Full detail on the Shipping and Returns pages.`,
+    },
+  ].filter((d): d is { q: string; a: string } => typeof d.a === "string");
 
   const url = absoluteUrl(`/fragrances/${slug}`);
   const availability = f.available
@@ -154,16 +182,11 @@ export default async function FragrancePage({
     { name: f.name, path: `/fragrances/${slug}` },
   ]);
 
-  const phases = [
-    ["Arrive", f.notesByPhase.arrive],
-    ["Linger", f.notesByPhase.linger],
-    ["Stay", f.notesByPhase.stay],
-  ] as const;
-
   return (
     <main
       id="main"
       className="pt-[calc(var(--announce-h)+var(--header-h)+2rem)] lg:pt-[calc(var(--announce-h)+var(--header-h)+3.5rem)]"
+      style={{ "--frag": f.accent } as CSSProperties}
     >
       <script
         type="application/ld+json"
@@ -190,26 +213,23 @@ export default async function FragrancePage({
           <span className="text-ink-2">{f.name}</span>
         </nav>
 
-        <div
-          className="mt-[clamp(20px,3vw,34px)] grid gap-[clamp(28px,4vw,60px)] pb-[clamp(48px,8vw,90px)] lg:grid-cols-2 lg:items-start"
-          style={{ "--frag": f.accent } as CSSProperties}
-        >
+        <div className="mt-[clamp(20px,3vw,34px)] grid gap-[clamp(28px,4vw,64px)] pb-[clamp(48px,8vw,96px)] lg:grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)] lg:items-start">
           <PdpGallery slug={f.slug} name={f.name} images={f.images} />
 
           <div>
-            <h1 className="text-[clamp(2rem,4.4vw,2.9rem)] font-light tracking-[0.1em]">
+            <p className="text-[10.5px] tracking-[0.24em] text-ink-3 uppercase">
+              Extrait de Parfum · {f.volumeMl} ml
+            </p>
+            <h1 className="mt-3 text-[clamp(2.1rem,4.6vw,3.1rem)] leading-[1.04] font-light tracking-[0.1em]">
               {f.name}
             </h1>
             <p className="mt-2 text-[11.5px] tracking-[0.04em] text-ink-3">
               {f.pronunciation}
             </p>
-            <p className="mt-1 text-[10px] tracking-[0.24em] text-ink-3 uppercase">
-              Extrait de Parfum
-            </p>
             {reviewsEnabled && f.rating.count > 0 && (
               <a
                 href="#reviews"
-                className="mt-2.5 inline-flex items-center gap-2 text-[11px] text-ink-3 hover:text-ink"
+                className="mt-3 inline-flex items-center gap-2 text-[11px] text-ink-3 hover:text-ink"
               >
                 <Stars value={f.rating.average} starClassName="size-3.5" />
                 <span className="tabular-nums">
@@ -218,7 +238,7 @@ export default async function FragrancePage({
                 </span>
               </a>
             )}
-            <p className="mt-4 inline-flex items-center gap-2 text-[11px] tracking-[0.18em] text-ink-2 uppercase">
+            <p className="mt-5 inline-flex items-center gap-2.5 text-[11px] tracking-[0.18em] text-ink-2 uppercase">
               <span
                 aria-hidden
                 className="size-1.5 rounded-full"
@@ -226,42 +246,32 @@ export default async function FragrancePage({
               />
               {f.title}
             </p>
-            <p className="serif-italic mt-3.5 max-w-[40ch] text-[1.15rem] leading-[1.5] text-ink-2">
+            <p className="serif-italic mt-3 max-w-[42ch] text-[1.15rem] leading-[1.55] text-ink-2">
               {f.poem}
             </p>
 
-            {/* buy box — the page's conversion focus */}
+            {/* buy box — the page's conversion focus: price, one button, four reassurances */}
             <div
               data-buybox
-              className="mt-6 rounded-[4px] border border-line-2 bg-surface p-[clamp(18px,3vw,26px)] [box-shadow:var(--sh-card)]"
+              className="mt-7 rounded-[4px] border border-line-2 bg-surface p-[clamp(18px,3vw,28px)] [box-shadow:var(--sh-card)]"
             >
-              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
-                <span className="text-[clamp(1.8rem,3.6vw,2.4rem)] leading-none font-light tracking-[0.01em]">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                <span className="text-[clamp(2rem,3.8vw,2.6rem)] leading-none font-light tracking-[0.01em]">
                   <Ticker text={formatINR(f.price)} />
                 </span>
-                <s className="text-[15px] text-ink-3">{formatINR(f.mrp)}</s>
-                <span className="rounded-full bg-cta px-2.5 py-1 text-[9px] tracking-[0.14em] text-w0 uppercase">
-                  Launch offer
-                </span>
+                {f.mrp > f.price && (
+                  <s className="text-[15px] text-ink-3">{formatINR(f.mrp)}</s>
+                )}
+                {savePct > 0 && (
+                  <span className="rounded-full bg-cta px-2.5 py-1 text-[9.5px] tracking-[0.14em] text-w0 uppercase">
+                    Launch price · {savePct}% off
+                  </span>
+                )}
               </div>
-              <p className="mt-2 text-[11px] tracking-[0.03em] text-ink-3">
-                Save {formatINR(f.mrp - f.price)} &middot; {f.volumeMl} ml
-                Extrait &middot; price all-inclusive
+              <p className="mt-2.5 text-[11.5px] leading-relaxed text-ink-3">
+                {f.volumeMl} ml (1.7 fl oz) · inclusive of all taxes
+                {f.mrp > f.price ? ` · you save ${formatINR(f.mrp - f.price)}` : ""}
               </p>
-
-              <div className="mt-4">
-                <span className="mb-2 block text-[10px] tracking-[0.14em] text-ink-3 uppercase">
-                  Size
-                </span>
-                <div className="flex gap-2">
-                  <span className="rounded-[2px] border border-ink-2 bg-bg px-4 py-2.5 text-[12px]">
-                    50 ml
-                  </span>
-                  <span className="rounded-[2px] border border-line-2 bg-surface-2 px-4 py-2.5 text-[12px] text-ink-3">
-                    100 ml · soon
-                  </span>
-                </div>
-              </div>
 
               <AddToBagButton
                 sku={f.sku}
@@ -274,101 +284,124 @@ export default async function FragrancePage({
                 label={`Add to bag · ${formatINR(f.price)}`}
                 variant="solid"
                 size="lg"
-                className="mt-4 w-full"
+                className="mt-5 w-full"
               />
 
-              <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-[10px] tracking-[0.04em] text-ink-3 uppercase">
-                {REASSURE.map((r) => (
-                  <span key={r.label} className="inline-flex items-center gap-1.5">
-                    <Icon name={r.icon} className="size-[15px] text-ink-2" />
-                    {r.label}
-                  </span>
+              <ul className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3.5 border-t border-line pt-5">
+                {trust.map((t) => (
+                  <li key={t.title} className="flex items-start gap-2.5">
+                    <Icon name={t.icon} className="mt-px size-[17px] shrink-0 text-ink-2" />
+                    <span className="min-w-0">
+                      <b className="block text-[11.5px] leading-snug font-normal text-ink">
+                        {t.title}
+                      </b>
+                      <span className="mt-0.5 block text-[10.5px] leading-snug text-ink-3">
+                        {t.sub}
+                      </span>
+                    </span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
 
-            <section className="mt-8 border-t border-line pt-7">
-              <h2 className="mb-4 text-[10.5px] font-normal tracking-[0.16em] text-ink-3 uppercase">
-                How it unfolds
-              </h2>
-              <dl>
-                {phases.map(([k, v], i) => (
-                  <div
-                    key={k}
-                    className={cn(
-                      "grid grid-cols-[84px_1fr] gap-3.5 py-3",
-                      i < phases.length - 1 && "border-b border-line",
-                    )}
-                  >
-                    <dt className="pt-[3px] text-[9.5px] tracking-[0.16em] text-ink-3 uppercase">
-                      {k}
-                    </dt>
-                    <dd className="text-[14px]">{v}</dd>
-                  </div>
-                ))}
-              </dl>
-              <div className="mt-3.5 flex flex-wrap gap-1.5">
-                {f.notes.map((n) => (
-                  <span
-                    key={n}
-                    className="rounded-full border border-line-2 px-3 py-1.5 text-[10.5px] tracking-[0.06em] text-ink-2 uppercase"
-                  >
-                    {n}
+            {/* the soft alternative for someone who is not ready for 50 ml */}
+            {set && (
+              <Link
+                href="/discovery-set"
+                className="group mt-3 flex items-center gap-3.5 rounded-[3px] border border-line bg-surface px-4 py-3.5 transition-colors hover:border-ink"
+              >
+                <span className="flex shrink-0 -space-x-1.5" aria-hidden>
+                  {catalog.fragrances.map((x) => (
+                    <i
+                      key={x.slug}
+                      className="size-4 rounded-full ring-2 ring-surface"
+                      style={{ background: FRAGRANCE_PALETTE[x.slug].juice }}
+                    />
+                  ))}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[12.5px] text-ink">
+                    Not sure yet? Try all three in {set.perVialMl} ml
                   </span>
-                ))}
-              </div>
-            </section>
-
-            <section className="mt-8 border-t border-line pt-7">
-              <h2 className="mb-4 text-[10.5px] font-normal tracking-[0.16em] text-ink-3 uppercase">
-                Specification
-              </h2>
-              <dl className="rounded-[3px] border border-line text-[12.5px]">
-                <SpecRow label="Concentration">
-                  Extrait · 25–30%{" "}
-                  <span className="text-ink-3">(indicative)</span>
-                </SpecRow>
-                <SpecRow label="Longevity">
-                  <span className="flex gap-[3px]">
-                    {[0, 1, 2, 3].map((i) => (
-                      <i
-                        key={i}
-                        className="h-[3px] w-[18px]"
-                        style={{
-                          background:
-                            i < f.longevity
-                              ? f.accent
-                              : "var(--track, var(--color-line-2))",
-                        }}
-                      />
-                    ))}
+                  <span className="block text-[11px] text-ink-3">
+                    {formatINR(set.price)} · credited back toward your first {f.volumeMl} ml
                   </span>
-                  <span className="text-ink-3">pending wear tests</span>
-                </SpecRow>
-                <SpecRow label="Sillage">{f.sillage}</SpecRow>
-                <SpecRow label="Best worn">{f.wearOccasion}</SpecRow>
-                <SpecRow label="Volume" last>
-                  {f.volumeMl} ml &nbsp;|&nbsp; 1.7 FL.OZ
-                </SpecRow>
-              </dl>
-            </section>
+                </span>
+                <Icon
+                  name="arrowRight"
+                  className="size-4 shrink-0 text-ink-3 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-ink"
+                />
+              </Link>
+            )}
 
-            <section className="mt-8 border-t border-line pt-7">
-              <h2 className="mb-1 text-[10.5px] font-normal tracking-[0.16em] text-ink-3 uppercase">
-                Details
-              </h2>
-              <Accordion items={DETAILS} />
-            </section>
+            <div className="mt-8">
+              <Accordion items={details} defaultOpen={0} />
+            </div>
           </div>
         </div>
+      </Container>
 
+      {/* the scent in three acts, and the facts of how it wears */}
+      <PdpScent
+        name={f.name}
+        impression={f.impression}
+        mood={f.mood}
+        notesByPhase={f.notesByPhase}
+        longevity={f.longevity}
+        sillage={f.sillage}
+        wearOccasion={f.wearOccasion}
+        volumeMl={f.volumeMl}
+      />
+
+      <Container className="max-w-[1280px]">
         <PdpReviews
           enabled={reviewsEnabled}
           productName={f.name}
           reviews={reviews}
         />
+      </Container>
 
-        <section className="border-t border-line py-[clamp(36px,6vw,64px)]">
+      {set && (
+        <section className="pdp-set rh-dark" aria-labelledby="pdp-set-h">
+          <Container className="max-w-[1280px]">
+            <div className="pdp-set__in">
+              <div>
+                <p className="rh-eyebrow">Not sure which one?</p>
+                <h2 className="pdp-set__h mt-3.5" id="pdp-set-h">
+                  Try all three before you choose.
+                </h2>
+                <p className="pdp-set__p mt-4">
+                  {set.vialCount} × {set.perVialMl} ml, in the exact full-size formula, not a diluted
+                  sample. The {formatINR(set.price)} is credited in full toward your first {f.volumeMl} ml
+                  bottle.
+                </p>
+                <div className="pdp-set__cta">
+                  <Button href="/discovery-set" variant="solidLight" size="md">
+                    Explore the Discovery Set
+                  </Button>
+                  <span className="pdp-set__price">{formatINR(set.price)}</span>
+                </div>
+                <p className="mt-4 max-w-[46ch] text-[11px] leading-relaxed text-champagne/60">
+                  One credit per customer, applied to a first {f.volumeMl} ml purchase. Non-refundable once
+                  any vial is opened.
+                </p>
+              </div>
+              <ul className="pdp-set__vials">
+                {catalog.fragrances.map((x) => (
+                  <li key={x.slug}>
+                    <b>{x.name}</b>
+                    <span>{x.mood[0]}</span>
+                    <span>{set.perVialMl} ml</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Container>
+        </section>
+      )}
+
+      <Container className="max-w-[1280px]">
+        <section className="py-[clamp(40px,6vw,72px)]">
           <h2 className="mb-5 text-[10.5px] font-normal tracking-[0.16em] text-ink-3 uppercase">
             You might also like
           </h2>
@@ -410,6 +443,16 @@ export default async function FragrancePage({
           </div>
         </section>
       </Container>
+
+      <PdpStickyBar
+        sku={f.sku}
+        name={f.name}
+        price={f.price}
+        mrp={f.mrp}
+        slug={f.slug}
+        volumeMl={f.volumeMl}
+        image={cover ? cover.tiny : null}
+      />
     </main>
   );
 }
@@ -455,31 +498,5 @@ function RelatedMedia({ r }: { r: Fragrance }) {
         style={{ background: r.juice }}
       />
     </Link>
-  );
-}
-
-function SpecRow({
-  label,
-  children,
-  last,
-}: {
-  label: string;
-  children: ReactNode;
-  last?: boolean;
-}) {
-  return (
-    <div
-      className={cn(
-        "grid grid-cols-[120px_1fr]",
-        !last && "border-b border-line",
-      )}
-    >
-      <dt className="border-r border-line px-3.5 py-2.5 text-[9.5px] tracking-[0.12em] text-ink-3 uppercase">
-        {label}
-      </dt>
-      <dd className="flex flex-wrap items-center gap-2 px-3.5 py-2.5">
-        {children}
-      </dd>
-    </div>
   );
 }

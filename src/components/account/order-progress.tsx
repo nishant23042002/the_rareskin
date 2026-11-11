@@ -18,8 +18,17 @@ const FLOW: { key: OrderStatus; label: string }[] = [
 
 const TRI_JUICE =
   "linear-gradient(90deg, #e0d7bf 0%, #c5872f 52%, #3d2712 100%)";
+// on a dark ground the rail's dark-brown end would vanish, so it stops at the amber
+const TRI_JUICE_ON_DARK = "linear-gradient(90deg, #e0d7bf 0%, #c5872f 100%)";
 
-export function OrderProgress({ status }: { status: OrderStatus }) {
+export function OrderProgress({
+  status,
+  onDark = false,
+}: {
+  status: OrderStatus;
+  /** drawn inside a `.ac-dark` block (the order page's band) */
+  onDark?: boolean;
+}) {
   if (status === "cancelled" || status === "returned" || status === "refunded") {
     return (
       <div className="border border-error/30 bg-error/[0.04] px-4 py-3 text-[12.5px] leading-relaxed text-ink-2">
@@ -52,7 +61,7 @@ export function OrderProgress({ status }: { status: OrderStatus }) {
           className="absolute top-[5px] left-[5px] h-[2px] -translate-y-1/2 transition-[width] duration-700 ease-out"
           style={{
             width: `calc((100% - 10px) * ${active} / ${FLOW.length - 1})`,
-            backgroundImage: TRI_JUICE,
+            backgroundImage: onDark ? TRI_JUICE_ON_DARK : TRI_JUICE,
           }}
         />
         <ol className="relative flex justify-between">

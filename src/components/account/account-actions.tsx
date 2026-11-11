@@ -32,7 +32,7 @@ export function AccountActions() {
     <div className="flex flex-wrap gap-3">
       <Button
         onClick={out}
-        variant="ghost"
+        variant="solid"
         size="sm"
         className="!px-4"
       >

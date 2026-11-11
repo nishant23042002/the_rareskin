@@ -59,7 +59,7 @@ function Art({
       aria-hidden="true"
       className="rh-dset__art"
       style={{
-        background: "linear-gradient(135deg,#2a2218,#0f0c09)",
+        background: "var(--onyx)",
       }}
     >
       <span
@@ -67,7 +67,7 @@ function Art({
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(62% 62% at 50% 48%,rgba(185,138,76,.55),transparent)",
+            "radial-gradient(62% 62% at 50% 48%,color-mix(in srgb,var(--champagne) 14%,transparent),transparent)",
         }}
       />
       {STAND.map((s) => {

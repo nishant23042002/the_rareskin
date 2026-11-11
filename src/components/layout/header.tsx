@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/logo";
 import { RhIcon } from "@/components/ui/rh-icon";
+import { Roll } from "@/components/ui/roll";
 import { useScrolled } from "@/hooks/use-scrolled";
 import { useCart } from "@/components/providers/cart-provider";
 import { useAuth } from "@/components/providers/auth-provider";
@@ -13,10 +14,16 @@ import { SiteMenu } from "./site-menu";
 
 /**
  * The glass header, rendered inside the fixed top strip under the announcement
- * bar. A frosted bar at every scroll position (no hero-tone dependency): burger
- * (opens the left sidebar) + Fragrances / Discovery Set / Our Story on the left,
- * the centred wordmark, sign-in (or Account) and the bag with its count on the
- * right. "Fragrances" drops a four-up panel — the three, then the Discovery Set.
+ * bar. A frosted bar at every scroll position (no hero-tone dependency): the menu
+ * icon (two lines of different lengths that even out on hover; opens the left
+ * sidebar) + Fragrances / Discovery Set / Our Story on the left, the centred
+ * wordmark, sign-in (or Account) and the bag with its count on the right.
+ *
+ * Every label rolls on hover (`Roll`), the other nav links step back while one is
+ * in focus, and one brass line glides under the link in play. "Fragrances" drops a
+ * four-up panel — the three, then the Discovery Set — that opens on a mouse
+ * hover (with a short intent delay, so crossing the bar does not trigger it) and
+ * on click, tap or keyboard; ESC, an outside click or leaving the header closes it.
  */
 export function Header({
   nav,
@@ -110,14 +117,75 @@ export function Header({
   }, []);
   const authed = mounted && status === "authed";
 
+  // ---- the Fragrances dropdown: hover intent + click ----
+  // A mouse resting on "Fragrances" opens it after a beat (110ms, so sweeping across the bar does
+  // nothing); it closes 200ms after the pointer has left both the button and the panel, a delay that
+  // also covers the few pixels between them. A mouse CLICK pins it open (it then stays until ESC, an
+  // outside click, a second click or a link); touch, pen and the keyboard just toggle it.
+  const hoverTimer = useRef<number | null>(null);
+  const pinned = useRef(false);
+  const lastPointer = useRef("mouse");
+  const clearHover = useCallback(() => {
+    if (hoverTimer.current !== null) {
+      window.clearTimeout(hoverTimer.current);
+      hoverTimer.current = null;
+    }
+  }, []);
+  const scheduleMega = (open: boolean, ms: number) => {
+    clearHover();
+    hoverTimer.current = window.setTimeout(() => {
+      hoverTimer.current = null;
+      if (!open) pinned.current = false;
+      setMegaOpen(open);
+    }, ms);
+  };
+  const closeMega = useCallback(() => {
+    clearHover();
+    pinned.current = false;
+    setMegaOpen(false);
+  }, [clearHover]);
+  useEffect(() => clearHover, [clearHover]);
+
+  const onHeaderOver = (e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse" || !(e.target instanceof Element)) return;
+    if (e.target.closest('[data-nav="fragrances"]')) {
+      if (megaOpen) clearHover();
+      else scheduleMega(true, 110);
+    } else if (e.target.closest(".rh-mega")) {
+      clearHover();
+    } else if (megaOpen && !pinned.current) {
+      scheduleMega(false, 200);
+    } else {
+      clearHover();
+    }
+  };
+  const onHeaderLeave = (e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse") return;
+    if (megaOpen && !pinned.current) scheduleMega(false, 200);
+    else clearHover();
+  };
+  const onFragrancesClick = (e: React.MouseEvent) => {
+    // e.detail is 0 for a keyboard-triggered click
+    if (e.detail > 0 && lastPointer.current === "mouse") {
+      clearHover();
+      if (megaOpen && pinned.current) closeMega();
+      else {
+        pinned.current = true;
+        setMegaOpen(true);
+      }
+    } else {
+      setMegaOpen((v) => !v);
+    }
+  };
+
   // dismiss the dropdown on an outside click or ESC
   useEffect(() => {
     if (!megaOpen) return;
     const onDown = (e: PointerEvent) => {
-      if (!headerRef.current?.contains(e.target as Node)) setMegaOpen(false);
+      if (!headerRef.current?.contains(e.target as Node)) closeMega();
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMegaOpen(false);
+      if (e.key === "Escape") closeMega();
     };
     document.addEventListener("pointerdown", onDown);
     document.addEventListener("keydown", onKey);
@@ -125,29 +193,11 @@ export function Header({
       document.removeEventListener("pointerdown", onDown);
       document.removeEventListener("keydown", onKey);
     };
-  }, [megaOpen]);
+  }, [megaOpen, closeMega]);
 
   const openMenu = () => {
-    setMegaOpen(false);
+    closeMega();
     setMenuOpen(true);
-  };
-
-  // The menu button leans a few pixels toward a mouse pointer (the ring and the
-  // glyph read `--mx` / `--my`, see `.rh-hdr__burger` in home.css). Mouse only,
-  // and not under reduced motion; the 44px hit box itself never moves.
-  const leanToward = (e: React.PointerEvent<HTMLButtonElement>) => {
-    if (e.pointerType !== "mouse") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const el = e.currentTarget;
-    const r = el.getBoundingClientRect();
-    const x = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
-    const y = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
-    el.style.setProperty("--mx", (x * 3.5).toFixed(2));
-    el.style.setProperty("--my", (y * 3.5).toFixed(2));
-  };
-  const leanAway = (e: React.PointerEvent<HTMLButtonElement>) => {
-    e.currentTarget.style.removeProperty("--mx");
-    e.currentTarget.style.removeProperty("--my");
   };
 
   return (
@@ -155,6 +205,8 @@ export function Header({
       <header
         ref={headerRef}
         className={`rh-hdr${scrolled ? " is-scrolled" : ""}${megaOpen ? " is-open" : ""}`}
+        onPointerOver={onHeaderOver}
+        onPointerLeave={onHeaderLeave}
       >
         <div className="rh-wrap rh-hdr__row">
           <div className="rh-hdr__l">
@@ -162,22 +214,22 @@ export function Header({
               type="button"
               className="rh-hdr__burger"
               onClick={openMenu}
-              onPointerMove={leanToward}
-              onPointerLeave={leanAway}
               aria-haspopup="dialog"
               aria-expanded={menuOpen}
               aria-label="Open menu"
               title="Menu"
             >
-              {/* four dots, the diagonal pair larger: not the stock hamburger (styles: .rh-hdr__burger in home.css) */}
+              {/* two lines of different lengths that even out on hover (styles: .rh-burger in home.css) */}
               <span className="rh-burger" aria-hidden="true">
-                <i />
-                <i />
-                <i />
-                <i />
+                <i>
+                  <b />
+                </i>
+                <i>
+                  <b />
+                </i>
               </span>
               <span className="rh-burger__label" aria-hidden="true">
-                Menu
+                <Roll>Menu</Roll>
               </span>
             </button>
             <nav
@@ -195,9 +247,12 @@ export function Header({
                 data-nav="fragrances"
                 aria-expanded={megaOpen}
                 aria-controls="rh-mega"
-                onClick={() => setMegaOpen((v) => !v)}
+                onPointerDown={(e) => {
+                  lastPointer.current = e.pointerType;
+                }}
+                onClick={onFragrancesClick}
               >
-                Fragrances <RhIcon name="chevD" small />
+                <Roll>Fragrances</Roll> <RhIcon name="chevD" small />
               </button>
               <Link
                 className="rh-nav-btn"
@@ -205,7 +260,7 @@ export function Header({
                 href="/discovery-set"
                 aria-current={section === "discovery" ? "page" : undefined}
               >
-                Discovery Set
+                <Roll>Discovery Set</Roll>
               </Link>
               <Link
                 className="rh-nav-btn rh-nav-btn--story"
@@ -213,7 +268,7 @@ export function Header({
                 href="/the-idea"
                 aria-current={section === "story" ? "page" : undefined}
               >
-                Our Story
+                <Roll>Our Story</Roll>
               </Link>
               <span ref={glideRef} className="rh-glide" aria-hidden="true" />
             </nav>
@@ -235,7 +290,9 @@ export function Header({
                 className="rh-nav-btn"
               >
                 <RhIcon name="user" />
-                <span className="rh-hide-sm">Account</span>
+                <span className="rh-hide-sm">
+                  <Roll>Account</Roll>
+                </span>
               </Link>
             ) : (
               <button
@@ -245,7 +302,9 @@ export function Header({
                 aria-label="Sign in"
               >
                 <RhIcon name="user" />
-                <span className="rh-hide-sm">Sign in</span>
+                <span className="rh-hide-sm">
+                  <Roll>Sign in</Roll>
+                </span>
               </button>
             )}
             <button
@@ -255,7 +314,9 @@ export function Header({
               aria-label={`Open bag, ${count} ${count === 1 ? "item" : "items"}`}
             >
               <RhIcon name="bag" />
-              <span className="rh-hide-sm">Bag</span>
+              <span className="rh-hide-sm">
+                <Roll>Bag</Roll>
+              </span>
               <b
                 key={bump}
                 className={`rh-bagcount${bump ? " is-bump" : ""}`}
@@ -272,50 +333,49 @@ export function Header({
           id="rh-mega"
           aria-label="Fragrances"
         >
-          <div className="rh-wrap rh-mega__in">
-            {nav.map((f) => (
+          <div className="rh-mega__panel">
+            <div className="rh-wrap rh-mega__in">
+              {nav.map((f, k) => (
+                <Link
+                  key={f.slug}
+                  href={`/fragrances/${f.slug}`}
+                  className="rh-mega__item"
+                  style={{ "--c": f.accent, "--k": k } as CSSProperties}
+                  onClick={closeMega}
+                >
+                  <span className="rh-dot" />
+                  <span className="rh-mega__txt">
+                    <b>{f.name}</b>
+                    <em>{f.title}</em>
+                    <small>{f.mood.join(" · ")}</small>
+                  </span>
+                  <RhIcon name="arrow" small />
+                </Link>
+              ))}
               <Link
-                key={f.slug}
-                href={`/fragrances/${f.slug}`}
-                className="rh-mega__item"
-                onClick={() => setMegaOpen(false)}
+                href="/discovery-set"
+                className="rh-mega__item rh-mega__item--set"
+                style={{ "--k": nav.length } as CSSProperties}
+                onClick={closeMega}
               >
-                <span
-                  className="rh-dot"
-                  style={{ "--c": f.accent } as CSSProperties}
-                />
-                <span>
-                  <b>{f.name}</b>
-                  <em>{f.title}</em>
-                  <small>{f.mood.join(" · ")}</small>
+                <span className="rh-dot rh-dot--ring" />
+                <span className="rh-mega__txt">
+                  <b>Discovery Set</b>
+                  <em>Three 10 ml travel companions</em>
+                  <small>
+                    {setPrice
+                      ? `${formatINR(setPrice)} · credited to your first bottle`
+                      : "Credited to your first bottle"}
+                  </small>
                 </span>
+                <RhIcon name="arrow" small />
               </Link>
-            ))}
-            <Link
-              href="/discovery-set"
-              className="rh-mega__item"
-              onClick={() => setMegaOpen(false)}
-            >
-              <span className="rh-dot rh-dot--ring" />
-              <span>
-                <b>Discovery Set</b>
-                <em>Three 10 ml travel companions</em>
-                <small>
-                  {setPrice
-                    ? `${formatINR(setPrice)} · credited to your first bottle`
-                    : "Credited to your first bottle"}
-                </small>
-              </span>
-            </Link>
-          </div>
-          <div className="rh-wrap rh-mega__foot">
-            <Link
-              className="rh-link-u"
-              href="/#collection"
-              onClick={() => setMegaOpen(false)}
-            >
-              See all three <RhIcon name="arrow" small />
-            </Link>
+            </div>
+            <div className="rh-wrap rh-mega__foot">
+              <Link className="rh-link-u" href="/#collection" onClick={closeMega}>
+                See all three <RhIcon name="arrow" small />
+              </Link>
+            </div>
           </div>
         </div>
       </header>
