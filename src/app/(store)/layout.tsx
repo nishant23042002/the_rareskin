@@ -1,5 +1,6 @@
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { RouteTransitionProvider } from "@/components/providers/route-transition";
+import { PdpFlightProvider } from "@/components/providers/pdp-flight";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { SignInModalMount } from "@/components/auth/sign-in-modal-mount";
 import { SignInAutoPrompt } from "@/components/auth/sign-in-auto-prompt";
@@ -102,6 +103,7 @@ export default async function StoreLayout({
       >
         <SmoothScroll>
           <RouteTransitionProvider>
+            <PdpFlightProvider>
             <NavToneProvider>
               <div className="fixed inset-x-0 top-0 z-50">
                 <AnnouncementBar
@@ -149,6 +151,7 @@ export default async function StoreLayout({
             />
             <SignInModalMount />
             <SignInAutoPrompt />
+            </PdpFlightProvider>
           </RouteTransitionProvider>
         </SmoothScroll>
       </CartProvider>

@@ -183,6 +183,7 @@ function GalleryBody({
     >
       <div
         ref={frameRef}
+        data-flight-frame={variant.isMain ? slug : undefined}
         className={cn("pdp-frame", slides && "is-viewable")}
         data-viewing={viewing ? "" : undefined}
         onPointerDown={(e) => {

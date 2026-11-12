@@ -1,0 +1,34 @@
+/* ==========================================================================
+   The flight: a Collection tile's picture opens into the product page's gallery picture, and flies back on browser back
+   (components/providers/pdp-flight.tsx). OPENING is a view transition: the two pictures are named the same, `view-transition-class: morph`; this file
+   times it. CLOSING is a hand-driven FLIP in pdp-flight.tsx (a view transition cannot capture the old page on a back navigation). Both use the PDP picture
+   viewer's own easing (components/product/pdp-viewer.tsx: cubic-bezier(0.16, 1, 0.3, 1); 820 ms in, 640 ms out), so a picture opens the same way
+   wherever it is. The page behind washes out as the picture travels. The two ends differ in shape (4:5 tile, near-square frame): the snapshots COVER
+   the moving box, they are never stretched. html[data-flight] is set only while a flight runs: nothing else uses a view transition.
+   ========================================================================== */
+html[data-flight]::view-transition-group(.morph) {
+  animation-duration: 820ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+html[data-flight]::view-transition-old(.morph),
+html[data-flight]::view-transition-new(.morph) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+html[data-flight]::view-transition-old(root) {
+  animation: 460ms ease both vt-wash-out;
+}
+html[data-flight]::view-transition-new(root) {
+  animation: 460ms ease both vt-wash-in;
+}
+@keyframes vt-wash-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-wash-in {
+  from {
+    opacity: 0;
+  }
+}

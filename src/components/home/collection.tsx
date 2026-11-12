@@ -12,6 +12,7 @@ import { BagButton } from "@/components/cart/bag-button";
 import { Flacon } from "@/components/ui/flacon";
 import { RhIcon } from "@/components/ui/rh-icon";
 import { useDragX } from "@/hooks/use-drag-x";
+import { useFlight } from "@/components/providers/pdp-flight";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { cloudinaryVariant, formatINR, type Fragrance } from "@/lib/catalog";
 import { resolveCardAsset } from "@/lib/home-images";
@@ -50,6 +51,8 @@ function Dots({ n }: { n: number }) {
 function ProductTile({ f }: { f: Fragrance }) {
   const [flipped, setFlipped] = useState(false);
   const mediaRef = useRef<HTMLDivElement>(null);
+  const hitRef = useRef<HTMLAnchorElement>(null);
+  const flight = useFlight();
   const trackRef = useRef<HTMLDivElement>(null);
   const base = useRef(0);
   const w = useRef(1);
@@ -98,6 +101,10 @@ function ProductTile({ f }: { f: Fragrance }) {
     },
   });
 
+  useEffect(() => {
+    hitRef.current?.toggleAttribute("data-no-transition", flight.canFly());
+  }, [flight]);
+
   const dark = groundIsDark(f.onGround);
   const line = {
     sku: f.sku,
@@ -124,7 +131,7 @@ function ProductTile({ f }: { f: Fragrance }) {
         } as CSSProperties
       }
     >
-      <div className="rh-tile__media rh-grain" ref={mediaRef}>
+      <div className="rh-tile__media rh-grain" ref={mediaRef} data-flight-tile={f.slug}>
         <div className="rh-tile__slides" ref={trackRef}>
           <div
             className={`rh-tile__slide rh-tile__slide--shot${card ? " rh-tile__slide--photo" : ""}`}
@@ -183,9 +190,16 @@ function ProductTile({ f }: { f: Fragrance }) {
           </div>
         </div>
         <Link
+          ref={hitRef}
           className="rh-tile__hit"
           href={`/fragrances/${f.slug}`}
           aria-label={`Open ${f.name}`}
+          onClick={(e) => {
+            // the picture flies into the product page (providers/pdp-flight.tsx); a modified click opens as usual
+            if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+            const tile = mediaRef.current;
+            if (tile && flight.open(f.slug, `/fragrances/${f.slug}`, tile)) e.preventDefault();
+          }}
         />
         <button
           type="button"

@@ -103,3 +103,25 @@ All timings are the `FULL` / `SOFT` (reduced motion) objects at the top of
 `route-transition.tsx`; the look (colours, sizes, the hairline) is
 `route-transition.css`. If the cover or the lift is changed, keep `push` inside
 the first half of `cover`.
+
+
+## The Collection flight (trial, branch `trial/collection-section`)
+
+A Collection tile does NOT use the curtain. Its picture flies into the product page's first picture, and flies back on browser back, with the
+PDP picture viewer's easing (`cubic-bezier(0.16, 1, 0.3, 1)`, 820 ms in / 640 ms out). Code: `components/providers/pdp-flight.tsx`,
+`app/morph.css`; the two ends are `data-flight-tile` (`home/collection.tsx`, the tile's media) and `data-flight-frame` (`product/pdp-gallery.tsx`, the
+50 ml gallery frame).
+
+- **Opening** is the browser's View Transitions API, driven by hand: the tile is named `fragrance-<slug>`, the route is pushed INSIDE the transition's
+  update, and the update resolves when the product page is there, at the top, with its first picture decoded; then the frame takes the same name
+  and the browser morphs one into the other (`object-fit: cover`, never stretched). **While the update runs the document does not render, so
+  `requestAnimationFrame` never fires: the waits use timers.**
+- **Closing** is NOT a view transition: by the time the browser captures the "old" page on a back navigation the router has already swapped it. The
+  Navigation API's `navigate` event (type `traverse`) fires while the product page is still on screen, so the picture is lifted out into a fixed copy over a
+  wash in the page colour, the route swaps behind it, the scroll goes back where the tile was (saved at open in `sessionStorage`), and the copy flies
+  to the tile while the wash lifts. `popstate` is the fallback where there is no Navigation API.
+- The tile's link carries `data-no-transition` ONLY where the flight can run (View Transitions API present, no reduced motion); everywhere else it is a
+  normal link and gets the curtain. Every other link in the site keeps the curtain, and a page reached by the header still flies back to its tile on back
+  when the tile is on screen.
+- To drop it: delete `pdp-flight.tsx`, `morph.css` and its `@import`, the `PdpFlightProvider` in `(store)/layout.tsx`, `data-flight-*`, and the tile link's
+  `onClick` / `ref` / effect.
