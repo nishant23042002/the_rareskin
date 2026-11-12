@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { PageIntro } from "@/components/layout/page-intro";
 import { Accordion } from "@/components/ui/accordion";
+import { ReadingProgress } from "@/components/layout/reading-progress";
+import { SectionNav } from "@/components/layout/section-nav";
 import { pageMeta } from "@/lib/seo";
 import { FAQ_GROUPS, ALL_FAQS } from "@/lib/faq";
 
@@ -22,9 +24,12 @@ const faqJsonLd = {
   })),
 };
 
+const groupId = (t: string) => `faq-${t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
+
 export default function FaqPage() {
   return (
-    <main id="main">
+    <main id="main" data-reveal>
+      <ReadingProgress />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
@@ -38,10 +43,20 @@ export default function FaqPage() {
       />
 
       <Container className="max-w-[840px] pb-[clamp(56px,10vw,120px)]">
+        <SectionNav
+          variant="chips"
+          label="Question topics"
+          items={FAQ_GROUPS.map((g) => ({ id: groupId(g.title), label: g.title }))}
+        />
         {FAQ_GROUPS.map((group, gi) => (
           <section
             key={group.title}
-            className={gi > 0 ? "mt-[clamp(36px,6vw,64px)]" : ""}
+            id={groupId(group.title)}
+            data-rv
+            className={
+              "scroll-mt-[calc(var(--announce-h)+var(--header-h)+76px)]" +
+              (gi > 0 ? " mt-[clamp(36px,6vw,64px)]" : "")
+            }
           >
             <h2 className="mb-2 text-[10.5px] font-normal tracking-[0.16em] text-ink-3 uppercase">
               {group.title}
@@ -50,7 +65,9 @@ export default function FaqPage() {
           </section>
         ))}
 
-        <p className="mt-[clamp(40px,7vw,72px)] border-t border-line pt-8 text-[13px] leading-[1.7] text-ink-2">
+        <p
+          data-rv
+          className="mt-[clamp(40px,7vw,72px)] border-t border-line pt-8 text-[13px] leading-[1.7] text-ink-2">
           Didn&rsquo;t find it?{" "}
           <Link
             href="/contact"

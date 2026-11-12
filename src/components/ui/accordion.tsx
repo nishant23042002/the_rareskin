@@ -29,7 +29,7 @@ export function Accordion({
         const isOpen = open === i;
         const panelId = `${baseId}-${i}`;
         return (
-          <div key={it.q} className="border-b border-line">
+          <div key={it.q} className="acc-row border-b border-line" data-open={isOpen ? "" : undefined}>
             <h3>
               <button
                 type="button"
@@ -38,7 +38,7 @@ export function Accordion({
                 onClick={() => setOpen(isOpen ? null : i)}
                 className="flex w-full items-center justify-between gap-5 py-[clamp(14px,2vw,18px)] text-left text-[13.5px] leading-[1.4]"
               >
-                <span>{it.q}</span>
+                <span className="acc-q">{it.q}</span>
                 <span
                   aria-hidden
                   className={cn(

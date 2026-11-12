@@ -14,6 +14,8 @@
 
 /* the hero (explorable picture, headline on its wall) and the launch pass */
 @import "./hero.css";
+/* the content pages: arrival, reveals, reading line, section nav, small interactions */
+@import "./pages.css";
 
 /* ==========================================================================
    THE RARESKIN — design tokens

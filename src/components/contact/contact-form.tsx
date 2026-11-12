@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 type Status = "idle" | "submitting" | "success" | "error";
 
 const field =
-  "peer w-full border-0 border-b border-line-2 bg-transparent pt-6 pb-2 text-[14px] text-ink placeholder-transparent transition-colors focus:border-ink focus:outline-none disabled:opacity-60";
+  "peer w-full border-0 border-b border-line-2 bg-transparent pt-6 pb-2 text-[14px] text-ink placeholder-transparent transition-colors focus:outline-none disabled:opacity-60";
 const label =
   "pointer-events-none absolute left-0 top-6 text-[13px] text-ink-3 transition-all peer-focus:top-0 peer-focus:text-[10px] peer-focus:tracking-[0.12em] peer-focus:uppercase peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:tracking-[0.12em] peer-[:not(:placeholder-shown)]:uppercase";
 
@@ -26,7 +26,7 @@ function Field({
 }) {
   const id = useId();
   return (
-    <div className="relative">
+    <div className="ct-field relative" data-rv>
       <input
         id={id}
         name={name}
@@ -81,13 +81,16 @@ export function ContactForm() {
 
   if (status === "success") {
     return (
-      <p
-        className="serif-italic max-w-[42ch] text-[1.15rem] leading-[1.5] text-ink-2"
-        role="status"
-      >
-        Thank you — your message is on its way. We usually reply within a working
-        day.
-      </p>
+      <div className="ct-ok" role="status">
+        <svg viewBox="0 0 52 52" aria-hidden="true">
+          <circle cx="26" cy="26" r="24" />
+          <path d="M15 27l8 8 14-16" />
+        </svg>
+        <p className="serif-italic max-w-[42ch] text-[1.15rem] leading-[1.5] text-ink-2">
+          Thank you — your message is on its way. We usually reply within a
+          working day.
+        </p>
+      </div>
     );
   }
 
@@ -109,7 +112,7 @@ export function ContactForm() {
       />
       <Field name="subject" labelText="Subject (optional)" />
 
-      <div className="relative sm:col-span-2">
+      <div className="ct-field relative sm:col-span-2" data-rv>
         <textarea
           id={msgId}
           name="message"

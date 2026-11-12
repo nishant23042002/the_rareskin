@@ -49,7 +49,7 @@ export default async function DiscoverySetPage() {
   ];
 
   return (
-    <main id="main">
+    <main id="main" data-reveal>
       <PageIntro
         eyebrow="The set"
         crumb={{ name: "Discovery Set", path: "/discovery-set" }}
@@ -60,12 +60,12 @@ export default async function DiscoverySetPage() {
       <DiscoverySet set={set} fragrances={fragrances} />
 
       <Container className="max-w-[980px] py-[clamp(48px,9vw,110px)]">
-        <h2 className="eyebrow mb-[clamp(24px,4vw,40px)]">
+        <h2 data-rv className="eyebrow mb-[clamp(24px,4vw,40px)]">
           How the credit works
         </h2>
         <ol className="grid gap-9 sm:grid-cols-3">
           {steps.map((s) => (
-            <li key={s.n}>
+            <li key={s.n} data-rv className="pg-step">
               <p className="serif text-[1.5rem] leading-none text-ink-3">
                 {s.n}
               </p>
@@ -76,7 +76,7 @@ export default async function DiscoverySetPage() {
             </li>
           ))}
         </ol>
-        <p className="mt-9 text-[11px] leading-[1.7] tracking-[0.03em] text-ink-3">
+        <p data-rv className="mt-9 text-[11px] leading-[1.7] tracking-[0.03em] text-ink-3">
           One credit per customer, applied automatically to your first 50 ml
           purchase and not combinable with other offers. The Discovery Set is
           non-refundable once any vial is opened. See{" "}

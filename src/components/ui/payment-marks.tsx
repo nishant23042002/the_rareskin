@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { cn } from "@/lib/cn";
 
 /**
@@ -40,6 +41,44 @@ export function UpiAppStrip({ className }: { className?: string }) {
             loading="lazy"
             decoding="async"
             className="h-[15px] w-auto"
+          />
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/**
+ * Three payment methods as overlapping circles, sized for the inside of a button: UPI, Visa and
+ * Mastercard, the three a shopper in India reaches for first (Razorpay takes all of them, and more:
+ * netbanking, wallets, RuPay). Each circle is white (the one place white is a fact: the brand marks
+ * need it to read) with a ring in the button's own colour so they separate cleanly; on a mouse the
+ * stack fans out a few pixels when the button is hovered. Decorative: the button's label says what it does.
+ * The parent button must carry `group`.
+ */
+export function PayStack({ className }: { className?: string }) {
+  const marks = [
+    { src: "/pay/bhim.svg", label: "UPI" },
+    { src: "/pay/visa.svg", label: "Visa" },
+    { src: "/pay/mastercard.svg", label: "Mastercard" },
+  ];
+  return (
+    <span className={cn("flex items-center", className)} aria-hidden>
+      {marks.map((m, k) => (
+        <span
+          key={m.label}
+          className="-ml-[9px] grid size-7 place-items-center rounded-full bg-white ring-2 ring-cta transition-transform duration-500 ease-[var(--ease-brand)] first:ml-0 group-hover:translate-x-[calc(var(--k)*4px)]"
+          style={{ zIndex: 3 - k, "--k": k } as CSSProperties}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={m.src}
+            alt=""
+            width={20}
+            height={20}
+            loading="lazy"
+            decoding="async"
+            className="size-5 object-contain"
           />
         </span>
       ))}

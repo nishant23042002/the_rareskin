@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Flacon } from "@/components/ui/flacon";
 import { Carousel } from "@/components/ui/carousel";
 import { cn } from "@/lib/cn";
 import type { FragranceImages, FragranceSlug } from "@/lib/catalog";
 import { pdpSlides } from "@/lib/pdp-images";
+import { PdpViewer } from "./pdp-viewer";
 
 /**
- * PDP gallery — a draggable frame with dots, plus a thumbnail strip.
+ * PDP gallery — a draggable frame with dots, plus a thumbnail strip. A click on the frame (or its
+ * enlarge button) opens `PdpViewer`: the picture lifts out of the page into a full-screen viewer with zoom,
+ * swipe, thumbnails, and flies back when it is closed.
  *
  * The official product photographs (`@/config/pdp-gallery`, six per extrait) come
  * first; a photograph uploaded in the admin catalogue (`images.hero|flat|box`)
@@ -36,6 +39,15 @@ export function PdpGallery({
   images: FragranceImages;
 }) {
   const [active, setActive] = useState(0);
+  // the full-screen viewer: open / which picture, and whether the page's own picture is hidden (it is
+  // while the viewer holds it, so the one that flies is never doubled)
+  const [viewer, setViewer] = useState({ open: false, index: 0 });
+  const [viewing, setViewing] = useState(false);
+  // the aspect of a picture whose size the config does not know (an upload), measured when it loads
+  const [measured, setMeasured] = useState<Record<number, number>>({});
+  const frameRef = useRef<HTMLDivElement>(null);
+  const expandRef = useRef<HTMLButtonElement>(null);
+  const downX = useRef<number | null>(null);
   // The slides whose pictures are fetched. Only the first is, to begin with: the others are 100-550 KB
   // each (about 1.1 MB for the set) and every byte of them competes with the picture the page is waiting
   // on. The next one is warmed when the browser is idle or on the first touch / hover / focus (a drag
@@ -68,6 +80,21 @@ export function PdpGallery({
   const all = pdpSlides(slug, images, name);
   const slides = all.length > 0 ? all : null;
 
+  const openViewer = (i: number) => {
+    if (!slides) return;
+    want(i - 1, i, i + 1);
+    setViewing(true);
+    setViewer({ open: true, index: i });
+  };
+  const viewerSlides = (slides ?? []).map((s, i) => ({
+    key: s.key,
+    full: s.full,
+    thumb: s.thumb,
+    tiny: s.tiny,
+    alt: s.alt,
+    ar: s.thumbWidth && s.thumbHeight ? s.thumbWidth / s.thumbHeight : (measured[i] ?? 1),
+  }));
+
   return (
     <div
       className="grid gap-3 lg:sticky lg:top-[calc(var(--announce-h)+var(--header-h)+24px)]"
@@ -75,6 +102,20 @@ export function PdpGallery({
       onPointerEnter={() => want(active + 1)}
       onFocusCapture={() => want(active - 1, active + 1)}
     >
+      <div
+        ref={frameRef}
+        className={cn("pdp-frame", slides && "is-viewable")}
+        data-viewing={viewing ? "" : undefined}
+        onPointerDown={(e) => {
+          downX.current = e.clientX;
+        }}
+        onClick={(e) => {
+          if (!slides || (e.target as HTMLElement).closest("button")) return;
+          // a drag that ended on the frame is a swipe, not a click
+          if (downX.current != null && Math.abs(e.clientX - downX.current) > 6) return;
+          openViewer(active);
+        }}
+      >
       <Carousel
         ariaLabel={`${name} images`}
         dotsInside
@@ -97,6 +138,12 @@ export function PdpGallery({
                     sizes={s.srcSet ? "(min-width: 1024px) 560px, 100vw" : undefined}
                     alt={s.alt}
                     className="h-full w-full object-cover"
+                    onLoad={(e) => {
+                      if (s.thumbWidth) return;
+                      const el = e.currentTarget;
+                      if (el.naturalWidth && el.naturalHeight)
+                        setMeasured((m) => (m[idx] ? m : { ...m, [idx]: el.naturalWidth / el.naturalHeight }));
+                    }}
                     // a slide that was asked for is fetched now (a lazy image inside a clipped, sliding
                     // track is not reliably "near"); the one on show is the priority, a neighbour is not
                     loading="eager"
@@ -125,6 +172,39 @@ export function PdpGallery({
               </div>
             ))}
       </Carousel>
+        {slides && (
+          <button
+            ref={expandRef}
+            type="button"
+            className="pdp-expand"
+            onClick={() => openViewer(active)}
+            aria-label={`Enlarge ${name} picture ${active + 1}`}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+            </svg>
+          </button>
+        )}
+      </div>
+
+      {slides && (
+        <PdpViewer
+          open={viewer.open}
+          index={viewer.index}
+          slides={viewerSlides}
+          name={name}
+          originFor={() => frameRef.current?.getBoundingClientRect() ?? null}
+          onIndexChange={(i) => {
+            setViewer((v) => ({ ...v, index: i }));
+            go(i);
+          }}
+          onClose={() => setViewer((v) => ({ ...v, open: false }))}
+          onClosed={() => {
+            setViewing(false);
+            expandRef.current?.focus({ preventScroll: true });
+          }}
+        />
+      )}
 
       <div className="flex gap-2.5">
         {slides

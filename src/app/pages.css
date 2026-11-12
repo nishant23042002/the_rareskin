@@ -1,0 +1,401 @@
+/* ==========================================================================
+   The content pages: shipping, returns, terms, privacy, FAQ, contact, our story, the Discovery Set page.
+
+   One small, shared kit instead of page-by-page effects, built to cost almost nothing:
+     - arrival: the intro of every page (eyebrow, headline word by word, lede, a short accent line) plays once with
+       CSS keyframes: opacity / transform only, a handful of elements, no script;
+     - reveals: the page's sections rise in as they scroll into view through the existing motion layer
+       (`data-reveal` on <main>, `data-rv` on what should rise): one IntersectionObserver, no scroll listener,
+       nothing hidden until the script has run;
+     - scroll-driven, on the compositor, no script: a reading-progress line and the hairline above each section
+       that draws as it arrives (`animation-timeline`; a browser without it simply shows them finished);
+     - micro-interactions: the table of contents / FAQ chips follow the section in view (one IntersectionObserver),
+       the contact fields draw a line as you focus them, channels and promises answer the pointer.
+
+   Only transform and opacity are animated, `will-change` is never set, and every motion rule sits behind
+   `prefers-reduced-motion: no-preference`: under reduced motion the pages are exactly the static ones.
+   ========================================================================== */
+
+@layer components {
+  /* ---- arrival ---- */
+  .pg-w {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding-bottom: 0.14em;
+    margin-bottom: -0.14em;
+  }
+  .pg-w > span {
+    display: inline-block;
+  }
+  .pg-rule {
+    display: block;
+    width: 56px;
+    height: 1px;
+    margin-top: clamp(22px, 3.4vw, 30px);
+    background: var(--brass);
+    transform-origin: left center;
+  }
+  @keyframes pg-fade {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+  @keyframes pg-rise {
+    from {
+      transform: translateY(108%);
+    }
+  }
+  @keyframes pg-draw {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .pg-eyebrow {
+      animation: pg-fade 0.9s var(--expo) 0.08s backwards;
+    }
+    .pg-w > span {
+      animation: pg-rise 1.05s var(--expo) calc(0.16s + var(--i, 0) * 0.07s) backwards;
+    }
+    .pg-lede {
+      animation: pg-fade 1s var(--expo) 0.36s backwards;
+    }
+    .pg-rule {
+      animation: pg-draw 1.3s var(--expo) 0.55s backwards;
+    }
+  }
+
+  /* ---- the reading line and the hairlines: scroll-driven, no script; without support they are simply there ----
+     The reading line is part of the HEADER (`.rh-hdr__read`, the header's last child), pinned to its bottom edge, so it
+     stays attached whether or not the announcement bar above has slid away. A page opts in by mounting
+     `ReadingProgress`, which sets `data-reading` on <html>; the line is then drawn by the scroll position. */
+  .rh-hdr__read {
+    display: none;
+  }
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      html[data-reading] .rh-hdr__read {
+        display: block;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 2;
+        height: 2px;
+        pointer-events: none;
+        background: linear-gradient(90deg, var(--brass), color-mix(in srgb, var(--brass) 45%, var(--ink)));
+        transform: scaleX(0);
+        transform-origin: left center;
+        animation: pg-progress linear both;
+        animation-timeline: scroll(root block);
+      }
+      .pg-sec::before {
+        transform: scaleX(0);
+        transform-origin: left center;
+        animation: pg-draw linear both;
+        animation-timeline: view();
+        animation-range: entry 10% entry 75%;
+      }
+    }
+  }
+  @keyframes pg-progress {
+    to {
+      transform: scaleX(1);
+    }
+  }
+  /* the hairline above each policy section (the first has none) */
+  .pg-sec {
+    position: relative;
+  }
+  .pg-sec::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -1.25rem;
+    height: 1px;
+    background: var(--line);
+  }
+  .pg-sec:first-child::before {
+    display: none;
+  }
+
+  /* ---- the section nav: a table of contents beside a policy, chips above the FAQ ---- */
+  .pg-toc {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .pg-toc {
+      display: block;
+      position: sticky;
+      top: calc(var(--announce-h) + var(--header-h) + 32px);
+      align-self: start;
+    }
+  }
+  .pg-toc__h {
+    margin: 0 0 14px;
+    font: 500 10px/1 var(--f-label);
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .pg-toc ol {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-left: 1px solid var(--line);
+  }
+  .pg-toc a {
+    display: block;
+    height: 36px;
+    padding: 0 12px 0 16px;
+    overflow: hidden;
+    font: 400 11px/36px var(--f-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--ink-3);
+    transition: color 0.35s var(--ease);
+  }
+  .pg-toc a:hover,
+  .pg-toc a[aria-current="true"] {
+    color: var(--ink);
+  }
+  .pg-toc__bar {
+    position: absolute;
+    left: -1px;
+    top: 0;
+    width: 2px;
+    height: 36px;
+    background: var(--brass);
+    transform: translateY(calc(var(--at, 0) * 36px));
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .pg-toc__bar {
+      transition: transform 0.7s var(--expo);
+    }
+  }
+
+  .pg-chips {
+    position: sticky;
+    top: calc(var(--announce-h) + var(--header-h));
+    z-index: 30;
+    margin-bottom: clamp(20px, 4vw, 36px);
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pg-chips {
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+    }
+  }
+  .pg-chips ol {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    padding: 10px 0;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .pg-chips ol::-webkit-scrollbar {
+    display: none;
+  }
+  .pg-chips a {
+    display: block;
+    padding: 9px 14px 8px;
+    border: 1px solid var(--line-2);
+    border-radius: 99px;
+    font: 400 10.5px/1 var(--f-label);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--ink-2);
+    transition:
+      background-color 0.35s var(--ease),
+      border-color 0.35s var(--ease),
+      color 0.35s var(--ease);
+  }
+  .pg-chips a:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+  .pg-chips a[aria-current="true"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+
+  /* ---- the FAQ's rows: a brass bar draws down the open one, the question leans in on hover ---- */
+  .acc-row {
+    position: relative;
+  }
+  .acc-row::before {
+    content: "";
+    position: absolute;
+    left: -14px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--brass);
+    transform: scaleY(0);
+    transform-origin: top center;
+  }
+  .acc-row[data-open]::before {
+    transform: none;
+  }
+  .acc-row .acc-q {
+    display: block;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .acc-row::before {
+      transition: transform 0.6s var(--expo);
+    }
+    .acc-row .acc-q {
+      transition: translate 0.5s var(--expo);
+    }
+  }
+  @media (hover: hover) {
+    .acc-row button:hover .acc-q {
+      translate: 4px 0;
+    }
+  }
+
+  /* ---- contact: a channel answers the pointer; a field draws its line as you enter it; the thank-you draws a tick ---- */
+  .ct-ch {
+    position: relative;
+  }
+  .ct-ch::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -1px;
+    height: 1px;
+    background: var(--brass);
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+  .ct-ch .rh-ico,
+  .ct-ch svg {
+    transition: translate 0.5s var(--expo);
+  }
+  @media (hover: hover) {
+    .ct-ch:hover::before {
+      transform: none;
+    }
+    .ct-ch:hover svg:first-child {
+      translate: 0 -2px;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ct-ch::before {
+      transition: transform 0.8s var(--expo);
+    }
+  }
+  .ct-field::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--ink);
+    transform: scaleX(0);
+    transform-origin: left center;
+    pointer-events: none;
+  }
+  .ct-field:focus-within::after {
+    transform: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ct-field::after {
+      transition: transform 0.7s var(--expo);
+    }
+  }
+  .ct-ok {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .ct-ok svg {
+    flex: none;
+    width: 46px;
+    height: 46px;
+    fill: none;
+    stroke: var(--brass);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ct-ok svg circle {
+      stroke-dasharray: 152;
+      animation: pg-stroke 1s var(--expo) backwards;
+    }
+    .ct-ok svg path {
+      stroke-dasharray: 40;
+      animation: pg-stroke 0.7s var(--expo) 0.55s backwards;
+    }
+    .ct-ok p {
+      animation: pg-fade 1s var(--expo) 0.3s backwards;
+    }
+  }
+  @keyframes pg-stroke {
+    from {
+      stroke-dashoffset: 152;
+    }
+  }
+
+  /* ---- our story and the Discovery Set page: a promise / a step answers the pointer ---- */
+  .pg-pro {
+    position: relative;
+  }
+  .pg-pro::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 1px;
+    background: var(--brass);
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+  .pg-pro > span:first-child {
+    display: inline-block;
+  }
+  @media (hover: hover) {
+    .pg-pro:hover::after {
+      transform: none;
+    }
+    .pg-pro:hover > span:first-child {
+      translate: 4px 0;
+      color: var(--brass);
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .pg-pro::after {
+      transition: transform 0.8s var(--expo);
+    }
+    .pg-pro > span:first-child {
+      transition:
+        translate 0.5s var(--expo),
+        color 0.4s var(--ease);
+    }
+  }
+  .pg-step {
+    transition: translate 0.6s var(--expo);
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .pg-step:hover {
+      translate: 0 -4px;
+    }
+  }
+}

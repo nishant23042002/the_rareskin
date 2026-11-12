@@ -47,7 +47,7 @@ const CHANNELS: {
 
 export default function ContactPage() {
   return (
-    <main id="main">
+    <main id="main" data-reveal>
       <PageIntro
         eyebrow="Support"
         crumb={{ name: "Contact", path: "/contact" }}
@@ -61,8 +61,9 @@ export default function ContactPage() {
           {CHANNELS.map((c, i) => (
             <div
               key={c.label}
+              data-rv
               className={
-                "flex flex-col gap-2 py-[clamp(20px,3vw,30px)] md:py-8 md:pr-8" +
+                "ct-ch flex flex-col gap-2 py-[clamp(20px,3vw,30px)] md:py-8 md:pr-8" +
                 (i < CHANNELS.length - 1
                   ? " border-b border-line md:border-r md:border-b-0"
                   : "") +
@@ -97,7 +98,7 @@ export default function ContactPage() {
 
         {/* the message form */}
         <div className="mt-[clamp(44px,8vw,88px)] grid gap-[clamp(28px,5vw,64px)] lg:grid-cols-[minmax(0,300px)_minmax(0,1fr)]">
-          <div>
+          <div data-rv>
             <h2 className="text-[clamp(1.4rem,2.6vw,1.9rem)] leading-[1.15]">
               Write to us
             </h2>

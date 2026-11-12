@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 
+import { RhIcon } from "@/components/ui/rh-icon";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { formatINR } from "@/lib/catalog";
 
@@ -20,6 +21,10 @@ import { formatINR } from "@/lib/catalog";
  *    · 12 days left". With none, it says plainly that the price returns to the list price when the
  *    launch ends. No countdown that restarts, no stock claim, nothing made up: every number is the
  *    catalogue's own.
+ *
+ * On a phone it is deliberately quiet: the kicker, the figure with the struck list price and a small
+ * "−47%" pill, one sentence, and one link. The belt, the turning seal, the meter and the chips are for
+ * wider screens.
  *
  * Without JavaScript, or with reduced motion, it shows its final state; the server markup is the
  * final state too, so there is no flash. Styles: `.rh-pass*` in `app/hero.css`.
@@ -231,6 +236,10 @@ export function LaunchPass({
               List <s>{formatINR(mrp)}</s>
             </span>
           </p>
+          {/* a phone gets one quiet line instead of the meter and the chips (see app/hero.css) */}
+          <a className="rh-pass__go" href="#collection">
+            See the three extraits <RhIcon name="arrow" />
+          </a>
           {items.length > 0 && (
             <ul className="rh-pass__chips" aria-label="The launch price applies to all three">
               {items.map((it, idx) => (

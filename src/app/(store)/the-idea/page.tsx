@@ -5,6 +5,7 @@ import {
   type FounderPhotoSource,
 } from "@/components/ui/founder-photo";
 import { PageIntro } from "@/components/layout/page-intro";
+import { ReadingProgress } from "@/components/layout/reading-progress";
 import { pageMeta } from "@/lib/seo";
 import { getSiteSettings } from "@/server/data/settings";
 
@@ -38,7 +39,7 @@ function FounderCard({ photo }: { photo?: FounderPhotoSource | null }) {
   return (
     // never cropped — the card takes the photo's own height; below lg it's a
     // size-capped, centred portrait rather than a full-width one
-    <figure className="mx-auto w-full max-w-[420px] overflow-hidden rounded-[4px] border border-line lg:mx-0 lg:max-w-none">
+    <figure data-tilt className="relative mx-auto w-full max-w-[420px] overflow-hidden rounded-[4px] border border-line lg:mx-0 lg:max-w-none">
       <div
         className="relative"
         style={{
@@ -67,7 +68,8 @@ function FounderCard({ photo }: { photo?: FounderPhotoSource | null }) {
 export default async function OurStoryPage() {
   const settings = await getSiteSettings();
   return (
-    <main id="main">
+    <main id="main" data-reveal>
+      <ReadingProgress />
       <PageIntro
         eyebrow="THE RARESKIN"
         crumb={{ name: "Our Story", path: "/the-idea" }}
@@ -83,19 +85,19 @@ export default async function OurStoryPage() {
           </div>
 
           <div>
-            <p className="eyebrow mb-4">A note from the founder</p>
+            <p data-rv className="eyebrow mb-4">A note from the founder</p>
             <div className="max-w-[62ch] space-y-4 text-[15px] leading-[1.85] text-ink-2">
-              <p className="text-ink">Hello,</p>
-              <p>
+              <p data-rv className="text-ink">Hello,</p>
+              <p data-rv>
                 I’m <span className="text-ink">Vijay More</span>, Founder of THE
                 RARESKIN.
               </p>
               {FOUNDER_LETTER.map((p) => (
-                <p key={p.slice(0, 24)}>{p}</p>
+                <p key={p.slice(0, 24)} data-rv>{p}</p>
               ))}
             </div>
 
-            <div className="mt-9 border-t border-line pt-6">
+            <div data-rv className="mt-9 border-t border-line pt-6">
               <p className="serif-italic text-[1.05rem] text-ink-2">
                 With gratitude,
               </p>
@@ -111,11 +113,11 @@ export default async function OurStoryPage() {
       {/* Our philosophy */}
       <section className="border-t border-line bg-surface">
         <Container className="max-w-[720px] py-[clamp(52px,9vw,110px)] text-center">
-          <p className="eyebrow mb-5">Our philosophy</p>
-          <p className="serif-italic text-[clamp(1.7rem,4vw,2.6rem)] leading-[1.25]">
+          <p data-rv className="eyebrow mb-5">Our philosophy</p>
+          <p data-rv className="serif-italic text-[clamp(1.7rem,4vw,2.6rem)] leading-[1.25]">
             Scents that stay with you.
           </p>
-          <p className="mx-auto mt-6 max-w-[54ch] text-[15px] leading-[1.8] text-ink-2">
+          <p data-rv className="mx-auto mt-6 max-w-[54ch] text-[15px] leading-[1.8] text-ink-2">
             We believe every fragrance should evoke emotion, preserve memories,
             and leave a lasting impression. We don’t create perfumes to follow
             trends — we create fragrances that become a part of who you are.
@@ -126,12 +128,13 @@ export default async function OurStoryPage() {
       {/* Our promise */}
       <section className="border-t border-line">
         <Container className="max-w-[920px] py-[clamp(52px,9vw,110px)]">
-          <p className="eyebrow mb-[clamp(24px,4vw,44px)]">Our promise</p>
+          <p data-rv className="eyebrow mb-[clamp(24px,4vw,44px)]">Our promise</p>
           <ul className="grid gap-x-10 sm:grid-cols-2">
             {PROMISE.map((p, i) => (
               <li
                 key={p}
-                className="flex items-baseline gap-4 border-b border-line py-4"
+                data-rv
+                className="pg-pro flex items-baseline gap-4 border-b border-line py-4"
               >
                 <span className="serif text-[1.1rem] leading-none text-ink-3">
                   {`0${i + 1}`}
@@ -140,7 +143,7 @@ export default async function OurStoryPage() {
               </li>
             ))}
           </ul>
-          <p className="mt-[clamp(26px,5vw,48px)] max-w-[48ch] text-[15px] leading-[1.7] text-ink-2">
+          <p data-rv className="mt-[clamp(26px,5vw,48px)] max-w-[48ch] text-[15px] leading-[1.7] text-ink-2">
             Every decision we make is guided by one promise —{" "}
             <span className="serif-italic text-ink">
               to deliver a luxury fragrance experience that exceeds

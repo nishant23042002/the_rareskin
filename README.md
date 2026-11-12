@@ -446,6 +446,22 @@ before going live:
   `public/founder/founder-fallback.webp` instead. Any portrait works; tall
   ~2:3 looks best. `--id=<new-id>` on the script keeps the previous Cloudinary
   asset.
+- **Product picture viewer** — a click on a product-page photograph (or the corner enlarge button) opens a
+  full-screen viewer (`src/components/product/pdp-viewer.tsx`, styles `.pv*` in `src/app/pdp.css`): the picture
+  lifts out of the page and settles in the middle, you can swipe / use the arrows / the thumbnails, click to zoom
+  (the picture follows the pointer), and closing flies it back into place. Esc, the cross, or a click beside the
+  picture closes it. Under reduced motion it fades instead of flying.
+- **Content-page motion** — shipping, returns, terms, privacy, FAQ, contact, our story and the Discovery
+  Set page share one small kit (`src/app/pages.css`, `PageIntro`, `ReadingProgress`, `SectionNav`, the motion
+  layer's `data-reveal` / `data-rv`): an intro that arrives, sections that rise in, a reading line under the
+  header, a table of contents (policies) / topic chips (FAQ) that follow the section in view, and small
+  interactions on the FAQ rows, contact channels and fields, and the promise rows. It is built to be cheap:
+  transform and opacity only, no scroll listeners (scroll-driven CSS and one IntersectionObserver), nothing
+  under `prefers-reduced-motion`.
+- **Checkout button payment marks** — the bag's "Proceed to checkout" button shows three payment methods as
+  overlapping circles (UPI, Visa, Mastercard; `PayStack` in `src/components/ui/payment-marks.tsx`, marks in
+  `public/pay/`). Razorpay accepts more than these three; they are the most recognised. On a phone the launch pass
+  (`launch-pass.tsx`) is a deliberately quiet version of the desktop card.
 - **Homepage hero photograph** — the picture beside "Three Extraits" is one
   photograph of the three flacons together, uploaded in **Admin → Settings →
   Homepage hero** (Site Settings `heroImage`; about 4:5 on a phone and

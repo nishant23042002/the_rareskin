@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 
 import { Button } from "@/components/ui/button";
+import { PayStack } from "@/components/ui/payment-marks";
 import { Icon } from "@/components/ui/icon";
 import { useCart } from "@/components/providers/cart-provider";
 import { formatINR } from "@/lib/catalog";
@@ -136,21 +137,25 @@ export function BagView({
           onClick={goToCheckout}
           disabled={!checkoutAvailable}
           size="lg"
-          className="group mt-4 w-full whitespace-nowrap max-[359px]:px-4 max-[359px]:tracking-[0.1em] [@media(max-height:720px)]:mt-3 [@media(max-height:720px)]:py-3.5"
+          className="group mt-4 w-full whitespace-nowrap max-[479px]:px-4 max-[479px]:tracking-[0.12em] [@media(max-height:720px)]:mt-3 [@media(max-height:720px)]:py-3.5"
         >
           {checkoutAvailable ? (
-            <>
+            // the label on the left; on the right the three payment methods as circles, then the arrow
+            <span className="flex w-full items-center justify-between gap-3">
               <span>
-                <span className="max-[359px]:hidden">Proceed to </span>
+                <span className="max-[419px]:hidden">Proceed to </span>
                 Checkout
                 <span aria-hidden> • </span>
                 <span className="tabular-nums">{formatINR(payable)}</span>
               </span>
-              <Icon
-                name="arrowRight"
-                className="size-[15px] transition-transform duration-300 group-hover:translate-x-1.5"
-              />
-            </>
+              <span className="flex shrink-0 items-center gap-3">
+                <PayStack />
+                <Icon
+                  name="arrowRight"
+                  className="size-[15px] transition-transform duration-300 group-hover:translate-x-1.5"
+                />
+              </span>
+            </span>
           ) : (
             <span>Checkout opens with launch</span>
           )}

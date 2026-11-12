@@ -378,6 +378,8 @@ export function Header({
             </div>
           </div>
         </div>
+        {/* the page's reading line: attached to the header's bottom edge (shown only where a page opts in, app/pages.css) */}
+        <span className="rh-hdr__read" aria-hidden="true" />
       </header>
 
       <SiteMenu

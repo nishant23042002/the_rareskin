@@ -269,11 +269,30 @@
   .rh-pass__chips a:hover, .rh-pass__chips a:focus-visible {background:var(--champagne);border-color:var(--champagne);color:var(--onyx);transform:translateY(-2px)}
   .rh-pass__chips a:hover em, .rh-pass__chips a:focus-visible em {color:var(--onyx)}
   .rh-pass__fine {position:relative;z-index:1;display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 24px;padding:13px clamp(20px,3.4vw,40px);border-top:1px solid var(--bd);font:500 10px/1.6 var(--f-label);letter-spacing:.16em;text-transform:uppercase;color:color-mix(in srgb,var(--champagne) 50%,transparent)}
+  /* the phone version: simple and still informative. Kicker, the figure with its struck list price and a small pill, one
+     sentence, one link, one line of fine print. The belt, the turning seal, the meter, the scale and the chips are for wider screens. */
+  .rh-pass__go {display:none}
   @media(max-width:599px) {
     .rh-pass-wrap {margin-top:-34px;background:linear-gradient(to bottom,transparent 34px,var(--paper) 34px)}
-    .rh-pass__chips a {padding:9px 11px 8px;font-size:10px;letter-spacing:.12em}
-    .rh-pass__chips em {display:none}
-    .rh-pass__fine span:last-child {max-width:34ch}
+    .rh-pass__belt {display:none}
+    .rh-pass__body {grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"lead seal" "side side";gap:14px 12px;padding:22px 20px 16px;align-items:start}
+    .rh-pass__kicker {font-size:10px;letter-spacing:.2em}
+    .rh-pass__price {margin-top:10px;gap:4px 12px;align-items:baseline}
+    .rh-pass__price b {font-size:3.1rem;min-width:0!important}
+    .rh-pass__was {padding-bottom:0}
+    .rh-pass__was small {display:none}
+    .rh-pass__was s {font-size:1.05rem}
+    .rh-pass__save {margin-top:10px;max-width:none;font-size:13px;line-height:1.5}
+    /* the seal becomes a small pill beside the figure */
+    .rh-pass__seal {width:auto;aspect-ratio:auto;margin-top:30px}
+    .rh-pass__ring {display:none}
+    .rh-pass__pct {width:auto;aspect-ratio:auto;padding:7px 11px 6px;border-radius:99px;font-size:.95rem;background:var(--brass);color:var(--onyx);box-shadow:none}
+    .rh-pass__meter, .rh-pass__scale, .rh-pass__chips {display:none}
+    .rh-pass__go {display:inline-flex;align-items:center;gap:10px;margin-top:2px;font:500 10.5px/1 var(--f-label);letter-spacing:.2em;text-transform:uppercase;color:var(--brass)}
+    .rh-pass__go .rh-ico {width:14px;height:14px;transition:translate .5s var(--expo)}
+    .rh-pass__go:active .rh-ico {translate:4px 0}
+    .rh-pass__fine {padding:11px 20px 13px}
+    .rh-pass__fine span:first-child {display:none}
   }
 
   /* the sequence: the figure drops (the component counts it), the strike is drawn, the seal turns in, the meter fills,
