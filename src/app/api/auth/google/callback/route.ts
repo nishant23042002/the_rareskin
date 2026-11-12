@@ -129,6 +129,9 @@ export async function GET(request: Request) {
     if (!auth) {
       return redirectTo(origin, "/?signin=1&next=/admin/account");
     }
+    if (!auth.user.isStaff) {
+      return redirectTo(origin, "/account");
+    }
     if (!identity.emailVerified) {
       return redirectTo(origin, `${linkReturn}?google_error=email-unverified`);
     }
@@ -203,6 +206,10 @@ export async function GET(request: Request) {
 
   if (!user) {
     return redirectTo(origin, signinError("google-no-match"));
+  }
+  // Google is for staff only: a customer account is never signed in (or auto-linked) through it
+  if (!isStaffRole(user.role)) {
+    return redirectTo(origin, signinError("google-staff-only"));
   }
   if (user.status !== "active") {
     return redirectTo(origin, signinError("google-account-inactive"));

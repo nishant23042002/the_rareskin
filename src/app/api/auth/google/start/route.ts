@@ -47,6 +47,9 @@ export async function GET(request: Request) {
         new URL("/?signin=1&next=/admin/account", url.origin),
       );
     }
+    if (!ctx.user.isStaff) {
+      return NextResponse.redirect(new URL("/account", url.origin));
+    }
   }
 
   const ctx = await requestContext();

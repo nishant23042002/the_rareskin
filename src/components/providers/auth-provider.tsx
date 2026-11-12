@@ -36,6 +36,8 @@ function googleAuthErrorText(code: string): string {
       return "No account matches that Google email. Sign in with your phone first, then link Google from your account.";
     case "google-staff-domain":
       return "That Google account isn't allowed for staff sign-in. Use your work account, or sign in by phone.";
+    case "google-staff-only":
+      return "Google sign-in is for team members only. Please sign in with your phone number.";
     case "google-account-inactive":
       return "That account isn't active. Contact support if you think this is a mistake.";
     case "google-cancelled":

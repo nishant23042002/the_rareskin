@@ -3,13 +3,12 @@ import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { AccountHero, AccountStats } from "@/components/account/account-hero";
 import { AccountActions } from "@/components/account/account-actions";
-import { SignInMethods } from "@/components/account/sign-in-methods";
 import { ProfilePhoto } from "@/components/account/profile-photo";
 import { OrderRow } from "@/components/account/order-row";
 import { pageMeta } from "@/lib/seo";
 import { maskPhone } from "@/lib/auth";
 import { formatPaise } from "@/lib/money";
-import { requireUser, listUserSessions, getSignInMethods } from "@/server/auth";
+import { requireUser, listUserSessions } from "@/server/auth";
 import { listUserOrders } from "@/server/data/orders";
 import { listAddresses } from "@/server/data/addresses";
 import { getAccountOverview } from "@/server/data/account";
@@ -33,7 +32,6 @@ export default async function AccountPage() {
     addresses,
     creditPaise,
     overview,
-    signInMethods,
     reviewable,
   ] = await Promise.all([
     listUserSessions(user.id, session._id),
@@ -41,7 +39,6 @@ export default async function AccountPage() {
     listAddresses(user.id),
     getStoreCreditBalance(user.id),
     getAccountOverview(user.id),
-    getSignInMethods(user.id),
     getReviewableItems(user.id),
   ]);
   const recent = orders.slice(0, 4);
@@ -194,11 +191,6 @@ export default async function AccountPage() {
               )}
             </p>
           </section>
-        </div>
-
-        {/* ── sign-in methods ────────────────────────────────────── */}
-        <div className="mt-10">
-          <SignInMethods methods={signInMethods} />
         </div>
 
         {/* ── devices ────────────────────────────────────────────── */}

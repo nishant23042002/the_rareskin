@@ -153,7 +153,13 @@ No Twilio / Turnstile / Upstash account needed:
 Try it: run the app, click **Sign in**, enter any Indian mobile number, then
 the dev code.
 
-## Google account linking ("Continue with Google")
+## Google account linking ("Continue with Google") — STAFF ONLY
+
+**Customers sign in and sign up by phone + one-time code only.** Google is a
+security convenience for team members: the button is on the Studio sign-in form
+only (`variant="studio"`, `next` under `/admin`), the link / unlink controls are on
+`/admin/account` only (the customer `/account` page has none), and the callback
+refuses a Google sign-in or link for any non-staff account (`auth_error=google-staff-only`).
 
 Optional, off by default. Google can **only sign into / link an account that
 already exists** (phone-first) — there is no Google signup. The join key is

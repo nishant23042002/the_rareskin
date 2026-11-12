@@ -413,12 +413,9 @@ export function Header({
                 </span>
                 <span className="rh-mega__txt">
                   <b>Discovery Set</b>
-                  <em>Three 10 ml travel companions</em>
-                  <small>
-                    {setPrice
-                      ? `${formatINR(setPrice)} · credited to your first bottle`
-                      : "Credited to your first bottle"}
-                  </small>
+                  <em>Three 10 ml extraits</em>
+                  {setPrice ? <small>{formatINR(setPrice)}</small> : null}
+                  <small className="rh-mega__credit">Credited back</small>
                 </span>
                 <RhIcon name="arrow" small />
               </Link>

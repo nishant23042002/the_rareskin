@@ -50,8 +50,8 @@ function displayPhone(raw: string): string {
  * numbers get an account automatically. `onAuthenticated` fires once the
  * session is live so the modal can hand off to the page transition.
  */
-/** `"1"` (build-time) shows "Continue with Google" — the client can't read the
- *  server OAuth keys, so this env var mirrors whether they're set. */
+/** `"1"` (build-time) shows "Continue with Google" on the STUDIO (staff) form only — the client can't read the
+ *  server OAuth keys, so this env var mirrors whether they're set. Customers sign in by phone + code, nothing else. */
 const googleAuthEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "1";
 
 export function SignInForm({
@@ -336,7 +336,7 @@ export function SignInForm({
             </Button>
           </div>
 
-          {googleAuthEnabled && (
+          {isStudio && googleAuthEnabled && (
             <>
               <div className="flex items-center gap-3 text-[10px] tracking-[0.16em] text-ink-3 uppercase">
                 <span className="h-px flex-1 bg-line-2" />
