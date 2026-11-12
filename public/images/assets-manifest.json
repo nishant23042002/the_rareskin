@@ -1,7 +1,7 @@
 {
   "$comment": "Single source of truth for the homepage image system. Read by src/lib/home-images.ts (components), scripts/home-images.ts (placeholders + checks) and ASSET_PROMPT_SHEET.md (prompts). To ship a real image: replace the file at the same path with the final WebP (same aspect ratio) and set \"status\" to \"final\" in this file. While \"placeholder\", components that already had an illustration keep showing it and the alt text stays empty (a tonal plate is decorative). For a picture that a frame crops (object-fit: cover), `sizes` must describe the scaled picture width, not the frame width (see sizesNote).",
   "version": 1,
-  "assetVersion": 11,
+  "assetVersion": 13,
   "assetVersionNote": "Next's image optimizer caches by URL and has no invalidation: images are requested as <file>?v=<assetVersion> and next.config.ts allows exactly that query string. BUMP THIS NUMBER whenever any file in public/images/homepage is replaced (placeholder -> final, or a new render). v1 = placeholders, v2 = first generated hero + product cards, v6 = stone hero (hero-grounded_stone), v7 = the other three hero directions, v8 = the four reference-benchmark hero variants (a borrowed-image test had cached variant 3 at v7), v9 = cylinders re-centred, uncapping hand + cap redone, risers on a compact plate, v11 = Discovery Set 10 ml pictures (desktop + mobile).",
   "updated": "2026-11-06",
   "basePath": "/images/homepage",
@@ -739,7 +739,7 @@
       "id": "extrait-atomizer-craft",
       "section": "Product engineering & formulation (Why extrait)",
       "component": "src/components/home/why-extrait.tsx",
-      "status": "placeholder",
+      "status": "final",
       "route": "generative",
       "variants": [
         {
@@ -759,7 +759,7 @@
         "#d8d3c8",
         "#8f8a7e"
       ],
-      "layoutNote": "No product label in frame, so a generator may draw it. No numbers or text anywhere (the site states no concentration figures). Nozzle upper third, mist filling the lower two thirds.",
+      "layoutNote": "FINAL 2026-11-12 (Kling macro, 2 credits, retouched: flag, glass tint and nozzle button removed; design-explorations/section-images/build_macro.py). No product label in frame, so a generator may draw it. No numbers or text anywhere (the site states no concentration figures). Nozzle upper third, mist filling the lower two thirds.",
       "creativeDirection": "Extreme macro of a micro-diffusion atomizer nozzle releasing a crystalline suspension mist, backlit, black background falling to warm grey, shallow depth of field; conveys purity and precision, not a percentage.",
       "materials": [
         "polished silver collar and nozzle",
@@ -777,7 +777,7 @@
       "id": "unboxing-experience",
       "section": "Unboxing ritual & gifting (new section)",
       "component": "src/components/home/unboxing-ritual.tsx",
-      "status": "placeholder",
+      "status": "final",
       "route": "composite",
       "variants": [
         {
@@ -792,12 +792,12 @@
       "objectPosition": {
         "default": "50% 55%"
       },
-      "alt": "A midnight-black rigid presentation box open on a dark surface: a 50 ml flacon beside a discovery vial in a velvet insert, with a debossed sleeve and a wax-sealed note.",
+      "alt": "The AUREVAN 50 ml extrait on a honed travertine ledge in soft morning window light, its black leather-grain cap lifted off and standing beside it, a folded linen cloth at the edge.",
       "placeholderTone": [
         "#1a1b22",
         "#08080b"
       ],
-      "layoutNote": "Generate the box scene WITHOUT the flacon, then composite the approved flacon (and the approved 10 ml vial art if it exists) into the velvet insert. Debossed sleeve: blind deboss only, no readable text except the approved THE RARESKIN wordmark.",
+      "layoutNote": "FINAL 2026-11-12 (v2): NOT the black presentation box of the original brief (not approved packaging): the first lift of the cap. The WHOLE picture is one Kling generation (2 credits, image_to_image with the approved AUREVAN 50 ml packshot as the reference; label text came out exact), eased toward the stone palette (design-explorations/section-images/build_ritual_kling.py). The earlier composite (a Kling plate + the approved flacon cut from its packshot) is kept as out/unboxing-experience_composite_v1.*. The frame is 3:2 at every width. Original note: Generate the box scene WITHOUT the flacon, then composite the approved flacon (and the approved 10 ml vial art if it exists) into the velvet insert. Debossed sleeve: blind deboss only, no readable text except the approved THE RARESKIN wordmark.",
       "creativeDirection": "A midnight-black soft-touch rigid presentation box, custom velvet insert with a flacon cut-out and a vial cut-out, a debossed sleeve beside it, a small wax-sealed note; 45-degree angle or flat lay, a single warm key light, deep shadows.",
       "materials": [
         "soft-touch black rigid board",

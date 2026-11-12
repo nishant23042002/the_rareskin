@@ -6,6 +6,8 @@ import Link from "next/link";
 import { BagButton } from "@/components/cart/bag-button";
 import { Flacon } from "@/components/ui/flacon";
 import { useDragX } from "@/hooks/use-drag-x";
+import { FOCUS_SCENES } from "@/config/focus-scenes";
+import { FocusScene } from "./focus-scene";
 import {
   cloudinaryVariant,
   formatINR,
@@ -26,7 +28,7 @@ import {
 // used to have their own brown bases, so In Focus read as a different dark from the rest of the page.
 const TONE: Record<FragranceSlug, { base: string; glow: string }> = {
   aurevan: { base: "var(--onyx)", glow: "#8c8466" },
-  orvelis: { base: "var(--onyx)", glow: "#b0782a" },
+  orvelis: { base: "var(--onyx)", glow: "#9a7c4e" },
   vayren: { base: "var(--onyx)", glow: "#7a5638" },
 };
 
@@ -133,6 +135,7 @@ export function InFocus({ fragrances }: { fragrances: Fragrance[] }) {
             meta: `Extrait · ${f.volumeMl} ml`,
           };
           const tone = TONE[f.slug];
+          const scene = FOCUS_SCENES[f.slug];
           return (
             <div
               key={f.slug}
@@ -156,8 +159,10 @@ export function InFocus({ fragrances }: { fragrances: Fragrance[] }) {
                 }}
               >
                 <div className="rh-fslide__in">
-                  <div className="rh-fslide__bottle">
-                    {photo ? (
+                  <div className={`rh-fslide__bottle${scene ? " rh-fslide__bottle--scene" : ""}`}>
+                    {scene ? (
+                      <FocusScene scene={scene} name={f.name} active={active === i} />
+                    ) : photo ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={photo}
