@@ -1047,7 +1047,9 @@
   }
   .rh-fscene {position:relative;display:block;width:100%;height:100%;--px:0;--py:0}
   .rh-fscene__layer {position:absolute;inset:0;transform:perspective(1100px) rotateY(calc(var(--px) * 3.2deg)) rotateX(calc(var(--py) * -2.4deg)) translate3d(calc(var(--px) * -9px),calc(var(--py) * -7px),0);transition:transform .7s var(--ease)}
-  .rh-fscene__pic {mix-blend-mode:screen;overflow:hidden}
+  .rh-fscene__link {position:absolute;inset:0;display:block;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:2px}
+  .rh-fscene__link:focus-visible {outline:1px solid var(--champagne);outline-offset:6px}
+  .rh-fscene__pic {overflow:hidden}
   .rh-fscene__pic img {display:block;width:100%;height:100%;object-fit:contain;user-select:none;-webkit-user-drag:none}
   .rh-fscene.is-active .rh-fscene__layer {animation:rh-fscene-breathe 9s ease-in-out infinite}
   @keyframes rh-fscene-breathe {50% {translate:0 -7px}}
@@ -1056,6 +1058,16 @@
   .rh-fscene__glint {position:absolute;inset:0;pointer-events:none;background:linear-gradient(104deg,transparent 42%,rgba(255,246,226,.20) 50%,transparent 58%);transform:translateX(-130%)}
   .rh-fscene.is-active .rh-fscene__glint {animation:rh-fscene-glint 11s var(--ease) 1.4s infinite}
   @keyframes rh-fscene-glint {0%,62% {transform:translateX(-130%)} 100% {transform:translateX(130%)}}
+  /* "View AUREVAN": the hint that the picture is a door to the product page (a mouse only; a tap goes straight through) */
+  .rh-fscene__go {position:absolute;z-index:2;left:50%;bottom:5%;display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border:1px solid color-mix(in srgb,var(--champagne) 30%,transparent);border-radius:999px;background:color-mix(in srgb,var(--onyx) 60%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);font:500 10px/1 var(--f-label);letter-spacing:.22em;text-transform:uppercase;white-space:nowrap;opacity:0;transform:translate(-50%,8px);transition:opacity .45s var(--ease),transform .7s var(--expo);pointer-events:none}
+  .rh-fscene__go svg {transition:transform .5s var(--expo)}
+  @media(hover:hover) {
+    .rh-fscene__link:is(:hover,:focus-visible) .rh-fscene__go {opacity:1;transform:translate(-50%,0)}
+    .rh-fscene__link:hover .rh-fscene__go svg {transform:translateX(4px)}
+  }
+  @media(hover:none) {
+    .rh-fscene__go {display:none}
+  }
   /* the notes */
   .rh-fscene__hots {pointer-events:none}
   .rh-fscene__hot {position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;display:grid;place-items:center;pointer-events:auto;color:var(--champagne);cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -1068,8 +1080,9 @@
   .rh-fscene__hot span {position:absolute;top:50%;white-space:nowrap;padding:7px 11px;background:color-mix(in srgb,var(--onyx) 78%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid color-mix(in srgb,var(--champagne) 22%,transparent);font:500 10px/1 var(--f-label);letter-spacing:.2em;text-transform:uppercase;opacity:0;pointer-events:none;transition:opacity .35s var(--ease),transform .6s var(--expo)}
   .rh-fscene__hot[data-side="right"] span {left:calc(50% + 14px);transform:translate(-8px,-50%)}
   .rh-fscene__hot[data-side="left"] span {right:calc(50% + 14px);transform:translate(8px,-50%)}
-  .rh-fscene__hot:is(:hover,:focus-visible) span {opacity:1;transform:translate(0,-50%)}
-  .rh-fscene__hot:is(:hover,:focus-visible) i {transform:scale(1.35)}
+  /* :focus too, so a tap or a click on a dot keeps its name open until the next press elsewhere */
+  .rh-fscene__hot:is(:hover,:focus) span {opacity:1;transform:translate(0,-50%)}
+  .rh-fscene__hot:is(:hover,:focus) i {transform:scale(1.35)}
   .rh-fscene__hot:focus-visible {outline:1px solid var(--champagne);outline-offset:-8px;border-radius:50%}
   @media(hover:none) {
     .rh-fscene__hot i::after {animation:none;opacity:.5;transform:scale(1.2)}
@@ -1078,7 +1091,7 @@
   @media(max-width:899px) {
     .rh-fscene__hot[data-half="r"] span {left:auto;right:calc(50% + 14px);transform:translate(8px,-50%)}
     .rh-fscene__hot[data-half="l"] span {right:auto;left:calc(50% + 14px);transform:translate(-8px,-50%)}
-    .rh-fscene__hot[data-half]:is(:hover,:focus-visible) span {transform:translate(0,-50%)}
+    .rh-fscene__hot[data-half]:is(:hover,:focus) span {transform:translate(0,-50%)}
   }
   @media(prefers-reduced-motion:reduce) {
     .rh-fscene.is-active .rh-fscene__layer, .rh-fscene.is-active .rh-fscene__glint, .rh-fscene__hot i::after {animation:none}

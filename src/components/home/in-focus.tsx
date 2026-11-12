@@ -42,7 +42,11 @@ export function InFocus({ fragrances }: { fragrances: Fragrance[] }) {
 
   // drag the scene to bring the next / previous fragrance in
   useDragX(sectionRef, {
-    skip: (e) => !!(e.target as Element).closest("button, a, [role=tab]"),
+    skip: (e) => {
+      const t = e.target as Element;
+      // controls are not drag handles, but the picture (a link) is: a drag that starts on it swipes to the next fragrance
+      return !!t.closest("button, a, [role=tab]") && !t.closest(".rh-fscene__link");
+    },
     start: () => {
       grabbed.current = wrapRefs.current[active] ?? null;
     },
@@ -161,7 +165,7 @@ export function InFocus({ fragrances }: { fragrances: Fragrance[] }) {
                 <div className="rh-fslide__in">
                   <div className={`rh-fslide__bottle${scene ? " rh-fslide__bottle--scene" : ""}`}>
                     {scene ? (
-                      <FocusScene scene={scene} name={f.name} active={active === i} />
+                      <FocusScene scene={scene} name={f.name} active={active === i} href={`/fragrances/${f.slug}`} />
                     ) : photo ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img

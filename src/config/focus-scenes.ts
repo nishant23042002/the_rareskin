@@ -3,8 +3,8 @@ import type { FragranceSlug } from "@/lib/catalog";
 /**
  * "In focus" scenes: the dark still-life each fragrance stands in, in the bottle slot of the In Focus section
  * (`src/components/home/in-focus.tsx`, `focus-scene.tsx`). Each is ONE picture (3:4) of the approved flacon with the
- * ingredients of its notes on black; it is laid on the section with `mix-blend-mode: screen`, so the black is the section's
- * own onyx and the glass shows the section's glow through it. Files: `public/images/focus/<slug>-<width>.webp` (1500 + 750 px);
+ * ingredients of its notes on black; it is laid on the section as a transparent picture (its black is not there), so the section's onyx shows
+ * own onyx and the glass shows the section's glow through it (transparent WebP, alpha from brightness: no blend mode needed). Files: `public/images/focus/<slug>-<width>.webp` (1500 + 750 px);
  * source + build: `design-explorations/section-images/focus/` (one Kling generation per fragrance, the approved packshot as the reference).
  *
  * `hotspots` are the notes, pinned to what they are made of (x / y as a share of the picture): the dot lights, the name of the note
@@ -29,7 +29,7 @@ export interface FocusScene {
 }
 
 /** bump when a file in public/images/focus changes (plain files: the browser cache) */
-export const FOCUS_VERSION = 5;
+export const FOCUS_VERSION = 7;
 
 export const FOCUS_SCENES: Partial<Record<FragranceSlug, FocusScene>> = {
   aurevan: {
