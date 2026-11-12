@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import type { CSSProperties } from "react";
+import type { CSSProperties, MouseEvent } from "react";
 
 import { RhIcon } from "@/components/ui/rh-icon";
 import { formatINR, type FragranceSlug } from "@/lib/catalog";
+import { isPlainClick, useCanFly, useFlight } from "@/components/providers/pdp-flight";
 import { useHero } from "./hero-frame";
 
 /**
@@ -32,8 +33,27 @@ export interface HeroExploreItem {
   notes: string[];
 }
 
+/**
+ * The hero's links to a product page fly: the bottle's own part of the photograph (a copy of just that region, drawn over the column) opens into the
+ * product page's picture, and flies back on browser back (`providers/pdp-flight.tsx`). Only where the hotspots exist (the shipped picture in the stage
+ * layout); an uploaded photograph, or a browser without View Transitions, uses the route curtain.
+ */
+function useHeroFlight() {
+  const flight = useFlight();
+  const canFly = useCanFly();
+  const { spots } = useHero();
+  const go = (e: MouseEvent<HTMLAnchorElement>, slug: string) => {
+    if (!isPlainClick(e)) return;
+    const col = document.querySelector<HTMLElement>(`.rh-col[data-f="${slug}"]`);
+    const img = col?.closest(".rh-hero__stage")?.querySelector<HTMLImageElement>("img");
+    if (col && img && flight.open(slug, `/fragrances/${slug}`, col, { id: `hero:${slug}`, ghost: img })) e.preventDefault();
+  };
+  return { go, noTransition: canFly && !!spots ? "" : undefined };
+}
+
 export function HeroIndex({ items }: { items: HeroExploreItem[] }) {
   const { hot, setHot } = useHero();
+  const { go, noTransition } = useHeroFlight();
   return (
     <ol className="rh-hero__index" aria-label="The three extraits">
       {items.map((f, i) => (
@@ -41,6 +61,8 @@ export function HeroIndex({ items }: { items: HeroExploreItem[] }) {
           <Link
             href={`/fragrances/${f.slug}`}
             className={hot === f.slug ? "is-hot" : undefined}
+            data-no-transition={noTransition}
+            onClick={(e) => go(e, f.slug)}
             onPointerEnter={(e) => e.pointerType === "mouse" && setHot(f.slug)}
             onPointerLeave={(e) => e.pointerType === "mouse" && setHot(null)}
             onFocus={() => setHot(f.slug)}
@@ -61,6 +83,7 @@ export function HeroIndex({ items }: { items: HeroExploreItem[] }) {
 
 export function HeroSpots({ items, price }: { items: HeroExploreItem[]; /** launch price, rupees (for the accessible name) */ price: number }) {
   const { hot, setHot, spots } = useHero();
+  const { go, noTransition } = useHeroFlight();
   if (!spots) return null;
 
   return (
@@ -75,6 +98,9 @@ export function HeroSpots({ items, price }: { items: HeroExploreItem[]; /** laun
             className={`rh-col${hot === f.slug ? " is-hot" : ""}`}
             aria-label={`${f.name}, ${f.title}. ${formatINR(price)}`}
             data-f={f.slug}
+            data-flight-src={`hero:${f.slug}`}
+            data-no-transition={noTransition}
+            onClick={(e) => go(e, f.slug)}
             onPointerEnter={(e) => e.pointerType === "mouse" && setHot(f.slug)}
             onPointerLeave={(e) => e.pointerType === "mouse" && setHot(null)}
             onFocus={() => setHot(f.slug)}

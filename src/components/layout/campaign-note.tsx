@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { Icon } from "@/components/ui/icon";
 import { Flacon } from "@/components/ui/flacon";
 import { useCardConcept } from "@/components/home/card-concept";
+import { useFlight } from "@/components/providers/pdp-flight";
 import { useCart } from "@/components/providers/cart-provider";
 import { useScrolled } from "@/hooks/use-scrolled";
 import { cloudinaryVariant, isFragranceSlug } from "@/lib/catalog";
@@ -66,6 +67,9 @@ export function CampaignNote({
   const scrolled = useScrolled(64);
   // the art direction chosen in the Preview panel (or the default): the tiles below follow it
   const concept = useCardConcept();
+  // the tiles open the product page with the picture flight (providers/pdp-flight.tsx) where the browser can; else the route curtain
+  const flight = useFlight();
+  const [flyable, setFlyable] = useState(false);
   // SSR + the first client render both paint nothing, so hydration matches; the
   // card only appears after mount (rAF, so the setState isn't an effect-body
   // statement — matches the pattern in site-menu.tsx).
@@ -79,6 +83,7 @@ export function CampaignNote({
   useEffect(() => {
     const id = requestAnimationFrame(() => {
       setMounted(true);
+      setFlyable(flight.canFly());
       try {
         setDismissed(localStorage.getItem(key(campaign.code)) === "1");
       } catch {
@@ -86,7 +91,7 @@ export function CampaignNote({
       }
     });
     return () => cancelAnimationFrame(id);
-  }, [campaign.code]);
+  }, [campaign.code, flight]);
 
   useEffect(() => {
     const footer = document.querySelector("footer");
@@ -167,11 +172,24 @@ export function CampaignNote({
                 });
                 const href =
                   p.href ?? (p.fragrance ? `/fragrances/${p.fragrance}` : "/#collection");
+                // only a tile that opens its own product page flies
+                const slug = p.fragrance && href === `/fragrances/${p.fragrance}` ? p.fragrance : null;
                 return (
                   <li key={p.name} className="min-w-0">
                     <Link
                       href={href}
-                      onClick={() => setOpen(false)}
+                      data-flight-offer={slug ?? undefined}
+                      data-no-transition={slug && flyable ? "" : undefined}
+                      onClick={(e) => {
+                        if (slug && flyable && !(e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) {
+                          // the picture flies into the product page; the card closes once the page is there
+                          if (flight.open(slug, href, e.currentTarget, { after: () => setOpen(false) })) {
+                            e.preventDefault();
+                            return;
+                          }
+                        }
+                        setOpen(false);
+                      }}
                       aria-label={`${p.name}: view the product`}
                       className="rh-offer__tile"
                       style={{ "--i": i } as CSSProperties}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent } from "react";
 
 import { focusSceneSrc, type FocusScene as Scene } from "@/config/focus-scenes";
+import { isPlainClick, useCanFly, useFlight } from "@/components/providers/pdp-flight";
 
 /**
  * The picture of a fragrance in the In Focus section, made to answer the pointer.
@@ -18,8 +19,10 @@ import { focusSceneSrc, type FocusScene as Scene } from "@/config/focus-scenes";
  *  - A glint crosses the glass now and then, and once when the fragrance comes into focus.
  * Styles: `.rh-fscene*` in `app/home.css`.
  */
-export function FocusScene({ scene, name, active, href }: { scene: Scene; name: string; active: boolean; href: string }) {
+export function FocusScene({ scene, name, slug, active, href }: { scene: Scene; name: string; slug: string; active: boolean; href: string }) {
   const ref = useRef<HTMLDivElement>(null);
+  const flight = useFlight();
+  const canFly = useCanFly();
   const down = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
@@ -64,16 +67,23 @@ export function FocusScene({ scene, name, active, href }: { scene: Scene; name: 
         aria-label={`View ${name}`}
         tabIndex={active ? 0 : -1}
         draggable={false}
+        data-no-transition={canFly ? "" : undefined}
         onPointerDown={(e: ReactPointerEvent) => {
           down.current = { x: e.clientX, y: e.clientY };
         }}
         onClick={(e: ReactMouseEvent) => {
           // a press that travelled is a drag / swipe, not a click
           const d = down.current;
-          if (d && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 8) e.preventDefault();
+          if (d && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 8) {
+            e.preventDefault();
+            return;
+          }
+          // the picture flies into the product page (providers/pdp-flight.tsx)
+          const pic = ref.current?.querySelector<HTMLElement>(".rh-fscene__pic");
+          if (pic && isPlainClick(e) && flight.open(slug, href, pic, { id: `focus:${slug}` })) e.preventDefault();
         }}
       >
-        <div className="rh-fscene__layer rh-fscene__pic">
+        <div className="rh-fscene__layer rh-fscene__pic" data-flight-src={`focus:${slug}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={focusSceneSrc(scene, 1500)}

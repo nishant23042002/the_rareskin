@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -9,6 +9,7 @@ import { RhIcon } from "@/components/ui/rh-icon";
 import { Roll } from "@/components/ui/roll";
 import { useScrolled } from "@/hooks/use-scrolled";
 import { useCart } from "@/components/providers/cart-provider";
+import { isPlainClick, useCanFly, useFlight } from "@/components/providers/pdp-flight";
 import { useAuth } from "@/components/providers/auth-provider";
 import { formatINR, type CatalogNavItem } from "@/lib/catalog";
 import { pdpPackshot } from "@/lib/pdp-images";
@@ -156,11 +157,33 @@ export function Header({
       setMegaOpen(open);
     }, ms);
   };
+  const flight = useFlight();
+  const canFly = useCanFly();
   const closeMega = useCallback(() => {
     clearHover();
     pinned.current = false;
     setMegaOpen(false);
   }, [clearHover]);
+  // a picture in the dropdown opens its page with the flight; the panel closes while the page loads (it takes .4 s to close)
+  const flyFrom = (e: MouseEvent<HTMLAnchorElement>, slug: string, href: string, pic: string) => {
+    const el = e.currentTarget.querySelector<HTMLElement>(pic);
+    const img = el?.querySelector<HTMLImageElement>("img");
+    if (el && img && isPlainClick(e)) {
+      // the panel shuts at once (no transition): the picture's flight is what the eye follows, and the page behind it is captured with the panel gone
+      const leave = () => {
+        const hdr = headerRef.current;
+        hdr?.setAttribute("data-instant", "");
+        closeMega();
+        window.setTimeout(() => hdr?.removeAttribute("data-instant"), 1200);
+        return new Promise<void>((r) => setTimeout(r, 90));
+      };
+      if (flight.open(slug, href, el, { after: leave, ghost: img, fill: true })) {
+        e.preventDefault();
+        return;
+      }
+    }
+    closeMega();
+  };
   useEffect(() => clearHover, [clearHover]);
 
   const onHeaderOver = (e: React.PointerEvent) => {
@@ -358,7 +381,8 @@ export function Header({
                   href={`/fragrances/${f.slug}`}
                   className="rh-mega__item"
                   style={{ "--c": f.accent, "--k": k } as CSSProperties}
-                  onClick={closeMega}
+                  data-no-transition={canFly ? "" : undefined}
+                  onClick={(e) => flyFrom(e, f.slug, `/fragrances/${f.slug}`, ".rh-mega__pic")}
                 >
                   <span className="rh-mega__pic" aria-hidden="true">
                     {pics &&
@@ -405,11 +429,12 @@ export function Header({
                 href="/discovery-set"
                 className="rh-mega__item rh-mega__item--set"
                 style={{ "--k": nav.length } as CSSProperties}
-                onClick={closeMega}
+                data-no-transition={canFly ? "" : undefined}
+                onClick={(e) => flyFrom(e, "discovery-set", "/discovery-set", ".rh-mega__trio")}
               >
                 <span className="rh-mega__trio" aria-hidden="true">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img className="rh-mega__trio-one" src="/images/pdp/discovery-set/menu-trio-light.webp?v=12" alt="" width={112} height={120} decoding="async" loading="lazy" />
+                  <img className="rh-mega__trio-one" src="/images/pdp/discovery-set/menu-trio-light.webp?v=16" alt="" width={112} height={120} decoding="async" loading="lazy" />
                 </span>
                 <span className="rh-mega__txt">
                   <b>Discovery Set</b>

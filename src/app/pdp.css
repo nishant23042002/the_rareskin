@@ -339,6 +339,33 @@
 }
 
 
+/* the back button beside the breadcrumb (components/product/pdp-back.tsx) */
+@layer components {
+  .pdp-back {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--line, rgba(16, 14, 12, 0.18));
+    border-radius: 50%;
+    color: var(--ink-2, #3a3733);
+    background: transparent;
+    cursor: pointer;
+    transition: color 0.25s var(--ease), background-color 0.25s var(--ease), border-color 0.25s var(--ease), translate 0.35s var(--spring);
+  }
+  .pdp-back:hover {
+    color: var(--champagne, #f5f2eb);
+    background: var(--onyx, #100e0c);
+    border-color: var(--onyx, #100e0c);
+    translate: -2px 0;
+  }
+  .pdp-back:focus-visible {
+    outline: 2px solid var(--ink, #100e0c);
+    outline-offset: 2px;
+  }
+}
+
 /* ==========================================================================
    The picture viewer (components/product/pdp-viewer.tsx) and its trigger on the gallery.
    The page's picture lifts out and settles in the middle (a FLIP, run in script); everything here is the
@@ -917,6 +944,116 @@
     .pdp-size__tag {
       padding-inline: 6px;
       letter-spacing: 0.1em;
+    }
+  }
+
+  /* ---- the size chips: the real bottle, and a dark "Coming soon" card ---- */
+  .pdp-size {
+    min-height: 132px;
+  }
+  .pdp-size__bottle {
+    height: 82px;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .pdp-size__bottle img {
+    display: block;
+    width: auto;
+    height: 64px;
+    transform-origin: 50% 100%;
+    transition: scale 0.5s var(--spring), opacity 0.3s var(--ease);
+    filter: drop-shadow(0 6px 5px rgba(16, 14, 12, 0.16));
+  }
+  .pdp-size__bottle[data-ml="50"] img {
+    height: 76px;
+  }
+  .pdp-size[aria-checked="true"] .pdp-size__bottle img {
+    scale: 1.08;
+  }
+  .pdp-size[data-state="soon"]:not([data-dark]) .pdp-size__bottle img {
+    opacity: 0.62;
+  }
+  /* Coming soon: onyx, a ghost of the bottle in champagne line, a gilt pulse, a slow sheen across */
+  .pdp-size[data-dark] {
+    overflow: hidden;
+    isolation: isolate;
+    background: radial-gradient(90% 70% at 50% 18%, color-mix(in srgb, var(--gilt-d, #d89a4d) 20%, transparent), transparent 70%), var(--onyx, #100e0c);
+    border-color: var(--onyx, #100e0c);
+    color: var(--champagne, #f5f2eb);
+  }
+  .pdp-size[data-dark]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(104deg, transparent 40%, rgba(255, 244, 222, 0.12) 50%, transparent 60%);
+    transform: translateX(-130%);
+    animation: pdp-soon-sheen 6s var(--ease) 1.2s infinite;
+  }
+  @keyframes pdp-soon-sheen {
+    0%,
+    55% {
+      transform: translateX(-130%);
+    }
+    100% {
+      transform: translateX(130%);
+    }
+  }
+  .pdp-size[data-dark] .pdp-size__ghost {
+    height: 64px;
+    width: auto;
+    fill: none;
+    stroke: color-mix(in srgb, var(--champagne, #f5f2eb) 46%, transparent);
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+    transform-origin: 50% 100%;
+    scale: 1.12;
+  }
+  .pdp-size[data-dark] .pdp-size__ml {
+    color: var(--champagne, #f5f2eb);
+  }
+  .pdp-size[data-dark] .pdp-size__sub {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--gilt-d, #d89a4d);
+    font: 500 9.5px/1 var(--f-label);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .pdp-size[data-dark] .pdp-size__sub i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pdp-soon-dot 2.4s ease-in-out infinite;
+  }
+  @keyframes pdp-soon-dot {
+    50% {
+      opacity: 0.25;
+    }
+  }
+  .pdp-size[data-dark][aria-checked="true"] {
+    border-color: var(--gilt-d, #d89a4d);
+    box-shadow: inset 0 0 0 1px var(--gilt-d, #d89a4d);
+    background-color: var(--onyx, #100e0c);
+  }
+  .pdp-size[data-dark]:focus-visible {
+    outline-color: var(--gilt-d, #d89a4d);
+  }
+  @media (max-width: 420px) {
+    /* a narrow card: the pulse above, the words on two centred lines */
+    .pdp-size[data-dark] .pdp-size__sub {
+      flex-direction: column;
+      gap: 5px;
+      text-align: center;
+      line-height: 1.35;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pdp-size[data-dark]::after,
+    .pdp-size[data-dark] .pdp-size__sub i {
+      animation: none;
     }
   }
 

@@ -52,6 +52,7 @@ function Art({
       fragrances={fragrances.map((f) => ({ slug: f.slug, name: f.name, mood: f.mood, notes: f.notes ?? [] }))}
       href={variant === "home" ? "/discovery-set" : undefined}
       linkBottles={variant === "page"}
+      flight={variant === "home" ? "from" : "to"}
       label={
         variant === "home"
           ? `${set.name}: three ${set.perVialMl} ml extraits, ${fragrances.map((f) => f.name).join(", ")}. Open the set`

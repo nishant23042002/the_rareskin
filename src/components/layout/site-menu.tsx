@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useLenis } from "lenis/react";
@@ -13,6 +13,7 @@ import { pdpPackshot as packshot } from "@/lib/pdp-images";
 import { MenuFooter } from "./menu-footer";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useCart } from "@/components/providers/cart-provider";
+import { isPlainClick, useCanFly, useFlight } from "@/components/providers/pdp-flight";
 import { formatINR, type CatalogNavItem } from "@/lib/catalog";
 
 // Kept tight on purpose: the routes a shopper actually needs before buying.
@@ -67,6 +68,26 @@ export function SiteMenu({
   const { status, openSignIn } = useAuth();
   const { count, openCart } = useCart();
   const shown = useSlideDialog(dialogRef, open, "menu", reduced);
+  const flight = useFlight();
+  const canFly = useCanFly();
+  // a picture in the drawer opens its page with the flight; the drawer slides shut while the page loads
+  const flyFrom = (e: MouseEvent<HTMLAnchorElement>, slug: string, href: string, pic: string) => {
+    const el = e.currentTarget.querySelector<HTMLElement>(pic);
+    const img = el?.querySelector<HTMLImageElement>("img");
+    if (el && img && isPlainClick(e)) {
+      // the drawer shuts at once (no slide): the picture's flight is what the eye follows, and the page behind it is captured with the drawer gone
+      const leave = () => {
+        onClose();
+        dialogRef.current?.close();
+        return new Promise<void>((r) => setTimeout(r, 90));
+      };
+      if (flight.open(slug, href, el, { after: leave, ghost: img, fill: true })) {
+        e.preventDefault();
+        return;
+      }
+    }
+    onClose();
+  };
 
   // Match SSR (no session) on first paint — see the note in header.tsx.
   const [mounted, setMounted] = useState(false);
@@ -129,7 +150,8 @@ export function SiteMenu({
                 <Link
                   href={`/fragrances/${f.slug}`}
                   className="rh-sb__frag"
-                  onClick={onClose}
+                  data-no-transition={canFly ? "" : undefined}
+                  onClick={(e) => flyFrom(e, f.slug, `/fragrances/${f.slug}`, ".rh-sb__pic")}
                   style={{ "--c": f.accent } as CSSProperties}
                 >
                   <span className="rh-sb__frag-in">
@@ -184,11 +206,12 @@ export function SiteMenu({
             href="/discovery-set"
             className="rh-sb__set rh-rise"
             style={rise(afterNav)}
-            onClick={onClose}
+            data-no-transition={canFly ? "" : undefined}
+            onClick={(e) => flyFrom(e, "discovery-set", "/discovery-set", ".rh-sb__trio")}
           >
             <span className="rh-sb__trio" aria-hidden="true">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="rh-sb__trio-one" src="/images/pdp/discovery-set/menu-trio-dark.webp?v=13" alt="" width={148} height={111} decoding="async" fetchPriority="low" />
+              <img className="rh-sb__trio-one" src="/images/pdp/discovery-set/menu-trio-dark.webp?v=16" alt="" width={148} height={111} decoding="async" fetchPriority="low" />
             </span>
             <span className="rh-sb__set-t">The Discovery Set</span>
             <span className="rh-sb__set-badge">3 × 10 ml</span>

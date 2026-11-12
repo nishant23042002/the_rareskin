@@ -105,23 +105,42 @@ All timings are the `FULL` / `SOFT` (reduced motion) objects at the top of
 the first half of `cover`.
 
 
-## The Collection flight (trial, branch `trial/collection-section`)
+## The flight (a picture opens into the product page)
 
-A Collection tile does NOT use the curtain. Its picture flies into the product page's first picture, and flies back on browser back, with the
-PDP picture viewer's easing (`cubic-bezier(0.16, 1, 0.3, 1)`, 820 ms in / 640 ms out). Code: `components/providers/pdp-flight.tsx`,
-`app/morph.css`; the two ends are `data-flight-tile` (`home/collection.tsx`, the tile's media) and `data-flight-frame` (`product/pdp-gallery.tsx`, the
-50 ml gallery frame).
+The curtain above is for the site's ordinary links. A link whose subject is a PRODUCT PICTURE does not use it: the picture itself flies into the
+product page's first picture, and flies back on browser back, with the PDP picture viewer's easing (`cubic-bezier(0.16, 1, 0.3, 1)`, 820 ms in /
+640 ms out). Code: `components/providers/pdp-flight.tsx`, `app/morph.css`. Both transitions stay: the flight for the pictures below, the curtain for
+everything else (header links, text links, the footer, account, checkout...).
 
-- **Opening** is the browser's View Transitions API, driven by hand: the tile is named `fragrance-<slug>`, the route is pushed INSIDE the transition's
-  update, and the update resolves when the product page is there, at the top, with its first picture decoded; then the frame takes the same name
-  and the browser morphs one into the other (`object-fit: cover`, never stretched). **While the update runs the document does not render, so
-  `requestAnimationFrame` never fires: the waits use timers.**
-- **Closing** is NOT a view transition: by the time the browser captures the "old" page on a back navigation the router has already swapped it. The
-  Navigation API's `navigate` event (type `traverse`) fires while the product page is still on screen, so the picture is lifted out into a fixed copy over a
-  wash in the page colour, the route swaps behind it, the scroll goes back where the tile was (saved at open in `sessionStorage`), and the copy flies
-  to the tile while the wash lifts. `popstate` is the fallback where there is no Navigation API.
-- The tile's link carries `data-no-transition` ONLY where the flight can run (View Transitions API present, no reduced motion); everywhere else it is a
-  normal link and gets the curtain. Every other link in the site keeps the curtain, and a page reached by the header still flies back to its tile on back
-  when the tile is on screen.
-- To drop it: delete `pdp-flight.tsx`, `morph.css` and its `@import`, the `PdpFlightProvider` in `(store)/layout.tsx`, `data-flight-*`, and the tile link's
-  `onClick` / `ref` / effect.
+**Where it is used** (each link carries `data-no-transition` where the flight can run, so the curtain does not also start):
+
+| Source | Element that flies | Code |
+| --- | --- | --- |
+| Collection tile | the tile's picture | `home/collection.tsx` (`data-flight-tile`) |
+| Hero: the three bottles, and the numbered index | a copy of just that bottle's part of the one photograph | `home/hero-explore.tsx` (`ghost`) |
+| In Focus: the picture, and the name | the scene's picture | `home/focus-scene.tsx`, `home/in-focus.tsx` |
+| Discovery Set section (home) | the stage | `home/discovery-stage.tsx` (`flight="from"`), lands on the set page's stage (`flight="to"`) |
+| Fragrances dropdown (header) | a copy of the card's picture | `layout/header.tsx` |
+| Menu drawer | a copy of the row's picture | `layout/site-menu.tsx` |
+| Launch offer card | the tile | `layout/campaign-note.tsx` |
+
+The landing is `data-flight-frame="<slug>"`: the 50 ml gallery frame (`product/pdp-gallery.tsx`), or the Discovery Set page's stage.
+
+**How**
+
+- **Opening** is the browser's View Transitions API, driven by hand: the source is named `fragrance-<slug>`, the route is pushed INSIDE the transition's
+  update, and the update resolves when the product page is there, at the top, with its first picture decoded; then the frame takes the same name and the
+  browser morphs one into the other (`object-fit: cover`, never stretched). **While the update runs the document does not render, so `requestAnimationFrame`
+  never fires: the waits use timers.**
+- **A `ghost`** is a fixed copy of the picture drawn over its source and removed in the update. It is used where the source cannot be named itself: the hero
+  (a region of one big photograph; `fill: false`) and anything inside a modal `<dialog>` or a closing panel (`fill: true`, a thumbnail): the browser aborts a
+  transition ("Animation start failed") when a named element lives in the top layer, which the menu drawer is.
+- **`after`** runs at the start of the update: the drawer, the dropdown and the offer card close there, instantly (no slide: the screen is frozen
+  while the update runs anyway, and the page behind is captured with them gone).
+- **Closing** is NOT a view transition: by the time the browser captures the "old" page on a back navigation the router has already swapped it. The Navigation
+  API's `navigate` event (type `traverse`) fires while the product page is still on screen, so the picture is lifted out into a fixed copy over a wash in
+  the page colour, the route swaps behind it, the scroll goes back where the source was (saved at open in `sessionStorage` with the source's id), and the copy
+  flies to it while the wash lifts. If the source is not on screen (a menu, another scroll position) the wash simply lifts. `popstate` is the fallback.
+- No View Transitions API, or reduced motion: nothing here runs; the links fall back to the curtain (`useCanFly()` drives `data-no-transition`).
+- Adding a source: give the link `data-no-transition={useCanFly() ? "" : undefined}` and an `onClick` that calls `useFlight().open(slug, href, element, { id, after, ghost, fill })`
+  for a plain click (`isPlainClick(e)`), then `e.preventDefault()` when it returns true. Name the element on the homepage `data-flight-src="<id>"` if the picture should fly back to it.

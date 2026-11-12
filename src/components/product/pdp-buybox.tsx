@@ -77,7 +77,7 @@ export function PdpBuyBox({
             <span>Size</span>
             <b>{v.volumeMl} ml</b>
           </p>
-          <PdpSizes variants={variants} selectedMl={v.volumeMl} juice={juice} onSelect={select} />
+          <PdpSizes slug={slug} variants={variants} selectedMl={v.volumeMl} juice={juice} onSelect={select} />
         </div>
       )}
 

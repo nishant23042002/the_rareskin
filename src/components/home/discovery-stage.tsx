@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, type CSSProperties } from "react";
 
+import { isPlainClick, useCanFly, useFlight } from "@/components/providers/pdp-flight";
 import { STAGE_BOTTLE, STAGE_LAYOUT, STAGE_TINT, stageSrc, type StageLayout, type StageTone } from "@/config/discovery-stage";
 
 /**
@@ -114,6 +115,7 @@ export function DiscoveryStage({
   linkBottles = false,
   label,
   hint = "Explore the set",
+  flight: fly,
 }: {
   tone: StageTone;
   fragrances: StageFragrance[];
@@ -123,8 +125,12 @@ export function DiscoveryStage({
   linkBottles?: boolean;
   label: string;
   hint?: string;
+  /** "from": the stage (a link) opens its page with the flight; "to": this stage is where that flight lands */
+  flight?: "from" | "to";
 }) {
   const ref = useRef<HTMLElement | null>(null);
+  const flight = useFlight();
+  const canFly = useCanFly();
 
   useEffect(() => {
     const el = ref.current;
@@ -189,11 +195,21 @@ export function DiscoveryStage({
     </>
   );
   return href ? (
-    <Link href={href} className={cls} aria-label={label} ref={(n) => void (ref.current = n)}>
+    <Link
+      href={href}
+      className={cls}
+      aria-label={label}
+      ref={(n) => void (ref.current = n)}
+      data-no-transition={fly === "from" && canFly ? "" : undefined}
+      onClick={(e) => {
+        const el = ref.current;
+        if (fly === "from" && el && isPlainClick(e) && flight.open("discovery-set", href, el, { id: "dset" })) e.preventDefault();
+      }}
+    >
       {body}
     </Link>
   ) : (
-    <div className={cls} role="group" aria-label={label} ref={(n) => void (ref.current = n)}>
+    <div className={cls} role="group" aria-label={label} ref={(n) => void (ref.current = n)} data-flight-frame={fly === "to" ? "discovery-set" : undefined}>
       {body}
     </div>
   );

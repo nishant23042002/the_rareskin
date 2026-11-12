@@ -1,4 +1,11 @@
 import type { FragranceSlug } from "@/lib/catalog";
+import manifestJson from "../../public/images/assets-manifest.json";
+
+/**
+ * Cache key of every product picture: the same number as the homepage pictures (`public/images/assets-manifest.json` -> `assetVersion`). These are plain <img>
+ * files, so a visitor's browser may hold the old copy of a picture that was replaced in place; bump the number whenever a file in `public/images/pdp` is replaced.
+ */
+export const PDP_ASSET_VERSION = (manifestJson as { assetVersion: number }).assetVersion;
 
 /**
  * The official product photographs of each extrait, in the order of the three
@@ -34,7 +41,7 @@ export function pdpPhotoSrc(
   size: "full" | "small" | "tiny",
 ): string {
   const w = size === "full" ? p.width : size === "small" ? p.small : PDP_TINY_WIDTH;
-  return `/images/pdp/${p.dir ?? slug}/${p.stem}-${w}.webp`;
+  return `/images/pdp/${p.dir ?? slug}/${p.stem}-${w}.webp?v=${PDP_ASSET_VERSION}`;
 }
 
 export const PDP_GALLERY: Record<FragranceSlug, PdpPhoto[]> = {
@@ -93,3 +100,14 @@ export const DISCOVERY_SET_GALLERY: PdpPhoto[] = [
   { dir: "discovery-set", stem: "03-meet-all-three", width: 1600, height: 1600, small: 640, alt: "Meet all three: AUREVAN fresh and elegant, ORVELIS warm and sophisticated, VAYREN bold and intense, with their notes" },
   { dir: "discovery-set", stem: "04-how-it-works", width: 1600, height: 1600, small: 640, alt: "The Discovery Set in three steps: meet them, choose yours, the set price credited back toward your first 50 ml" },
 ];
+
+/**
+ * The small transparent picture of a size, for the size chooser (`components/product/pdp-sizes.tsx`): the real bottle, 260 px tall, shown at ~60-76 px.
+ * 50 ml: `/images/pdp/<slug>/chip-50.webp`; 10 ml: `/images/pdp/<slug>-10ml/chip-10.webp` (only where that size has pictures). A size without
+ * one (the 100 ml) returns null: the chooser draws its dark "Coming soon" card instead. Built by `design-explorations/section-images/build_chips.py`.
+ */
+export function pdpSizeChip(slug: FragranceSlug, volumeMl: number): { src: string; width: number; height: number } | null {
+  if (volumeMl === 50) return { src: `/images/pdp/${slug}/chip-50.webp?v=${PDP_ASSET_VERSION}`, width: 146, height: 260 };
+  if (volumeMl === 10 && PDP_SIZE_GALLERY[slug]?.[10]) return { src: `/images/pdp/${slug}-10ml/chip-10.webp?v=${PDP_ASSET_VERSION}`, width: 56, height: 260 };
+  return null;
+}

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, type KeyboardEvent } from "react";
-import { formatINR, sizeScale, type FragranceVariant } from "@/lib/catalog";
+import { formatINR, type FragranceSlug, type FragranceVariant } from "@/lib/catalog";
+import { pdpSizeChip } from "@/config/pdp-gallery";
 import { cn } from "@/lib/cn";
 
 /** which size gives the most for the money, per ml, among the priced ones: only worth a tag when it is not the smallest */
@@ -14,36 +15,23 @@ function bestValueSlug(variants: FragranceVariant[]): string | null {
   return best.slug === smallest.slug ? null : best.slug;
 }
 
-/** a bottle as a small glyph, drawn at its size next to the others (a 10 ml stands visibly shorter than a 100 ml) */
-function Bottle({ ml, juice }: { ml: number; juice: string }) {
-  const h = Math.round(34 * sizeScale(ml));
-  return (
-    <svg viewBox="0 0 20 40" height={h} width={h / 2} aria-hidden="true">
-      <rect x="6" y="0" width="8" height="9" rx="1.5" fill="var(--color-cta)" />
-      <rect x="7.5" y="8" width="5" height="2.5" fill="#b89a5c" />
-      <rect x="1.5" y="10" width="17" height="29" rx="2.5" fill="var(--color-surface-2)" />
-      <rect x="1.5" y="10" width="17" height="29" rx="2.5" fill={juice} opacity="0.88" />
-      <rect x="1.5" y="10" width="17" height="29" rx="2.5" fill="none" stroke="rgba(16,14,12,0.28)" strokeWidth="0.8" />
-      <rect x="4" y="12" width="2" height="24" rx="1" fill="#fff" opacity="0.38" />
-    </svg>
-  );
-}
-
 /**
- * The size chooser: one chip per size (10 / 50 / 100 ml) with the bottle drawn at its size, the size, and its
- * price, or "Soon". A size that is not on sale yet stays selectable: choosing it shows its own pictures and
+ * The size chooser: one chip per size (10 / 50 / 100 ml) with the REAL bottle at its size (`pdpSizeChip`), the size, and its
+ * price, or "Soon". A size with no bottle photograph yet (the 100 ml) is a dark "Coming soon" card. A size that is not on sale yet stays selectable: choosing it shows its own pictures and
  * says when it arrives, but the buy box will not put it in the bag. It is a radio group, so a screen reader
  * announces "50 ml, selected, 2 of 3", and the arrow keys move the choice.
  */
 export function PdpSizes({
+  slug,
   variants,
   selectedMl,
-  juice,
   onSelect,
 }: {
+  slug: FragranceSlug;
   variants: FragranceVariant[];
   selectedMl: number;
-  juice: string;
+  /** kept for callers: the chips no longer tint a drawn bottle */
+  juice?: string;
   onSelect: (volumeMl: number) => void;
 }) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -72,14 +60,19 @@ export function PdpSizes({
     >
       {variants.map((v, i) => {
         const on = v.volumeMl === selectedMl;
+        const chip = pdpSizeChip(slug, v.volumeMl);
+        // no bottle photograph and not on sale: a dark card that says so
+        const dark = !chip && v.state !== "available";
         const tag =
-          v.state === "soldout"
-            ? "Sold out"
-            : v.state === "soon" && v.price > 0
-              ? "Soon"
-              : v.slug === best
-                ? "Best value"
-                : null;
+          dark
+            ? null
+            : v.state === "soldout"
+              ? "Sold out"
+              : v.state === "soon" && v.price > 0
+                ? "Soon"
+                : v.slug === best
+                  ? "Best value"
+                  : null;
         return (
           <button
             key={v.slug}
@@ -91,6 +84,7 @@ export function PdpSizes({
             aria-checked={on}
             tabIndex={on ? 0 : -1}
             data-state={v.state}
+            data-dark={dark ? "" : undefined}
             className="pdp-size"
             onClick={() => onSelect(v.volumeMl)}
             onKeyDown={(e) => onKeyDown(e, i)}
@@ -98,11 +92,32 @@ export function PdpSizes({
             {tag && (
               <span className={cn("pdp-size__tag", tag === "Best value" && "is-best")}>{tag}</span>
             )}
-            <span className="pdp-size__bottle">
-              <Bottle ml={v.volumeMl} juice={juice} />
+            <span className="pdp-size__bottle" data-ml={v.volumeMl}>
+              {chip ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={chip.src} alt="" width={chip.width} height={chip.height} loading="lazy" decoding="async" />
+              ) : (
+                <svg viewBox="0 0 60 100" aria-hidden="true" className="pdp-size__ghost">
+                  <rect x="22" y="2" width="16" height="16" rx="2" />
+                  <rect x="25" y="18" width="10" height="5" />
+                  <rect x="4" y="23" width="52" height="73" rx="5" />
+                  <path d="M18 62h24" />
+                </svg>
+              )}
             </span>
             <span className="pdp-size__ml">{v.volumeMl} ml</span>
-            <span className="pdp-size__sub">{v.price > 0 ? formatINR(v.price) : "Soon"}</span>
+            <span className="pdp-size__sub">
+              {dark ? (
+                <>
+                  <i aria-hidden="true" />
+                  Coming soon
+                </>
+              ) : v.price > 0 ? (
+                formatINR(v.price)
+              ) : (
+                "Soon"
+              )}
+            </span>
           </button>
         );
       })}

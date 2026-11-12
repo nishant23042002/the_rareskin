@@ -9,6 +9,7 @@ import { Icon, type IconName } from "@/components/ui/icon";
 import { AddToBagButton } from "@/components/cart/add-to-bag-button";
 import { PdpGallery } from "@/components/product/pdp-gallery";
 import { PdpBuyBox } from "@/components/product/pdp-buybox";
+import { PdpBack } from "@/components/product/pdp-back";
 import { PdpSizeLine, PdpVariantsProvider } from "@/components/product/pdp-variants";
 import { PdpScent } from "@/components/product/pdp-scent";
 import { PdpStickyBar } from "@/components/product/pdp-sticky-bar";
@@ -200,7 +201,7 @@ export default async function FragrancePage({
   return (
     <main
       id="main"
-      className="pt-[calc(var(--announce-h)+var(--header-h)+2rem)] lg:pt-[calc(var(--announce-h)+var(--header-h)+3.5rem)]"
+      className="pt-[calc(var(--announce-h)+var(--header-h)+clamp(20px,3vw,34px))]"
       style={{ "--frag": f.accent } as CSSProperties}
     >
       <script
@@ -214,20 +215,23 @@ export default async function FragrancePage({
 
       <PdpVariantsProvider variants={f.variants} initialMl={initialMl}>
       <Container className="max-w-[1280px]">
-        <nav
-          aria-label="Breadcrumb"
-          className="text-[11px] tracking-[0.06em] text-ink-3 uppercase"
-        >
-          <Link href="/" className="transition-colors hover:text-ink">
-            Home
-          </Link>
-          <span className="mx-2">/</span>
-          <Link href="/#shop" className="transition-colors hover:text-ink">
-            Fragrances
-          </Link>
-          <span className="mx-2">/</span>
-          <span className="text-ink-2">{f.name}</span>
-        </nav>
+        <div className="flex items-center gap-3">
+          <PdpBack />
+          <nav
+            aria-label="Breadcrumb"
+            className="text-[11px] tracking-[0.06em] text-ink-3 uppercase"
+          >
+            <Link href="/" className="transition-colors hover:text-ink">
+              Home
+            </Link>
+            <span className="mx-2">/</span>
+            <Link href="/#collection" className="transition-colors hover:text-ink">
+              Fragrances
+            </Link>
+            <span className="mx-2">/</span>
+            <span className="text-ink-2">{f.name}</span>
+          </nav>
+        </div>
 
         <div className="mt-[clamp(20px,3vw,34px)] grid gap-[clamp(28px,4vw,64px)] pb-[clamp(48px,8vw,96px)] lg:grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)] lg:items-start">
           <PdpGallery slug={f.slug} name={f.name} images={f.images} />

@@ -7,6 +7,7 @@ import { BagButton } from "@/components/cart/bag-button";
 import { Flacon } from "@/components/ui/flacon";
 import { useDragX } from "@/hooks/use-drag-x";
 import { FOCUS_SCENES } from "@/config/focus-scenes";
+import { isPlainClick, useCanFly, useFlight } from "@/components/providers/pdp-flight";
 import { FocusScene } from "./focus-scene";
 import {
   cloudinaryVariant,
@@ -35,6 +36,8 @@ const TONE: Record<FragranceSlug, { base: string; glow: string }> = {
 export function InFocus({ fragrances }: { fragrances: Fragrance[] }) {
   const n = fragrances.length;
   const [active, setActive] = useState(0);
+  const flight = useFlight();
+  const canFly = useCanFly();
   const sectionRef = useRef<HTMLElement>(null);
   const wrapRefs = useRef<(HTMLDivElement | null)[]>([]);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -165,7 +168,7 @@ export function InFocus({ fragrances }: { fragrances: Fragrance[] }) {
                 <div className="rh-fslide__in">
                   <div className={`rh-fslide__bottle${scene ? " rh-fslide__bottle--scene" : ""}`}>
                     {scene ? (
-                      <FocusScene scene={scene} name={f.name} active={active === i} href={`/fragrances/${f.slug}`} />
+                      <FocusScene scene={scene} name={f.name} slug={f.slug} active={active === i} href={`/fragrances/${f.slug}`} />
                     ) : photo ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -185,6 +188,12 @@ export function InFocus({ fragrances }: { fragrances: Fragrance[] }) {
                       <Link
                         href={`/fragrances/${f.slug}`}
                         tabIndex={active === i ? 0 : -1}
+                        data-no-transition={canFly && scene ? "" : undefined}
+                        onClick={(e) => {
+                          // the name opens the page the way the picture does
+                          const pic = scene ? document.querySelector<HTMLElement>(`[data-flight-src="focus:${f.slug}"]`) : null;
+                          if (pic && isPlainClick(e) && flight.open(f.slug, `/fragrances/${f.slug}`, pic, { id: `focus:${f.slug}` })) e.preventDefault();
+                        }}
                       >
                         {f.name}
                       </Link>

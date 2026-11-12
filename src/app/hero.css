@@ -85,8 +85,24 @@
   @media(min-width:768px) {
     .rh-hero[data-layout="stage"] .rh-hero__media {aspect-ratio:16/9}
   }
+  /* PHONE (under 600px): the picture leads. The headline stands on its wall, the empty top of the 4:5 picture, the way it does on a wide screen; the
+     three bottles and their dots are right under it; then the one button, the way to the quiz and the launch price. On a 375 x 812 phone the whole
+     of it is on the first screen. The text is not moved in the markup: the text panel and the copy are `display: contents`, so the hero itself is
+     the grid, and the picture spans rows 1-4 with the headline's three lines laid over its first rows. Tablet and desktop are untouched. */
   @media(max-width:599px) {
-    .rh-hero[data-layout="stage"] .rh-hero__text {padding-block:34px 36px}
+    .rh-hero[data-layout="stage"] {display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto 1fr auto auto;padding-bottom:54px}
+    .rh-hero[data-layout="stage"] :is(.rh-hero__text, .rh-hero__copy) {display:contents}
+    .rh-hero[data-layout="stage"] .rh-hero__media {grid-column:1;grid-row:1 / 5}
+    .rh-hero[data-layout="stage"] :is(.rh-hero__eyebrow, .rh-display, .rh-hero__sub) {grid-column:1;position:relative;z-index:3;margin:0;padding-inline:var(--gutter);pointer-events:none}
+    .rh-hero[data-layout="stage"] .rh-hero__eyebrow {grid-row:1;padding-top:24px;color:var(--ink-2)}
+    .rh-hero[data-layout="stage"] .rh-display {grid-row:2;margin-top:12px;font-size:clamp(1.75rem,9.2vw,2.4rem);line-height:1.02;white-space:nowrap}
+    .rh-hero[data-layout="stage"] .rh-hero__ln {display:inline-block;vertical-align:top}
+    .rh-hero[data-layout="stage"] .rh-hero__sub {grid-row:3;margin-top:10px;font-size:1.12rem}
+    .rh-hero[data-layout="stage"] .rh-hero__cta {grid-column:1;grid-row:5;display:grid;gap:2px;padding:22px var(--gutter) 0}
+    .rh-hero[data-layout="stage"] .rh-hero__cta .rh-btn {justify-content:center;width:100%}
+    .rh-hero[data-layout="stage"] .rh-hero__alt {justify-self:center}
+    .rh-hero[data-layout="stage"] .rh-hero__offer {grid-column:1;grid-row:6;grid-template-columns:auto;justify-items:center;text-align:center;gap:6px;margin:0;padding:10px var(--gutter) 0}
+    .rh-hero[data-layout="stage"] .rh-hero__amt {justify-content:center}
   }
 
   /* the art box owns the cover arithmetic (--ar, --ox, --oy, --W) so the stage and the plaque layer share it */

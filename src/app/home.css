@@ -240,6 +240,8 @@
   /* the Discovery Set: the three packshots fanned in a frame of the same size; they spread apart on hover */
   .rh-mega__trio {position:relative;flex:none;width:104px;height:105px;overflow:hidden;border-radius:3px;background:var(--stone);box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 9%,transparent)}
   .rh-mega__trio img {position:absolute;left:calc(var(--k) * 19px);top:calc(12px + var(--k) * 6px);width:46px;height:57px;object-fit:cover;border-radius:2px;border:1px solid color-mix(in srgb,var(--ink) 12%,transparent);background:var(--stone);box-shadow:0 10px 18px -10px color-mix(in srgb,var(--ink) 45%,transparent);rotate:calc((var(--k) - 1) * -3deg);transition:translate .75s var(--expo),rotate .75s var(--expo)}
+  /* the Fragrances panel shuts without its transitions while a picture flies out of it (header.tsx) */
+  .rh-hdr[data-instant] .rh-mega, .rh-hdr[data-instant] .rh-mega::before, .rh-hdr[data-instant] .rh-mega__panel {transition:none !important}
   @media(prefers-reduced-motion:reduce) {
     .rh-mega.is-open .rh-mega__item {animation:none}
     .rh-mega__panel, .rh-mega::before, .rh-mega__pic img, .rh-mega__pic::after, .rh-mega__trio img {transition-duration:.01s}
