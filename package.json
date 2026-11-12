@@ -12,6 +12,7 @@
     "db:check": "tsx scripts/db-check.ts",
     "db:seed": "tsx scripts/seed.ts",
     "catalog": "tsx scripts/catalog.ts",
+    "variants": "tsx scripts/variants.ts",
     "coupon": "tsx scripts/coupon.ts",
   "reset:commerce": "tsx scripts/reset-commerce.ts",
     "reset:stock": "tsx scripts/reset-stock.ts",

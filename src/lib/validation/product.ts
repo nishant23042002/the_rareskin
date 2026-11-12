@@ -118,9 +118,24 @@ const inventoryUpdate = z.object({
   allowBackorder: z.boolean().optional(),
 });
 
+/**
+ * A size (10 ml / 50 ml / 100 ml) is its own product record, linked to its fragrance by `variantOf`: it has its
+ * own SKU, price, stock, status and picture gallery, so the bag, checkout, stock ledger and orders need nothing
+ * new. `launch.soon` keeps a size on the product page but out of the bag ("Available soon" / "Launching soon");
+ * flipping it off is all it takes to start selling that size.
+ */
+export const launchState = z.object({
+  soon: z.boolean().default(false),
+  /** what the size's chip and button say while it is not on sale yet, e.g. "Available soon" */
+  label: z.string().trim().max(40, "Keep this under 40 characters").default(""),
+});
+
 /** Fields shared by every product kind. */
 const productBase = z.object({
   slug,
+  /** the fragrance this size belongs to (its slug); absent / null = a main product */
+  variantOf: slug.nullable().optional(),
+  launch: launchState.default({ soon: false, label: "" }),
   status: z.enum(PRODUCT_STATUSES).default("draft"),
   name: shortText(80),
   pronunciation: shortText(120).optional(),
@@ -199,6 +214,7 @@ export const productUpdateInput = z.object({
   pricing: pricing.optional(),
   volumeMl: z.number().int().positive().max(1000).optional(),
   hsnCode: hsnCode.optional(),
+  launch: launchState.optional(),
   inventory: inventoryUpdate.optional(),
   media: mediaUpdate.optional(),
   seo: seoUpdate.optional(),
@@ -229,6 +245,15 @@ export const productActionInput = z.discriminatedUnion("action", [
   z.object({ action: z.literal("duplicate") }),
   // hard delete — draft-only, zero orders, sudo-gated (see catalog-actions.ts)
   z.object({ action: z.literal("delete") }),
+  // a new size of this fragrance (10 ml / 100 ml …): a product record of its own, copied from the fragrance
+  z.object({
+    action: z.literal("add_size"),
+    volumeMl: z.number().int().positive().max(1000),
+    price: paise,
+    mrp: paise,
+    soon: z.boolean().default(true),
+    soonLabel: z.string().trim().max(40, "Keep this under 40 characters").default(""),
+  }),
 ]);
 
 /** `POST /api/admin/catalogue/reorder` — the full ordering of product slugs. */

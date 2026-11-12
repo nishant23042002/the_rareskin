@@ -155,6 +155,20 @@ scripted / CI edits). `catalog_manager` or `operations`+.
 - Every write bumps the storefront cache — `revalidateTag("catalog")` +
   `revalidateTag("product:<slug>", { expire: 0 })` — so a change is live on the
   next request.
+- **Sizes** (10 / 50 / 100 ml) — a size is a product record of its own, linked
+  to its fragrance by `variantOf` (`aurevan-10ml` → `aurevan`) and built from it
+  by `server/admin/size-record.ts` (shared with `pnpm variants`). The list shows
+  sizes under their fragrance (not draggable, `soon` badge). A fragrance's edit
+  page has a **Sizes** panel — "Add size" (`POST /api/admin/catalogue/<slug>`
+  `{ action: "add_size", volumeMl, price, mrp, soon, soonLabel }`) creates the
+  record with stock 0, no pictures and `launch.soon` on. A size's own edit page
+  shows only what belongs to it: **Availability** ("Not on sale yet" + the chip /
+  button wording), price, inventory flags, the ledgered stock panel and **its
+  own picture gallery** (what the PDP shows when that size is chosen); story,
+  notes, colours and SEO are the fragrance's. To start selling a size: untick
+  "Not on sale yet", add stock, upload its pictures, set Status to active, save.
+  While `soon` is on the storefront lists it as "Available soon" and the cart /
+  checkout refuse it even if it has stock. Low-stock counts skip `soon` sizes.
 
 ### Product photography
 

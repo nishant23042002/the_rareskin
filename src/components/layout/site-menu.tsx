@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useLenis } from "lenis/react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
@@ -44,6 +45,7 @@ export function SiteMenu({
   open,
   onClose,
   nav,
+  pics = {},
   setPrice = null,
   whatsapp = null,
   freeShippingAbove = 0,
@@ -51,6 +53,8 @@ export function SiteMenu({
   open: boolean;
   onClose: () => void;
   nav: CatalogNavItem[];
+  /** slug -> the picture the homepage's "The Three" shows for it (the finalized card direction) */
+  pics?: Record<string, string>;
   setPrice?: number | null;
   /** concierge number (WhatsApp, else phone) for the footer's "speak with a specialist" link */
   whatsapp?: string | null;
@@ -91,7 +95,6 @@ export function SiteMenu({
 
   const rise = (i: number) => ({ "--i": i }) as CSSProperties;
   const afterNav = nav.length + 1;
-  const trio = nav.map((f) => ({ slug: f.slug, shot: packshot(f.slug) })).filter((t) => t.shot);
 
   return (
     <dialog
@@ -132,16 +135,31 @@ export function SiteMenu({
                   <span className="rh-sb__frag-in">
                     <span className="rh-sb__pic" aria-hidden="true">
                       {(() => {
+                        // the same picture as the homepage's "The Three" (the finalized card direction);
+                        // the packshot only if a card picture is missing
+                        if (pics[f.slug])
+                          return (
+                            <Image
+                              src={pics[f.slug]}
+                              alt=""
+                              width={56}
+                              height={70}
+                              sizes="56px"
+                              quality={80}
+                              loading="eager"
+                              fetchPriority="low"
+                            />
+                          );
                         const shot = packshot(f.slug);
                         return shot ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={shot.src}
                             srcSet={shot.srcSet}
-                            sizes="50px"
+                            sizes="56px"
                             alt=""
-                            width={50}
-                            height={58}
+                            width={56}
+                            height={64}
                             decoding="async"
                             fetchPriority="low"
                           />
@@ -164,27 +182,14 @@ export function SiteMenu({
 
           <Link
             href="/discovery-set"
-            className={`rh-sb__set rh-rise${trio.length === 3 ? "" : " rh-sb__set--plain"}`}
+            className="rh-sb__set rh-rise"
             style={rise(afterNav)}
             onClick={onClose}
           >
-            {trio.length === 3 && (
-              <span className="rh-sb__trio" aria-hidden="true">
-                {trio.map((t, k) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    key={t.slug}
-                    src={t.shot!.src}
-                    alt=""
-                    width={40}
-                    height={46}
-                    decoding="async"
-                    fetchPriority="low"
-                    style={{ "--k": k } as CSSProperties}
-                  />
-                ))}
-              </span>
-            )}
+            <span className="rh-sb__trio" aria-hidden="true">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="rh-sb__trio-one" src="/images/pdp/discovery-set/menu-trio-dark.webp?v=13" alt="" width={148} height={111} decoding="async" fetchPriority="low" />
+            </span>
             <span className="rh-sb__set-t">The Discovery Set</span>
             <span className="rh-sb__set-badge">3 × 10 ml</span>
             {setPrice ? (

@@ -1,4 +1,4 @@
-import { PDP_GALLERY, pdpPhotoSrc } from "@/config/pdp-gallery";
+import { PDP_GALLERY, PDP_SIZE_GALLERY, pdpPhotoSrc } from "@/config/pdp-gallery";
 import {
   cloudinaryVariant,
   type FragranceImages,
@@ -18,7 +18,7 @@ import {
  *
  * Isomorphic: no server-only imports, safe in client components.
  */
-interface PdpSlide {
+export interface PdpSlide {
   key: string;
   /** the large file (the gallery's main frame) */
   full: string;
@@ -34,10 +34,55 @@ interface PdpSlide {
   thumbHeight?: number;
 }
 
+/** A list of uploaded pictures (a size's own gallery, or a fragrance's extra ones) as slides. */
+export function uploadSlides(
+  pictures: { url: string; alt: string }[],
+  name: string,
+  keyPrefix: string,
+): PdpSlide[] {
+  return pictures.map((p, i): PdpSlide => {
+    const thumb = cloudinaryVariant(p.url, { w: 200 }) ?? p.url;
+    return {
+      key: `${keyPrefix}-${i}`,
+      full: cloudinaryVariant(p.url, { w: 1000 }) ?? p.url,
+      thumb,
+      tiny: thumb,
+      alt: p.alt || name,
+    };
+  });
+}
+
+/**
+ * The slides of a smaller size (the 10 ml): its official pictures (`PDP_SIZE_GALLERY`) first, then what was uploaded to
+ * the size's own record in the admin. Empty when the size has neither (the gallery then draws the vector bottle).
+ */
+export function pdpSizeSlides(
+  slug: FragranceSlug,
+  volumeMl: number,
+  name: string,
+  uploads: { url: string; alt: string }[] = [],
+): PdpSlide[] {
+  const official = (PDP_SIZE_GALLERY[slug]?.[volumeMl] ?? []).map(
+    (p, i): PdpSlide => ({
+      key: `size-${volumeMl}-official-${i}`,
+      full: pdpPhotoSrc(slug, p, "full"),
+      thumb: pdpPhotoSrc(slug, p, "small"),
+      tiny: pdpPhotoSrc(slug, p, "tiny"),
+      srcSet: `${pdpPhotoSrc(slug, p, "small")} ${p.small}w, ${pdpPhotoSrc(slug, p, "full")} ${p.width}w`,
+      alt: p.alt,
+      thumbWidth: p.small,
+      thumbHeight: Math.round((p.small * p.height) / p.width),
+    }),
+  );
+  return [...official, ...uploadSlides(uploads, `${name} ${volumeMl} ml`, `size-${volumeMl}`)];
+}
+
 export function pdpSlides(
   slug: FragranceSlug,
   images: FragranceImages,
   name: string,
+  /** the fragrance's own extra pictures (admin: Product images → Gallery), after the others */
+  gallery: { url: string; alt: string }[] = [],
 ): PdpSlide[] {
   const official = (PDP_GALLERY[slug] ?? []).map(
     (p, i): PdpSlide => ({
@@ -66,7 +111,7 @@ export function pdpSlides(
       };
     });
 
-  return [...official, ...uploaded];
+  return [...official, ...uploaded, ...uploadSlides(gallery, name, "gallery")];
 }
 
 /**

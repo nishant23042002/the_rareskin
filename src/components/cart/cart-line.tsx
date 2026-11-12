@@ -41,8 +41,13 @@ export function CartLineRow({
   const [leaving, setLeaving] = useState(false);
 
   const f = line.fragrance ? FRAGRANCE_PALETTE[line.fragrance] : null;
-  // the cart line keeps no picture, so borrow the catalogue's by SKU
-  const image = suggestions.find((s) => s.sku === line.sku)?.image ?? null;
+  // the cart line keeps no picture, so borrow the catalogue's by SKU; a size (10 ml, 100 ml) is not a suggestion
+  // of its own, so it borrows its fragrance's
+  const image =
+    (
+      suggestions.find((s) => s.sku === line.sku) ??
+      (line.fragrance ? suggestions.find((s) => s.fragrance === line.fragrance) : undefined)
+    )?.image ?? null;
 
   function remove() {
     if (leaving) return;

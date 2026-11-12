@@ -8,12 +8,13 @@ import {
   setProductStatus,
   duplicateProduct,
   deleteProduct,
+  addSize,
   bumpCatalogCache,
 } from "@/server/admin";
 
 /**
  * `PATCH /api/admin/catalogue/<slug>` — edit a product (partial).
- * `POST  /api/admin/catalogue/<slug>` — `{ action: "status" | "duplicate" }`.
+ * `POST  /api/admin/catalogue/<slug>` — `{ action: "status" | "duplicate" | "add_size" | "delete" }`.
  * `catalog_manager`+.
  */
 export const dynamic = "force-dynamic";
@@ -68,7 +69,20 @@ export async function POST(
         ? await setProductStatus(slug, parsed.data.status, ctx, req)
         : parsed.data.action === "duplicate"
           ? await duplicateProduct(slug, ctx, req)
-          : await deleteProduct(slug, ctx, req);
+          : parsed.data.action === "add_size"
+            ? await addSize(
+                slug,
+                {
+                  volumeMl: parsed.data.volumeMl,
+                  price: parsed.data.price,
+                  mrp: parsed.data.mrp,
+                  soon: parsed.data.soon,
+                  soonLabel: parsed.data.soonLabel,
+                },
+                ctx,
+                req,
+              )
+            : await deleteProduct(slug, ctx, req);
 
     if (!result.ok) {
       return NextResponse.json(result, {
@@ -76,7 +90,9 @@ export async function POST(
       });
     }
     bumpCatalogCache(
-      parsed.data.action === "duplicate" ? [slug, result.slug] : slug,
+      parsed.data.action === "duplicate" || parsed.data.action === "add_size"
+        ? [slug, result.slug]
+        : slug,
     );
     return NextResponse.json(result);
   } catch (err) {

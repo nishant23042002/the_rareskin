@@ -52,7 +52,7 @@ export function Quiz({ fragrances }: { fragrances: Fragrance[] }) {
   const filled = step >= STEPS ? STEPS : step + 1;
 
   return (
-    <section id="quiz" className="rh-quiz" aria-labelledby="quiz-h">
+    <section id="quiz" className="rh-quiz rh-quiz--dark rh-dark" aria-labelledby="quiz-h">
       <div className="rh-wrap rh-quiz__grid">
         <div className="rh-quiz__intro">
           <p className="rh-eyebrow">Not sure which</p>

@@ -408,23 +408,8 @@ export function Header({
                 onClick={closeMega}
               >
                 <span className="rh-mega__trio" aria-hidden="true">
-                  {pics &&
-                    nav.map((f, k) =>
-                      cardPics[f.slug] ? (
-                        <Image
-                          key={f.slug}
-                          src={cardPics[f.slug]}
-                          alt=""
-                          width={46}
-                          height={57}
-                          sizes="46px"
-                          quality={75}
-                          loading="eager"
-                          fetchPriority="low"
-                          style={{ "--k": k } as CSSProperties}
-                        />
-                      ) : null,
-                    )}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img className="rh-mega__trio-one" src="/images/pdp/discovery-set/menu-trio-light.webp?v=12" alt="" width={112} height={120} decoding="async" loading="lazy" />
                 </span>
                 <span className="rh-mega__txt">
                   <b>Discovery Set</b>
@@ -453,6 +438,7 @@ export function Header({
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
         nav={nav}
+        pics={cardPics}
         setPrice={setPrice}
         whatsapp={whatsapp}
         freeShippingAbove={freeShippingAbove}

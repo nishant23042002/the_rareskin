@@ -31,6 +31,11 @@ export interface AdminProductRow {
   order: number;
   heroThumb: string | null;
   updatedAt: string;
+  /** the fragrance this size belongs to; null for a main product */
+  variantOf: string | null;
+  volumeMl: number;
+  /** a size that is listed on its page but not on sale yet */
+  soon: boolean;
 }
 
 function firstImage(media: ProductDoc["media"] | undefined): string | null {
@@ -63,6 +68,9 @@ export async function listProducts(): Promise<AdminProductRow[]> {
     order: d.order,
     heroThumb: firstImage(d.media),
     updatedAt: d.updatedAt.toISOString(),
+    variantOf: d.variantOf ?? null,
+    volumeMl: d.volumeMl,
+    soon: Boolean(d.launch?.soon),
   }));
 }
 
@@ -72,9 +80,9 @@ export async function getCatalogueOverview(): Promise<{
 }> {
   await dbConnect();
   const docs = await Product.find()
-    .select("slug name status inventory.stock inventory.lowStockThreshold inventory.trackInventory")
+    .select("slug name status launch inventory.stock inventory.lowStockThreshold inventory.trackInventory")
     .lean<
-      Pick<ProductDoc, "slug" | "name" | "status" | "inventory">[]
+      Pick<ProductDoc, "slug" | "name" | "status" | "inventory" | "launch">[]
     >();
 
   const byStatus = Object.fromEntries(
@@ -89,7 +97,9 @@ export async function getCatalogueOverview(): Promise<{
 
   for (const d of docs) {
     byStatus[d.status as ProductStatus] += 1;
+    // a size that is not on sale yet has no stock on purpose: it is not "low"
     if (
+      !d.launch?.soon &&
       d.inventory.trackInventory &&
       d.inventory.stock <= d.inventory.lowStockThreshold
     ) {
@@ -176,6 +186,22 @@ export interface ProductEditDTO {
   components: { productSlug: string; volumeMl: number }[];
   credit: ProductDoc["credit"] | null;
   updatedAt: string;
+  /** the fragrance this size belongs to (null for a main product) */
+  variantOf: string | null;
+  launch: { soon: boolean; label: string };
+  /** a main fragrance's size records (10 ml / 100 ml …), smallest first */
+  sizes: {
+    slug: string;
+    sku: string;
+    volumeMl: number;
+    status: ProductStatus;
+    soon: boolean;
+    label: string;
+    pricePaise: number;
+    mrpPaise: number;
+    stock: number;
+    pictures: number;
+  }[];
   ledger: {
     at: string;
     delta: number;
@@ -196,6 +222,10 @@ export async function getProductForEdit(
     .sort({ at: -1 })
     .limit(12)
     .lean<StockLedgerDoc[]>();
+  const sizeDocs =
+    d.kind === "fragrance" && !d.variantOf
+      ? await Product.find({ variantOf: d.slug }).sort({ volumeMl: 1 }).lean<ProductDoc[]>()
+      : [];
 
   return {
     id: String(d._id),
@@ -253,6 +283,20 @@ export async function getProductForEdit(
     })),
     credit: d.credit ?? null,
     updatedAt: d.updatedAt.toISOString(),
+    variantOf: d.variantOf ?? null,
+    launch: { soon: Boolean(d.launch?.soon), label: d.launch?.label ?? "" },
+    sizes: sizeDocs.map((z) => ({
+      slug: z.slug,
+      sku: z.inventory.sku,
+      volumeMl: z.volumeMl,
+      status: z.status as ProductStatus,
+      soon: Boolean(z.launch?.soon),
+      label: z.launch?.label ?? "",
+      pricePaise: z.pricing.price,
+      mrpPaise: z.pricing.mrp,
+      stock: z.inventory.stock,
+      pictures: (z.media?.gallery ?? []).length,
+    })),
     ledger: ledgerRows.map((l) => ({
       at: l.at.toISOString(),
       delta: l.delta,
@@ -268,7 +312,8 @@ export async function fragranceSlugOptions(): Promise<
   { slug: string; name: string }[]
 > {
   await dbConnect();
-  const docs = await Product.find({ kind: "fragrance" })
+  // the fragrances, not their sizes
+  const docs = await Product.find({ kind: "fragrance", variantOf: null })
     .select("slug name")
     .sort({ order: 1 })
     .lean<{ slug: string; name: string }[]>();

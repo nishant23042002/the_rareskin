@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { Card } from "@/components/admin/ui";
@@ -10,6 +11,7 @@ import {
   TextArea,
   Select,
   Checkbox,
+  Toggle,
   FormSection,
   Row,
 } from "@/components/admin/field";
@@ -74,6 +76,10 @@ interface FormState {
   og: MediaSlot;
   ogImageRef: MediaSlot;
   gallery: MediaRefDTO[];
+  // size-only: the fragrance this is a size of, and whether it is on sale yet
+  variantOf: string | null;
+  soon: boolean;
+  soonLabel: string;
   // set-only
   components: { productSlug: string; volumeMl: string }[];
   creditAmount: string;
@@ -125,6 +131,9 @@ function fromDto(p: ProductEditDTO): FormState {
     og: p.media.og,
     ogImageRef: p.seo.ogImageRef,
     gallery: p.media.gallery,
+    variantOf: p.variantOf,
+    soon: p.launch.soon,
+    soonLabel: p.launch.label,
     components: p.components.map((c) => ({
       productSlug: c.productSlug,
       volumeMl: String(c.volumeMl),
@@ -178,6 +187,9 @@ const EMPTY: FormState = {
   og: null,
   ogImageRef: null,
   gallery: [],
+  variantOf: null,
+  soon: false,
+  soonLabel: "",
   components: [
     { productSlug: "", volumeMl: "10" },
     { productSlug: "", volumeMl: "10" },
@@ -279,6 +291,10 @@ export function ProductForm({
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  // a size (10 ml / 100 ml …) is a product record of its own, but its story, notes, colours and SEO are its
+  // fragrance's: the form shows only what belongs to the size (availability, price, stock, pictures)
+  const isSize = Boolean(f.variantOf);
+  const parentName = fragranceOptions.find((o) => o.slug === f.variantOf)?.name ?? f.variantOf ?? "";
 
   // Re-sync the form when the server hands back a newer record (after a save +
   // `router.refresh()`), so what's on screen is always the persisted truth.
@@ -329,6 +345,18 @@ export function ProductForm({
   }
 
   function buildCommon() {
+    if (isSize) {
+      return {
+        status: f.status,
+        pricing: {
+          price: toPaise(Number(f.price)),
+          mrp: toPaise(Number(f.mrp)),
+          currency: "INR",
+        },
+        launch: { soon: f.soon, label: f.soonLabel.trim() },
+        media: { gallery: f.gallery },
+      };
+    }
     const common: Record<string, unknown> = {
       status: f.status,
       order: Number(f.order) || 0,
@@ -464,6 +492,17 @@ export function ProductForm({
   return (
     <Card>
       <div className="flex flex-col gap-0">
+        {isSize && (
+          <div className="mb-5 border-l-2 border-gilt/50 bg-gilt/5 px-3 py-2 text-[11.5px] leading-relaxed text-ink-2">
+            This is the <b className="text-ink">{f.volumeMl} ml</b> size of{" "}
+            <Link href={`/admin/catalogue/${f.variantOf}/edit`} className="text-ink underline underline-offset-2">
+              {parentName}
+            </Link>
+            . Its story, notes, colours and SEO are the fragrance&apos;s — edit them there. What belongs to this
+            size is its availability, price, stock and pictures.
+          </div>
+        )}
+
         <FormSection title="Status & order">
           <Row>
             <Field label="Status" info={INFO.status}>
@@ -475,16 +514,50 @@ export function ProductForm({
                 ))}
               </Select>
             </Field>
-            <Field label="Grid position" hint="lower sorts first" info={INFO.order}>
-              <TextInput
-                type="number"
-                value={f.order}
-                onChange={(e) => set("order", e.target.value)}
-              />
-            </Field>
+            {!isSize && (
+              <Field label="Grid position" hint="lower sorts first" info={INFO.order}>
+                <TextInput
+                  type="number"
+                  value={f.order}
+                  onChange={(e) => set("order", e.target.value)}
+                />
+              </Field>
+            )}
           </Row>
         </FormSection>
 
+        {isSize && (
+          <FormSection
+            title="Availability"
+            description="Whether this size can be bought yet. It is always visible on the product page."
+          >
+            <Toggle
+              label="Not on sale yet — show as “Available soon”"
+              checked={f.soon}
+              onChange={(e) => set("soon", e.target.checked)}
+            />
+            {f.soon && (
+              <div className="max-w-[300px]">
+                <Field label="Wording on the chip and button" hint="≤ 40 chars">
+                  <TextInput
+                    value={f.soonLabel}
+                    maxLength={40}
+                    placeholder="Available soon"
+                    onChange={(e) => set("soonLabel", e.target.value)}
+                  />
+                </Field>
+              </div>
+            )}
+            <p className="text-[11px] leading-relaxed text-ink-3">
+              {f.soon
+                ? "While this is on, the size shows on the product page but can't be added to the bag. To start selling it: turn this off, add stock (the panel on the right), upload its pictures below, set Status to active, then save."
+                : "This size is on sale: it can be added to the bag whenever it has stock. Turn this on to hold it back as “Available soon”."}
+            </p>
+          </FormSection>
+        )}
+
+        {!isSize && (
+          <>
         <FormSection title="Identity">
           {mode === "create" && (
             <p className="border-l-2 border-gilt/50 bg-gilt/5 px-3 py-2 text-[11.5px] text-ink-2">
@@ -630,6 +703,9 @@ export function ProductForm({
           </Row>
         </FormSection>
 
+          </>
+        )}
+
         <FormSection title="Pricing">
           <Row>
             <Field label="Price (₹)" info={INFO.price}>
@@ -648,16 +724,23 @@ export function ProductForm({
             </Field>
           </Row>
           <Row>
-            <Field label="Volume (ml)" info={INFO.volumeMl}>
+            <Field
+              label="Volume (ml)"
+              hint={isSize ? "fixed: the size's identity" : undefined}
+              info={INFO.volumeMl}
+            >
               <TextInput
                 type="number"
                 value={f.volumeMl}
+                disabled={isSize}
                 onChange={(e) => set("volumeMl", e.target.value)}
               />
             </Field>
-            <Field label="HSN code" info={INFO.hsnCode}>
-              <TextInput value={f.hsnCode} onChange={(e) => set("hsnCode", e.target.value)} />
-            </Field>
+            {!isSize && (
+              <Field label="HSN code" info={INFO.hsnCode}>
+                <TextInput value={f.hsnCode} onChange={(e) => set("hsnCode", e.target.value)} />
+              </Field>
+            )}
           </Row>
         </FormSection>
 
@@ -699,6 +782,7 @@ export function ProductForm({
           )}
         </FormSection>
 
+        {!isSize && (
         <FormSection
           title="Homepage hero banner"
           description="The full-screen image behind the headline on this fragrance's slide of the homepage carousel. Upload a landscape crop for desktop and a portrait crop for phones."
@@ -718,17 +802,27 @@ export function ProductForm({
             />
           </div>
         </FormSection>
+        )}
 
-        <FormSection title="Product images" description="A photo replaces the vector flacon on the product-page gallery and the collection card.">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            <UploadField label="Flat (packshot)" info={IMG_INFO.flat} value={f.flat} onChange={(v) => set("flat", v)} />
-            <UploadField label="Box" info={IMG_INFO.box} value={f.box} onChange={(v) => set("box", v)} />
-            <UploadField label="OG image" info={IMG_INFO.og} value={f.og} onChange={(v) => set("og", v)} />
-          </div>
+        <FormSection
+          title={isSize ? `Pictures of the ${f.volumeMl} ml` : "Product images"}
+          description={
+            isSize
+              ? "The product page shows exactly these when this size is chosen, in this order; the first is the cover. Until there is one, a drawn bottle at this size stands in."
+              : "A photo replaces the vector flacon on the product-page gallery and the collection card."
+          }
+        >
+          {!isSize && (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <UploadField label="Flat (packshot)" info={IMG_INFO.flat} value={f.flat} onChange={(v) => set("flat", v)} />
+              <UploadField label="Box" info={IMG_INFO.box} value={f.box} onChange={(v) => set("box", v)} />
+              <UploadField label="OG image" info={IMG_INFO.og} value={f.og} onChange={(v) => set("og", v)} />
+            </div>
+          )}
           <div>
             <span className="inline-flex items-center text-[10.5px] font-medium tracking-[0.1em] text-ink-3 uppercase">
-              Gallery
-              <InfoTip>{IMG_INFO.gallery}</InfoTip>
+              {isSize ? "Gallery · up to 12" : "Gallery"}
+              <InfoTip>{isSize ? "Pictures of this size's bottle, in order. Portrait, about 4:5 (e.g. 1200×1500+), JPG / PNG / WebP, ≤ 10 MB. Each one is a slide, with its own thumbnail, in the product page's gallery and its full-screen viewer." : IMG_INFO.gallery}</InfoTip>
             </span>
             <div className="mt-1 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {f.gallery.map((g, i) => (
@@ -757,6 +851,8 @@ export function ProductForm({
           </div>
         </FormSection>
 
+        {!isSize && (
+          <>
         <FormSection title="SEO">
           <Field label="Meta title" hint="≤ 70 chars" info={INFO.metaTitle}>
             <TextInput
@@ -810,6 +906,8 @@ export function ProductForm({
             ))}
           </div>
         </details>
+          </>
+        )}
 
         {f.kind === "set" && (
           <FormSection title="Set — components & credit">
@@ -938,6 +1036,7 @@ export function ProductForm({
         >
           {busy ? "Saving…" : mode === "create" ? "Create product" : "Save changes"}
         </button>
+        {!isSize && (
         <button
           type="button"
           onClick={() => setPreviewOpen(true)}
@@ -946,6 +1045,7 @@ export function ProductForm({
           <Icon name="external" className="size-3.5" />
           Preview
         </button>
+        )}
         {saved && (
           <span className="flex items-center gap-1.5 text-[11.5px] text-ok">
             <Icon name="check" className="size-3.5" /> Saved

@@ -7,7 +7,8 @@ import { dbConnect } from "@/server/db";
 import { Product, Order, MediaAsset, recordAudit } from "@/server/models";
 import { assertSudo } from "@/server/auth/admin";
 import { adjustStock } from "@/server/commerce/inventory";
-import { isFragranceSlug, DISCOVERY_SET_SLUG } from "@/lib/catalog";
+import { isFragranceSlug, familySlug, DISCOVERY_SET_SLUG } from "@/lib/catalog";
+import { sizeRecord } from "./size-record";
 import type { AuthContext } from "@/server/auth/session";
 import type {
   ProductCreateInput,
@@ -73,7 +74,8 @@ function toDotSet(
  */
 function storefrontKnowsSlug(kind: string, slug: string): boolean {
   if (kind === "set") return slug === DISCOVERY_SET_SLUG;
-  return isFragranceSlug(slug);
+  // a size record (`aurevan-10ml`) is known when its fragrance is
+  return isFragranceSlug(familySlug(slug));
 }
 
 export async function createProduct(
@@ -329,6 +331,8 @@ const DUP_BLOCKLIST = new Set([
   "id",
   "slug",
   "status",
+  "variantOf",
+  "launch",
   "inventory",
   "media",
   "ratings",
@@ -389,4 +393,70 @@ export async function duplicateProduct(
     userAgent: req.userAgent,
   });
   return { ok: true, slug: doc.slug };
+}
+
+// ── sizes ──────────────────────────────────────────────────────────────
+
+/**
+ * Add a size (10 ml, 100 ml …) to a fragrance. A size is a product record of its own (own SKU, price, stock,
+ * status and picture gallery) linked to the fragrance by `variantOf`, so the bag, checkout, stock ledger and
+ * orders work for it exactly as for any product. It is created from the fragrance's own record (copy, colours,
+ * notes, HSN) with an empty gallery and no stock, and starts `soon` unless the admin says otherwise: it then shows
+ * on the product page as "Available soon" and cannot be bought until `launch.soon` is switched off.
+ */
+export async function addSize(
+  slug: string,
+  input: {
+    volumeMl: number;
+    price: number;
+    mrp: number;
+    soon: boolean;
+    soonLabel: string;
+  },
+  ctx: AuthContext,
+  req: Req,
+): Promise<CatalogActionResult<{ slug: string }>> {
+  await dbConnect();
+  const parent = await Product.findOne({ slug }).lean();
+  if (!parent) return { ok: false, error: "not-found" };
+  const src = parent as unknown as Record<string, unknown> & {
+    slug: string;
+    kind: string;
+    variantOf?: string | null;
+    volumeMl: number;
+    order: number;
+    inventory: { sku: string; lowStockThreshold: number };
+  };
+  if (src.kind !== "fragrance") return { ok: false, error: "only-fragrances-have-sizes" };
+  if (src.variantOf) return { ok: false, error: "already-a-size" };
+  if (input.mrp < input.price) return { ok: false, error: "mrp-below-price" };
+
+  const taken = await Product.exists({
+    $or: [{ slug }, { variantOf: slug }].map((q) => ({ ...q, volumeMl: input.volumeMl })),
+  });
+  if (taken) return { ok: false, error: "size-exists" };
+
+  const actor = new Types.ObjectId(ctx.user.id);
+
+  try {
+    const doc = await Product.create({
+      ...sizeRecord(src, input),
+      createdBy: actor,
+      updatedBy: actor,
+    });
+    await recordAudit({
+      actorId: actor,
+      actorRole: ctx.user.role,
+      action: "product.add_size",
+      targetType: "Product",
+      targetId: doc.slug,
+      after: { of: slug, volumeMl: input.volumeMl, soon: input.soon },
+      ip: req.ip,
+      userAgent: req.userAgent,
+    });
+    return { ok: true, slug: doc.slug };
+  } catch (e) {
+    if ((e as { code?: number }).code === 11000) return { ok: false, error: "slug-or-sku-taken" };
+    throw e;
+  }
 }

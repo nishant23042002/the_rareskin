@@ -786,3 +786,230 @@
     }
   }
 }
+
+
+/* ==========================================================================
+   Sizes (components/product/pdp-sizes.tsx, pdp-buybox.tsx, pdp-gallery.tsx)
+   10 / 50 / 100 ml: a chooser in the buy box, and a gallery that swaps with it. Opacity, transform and colour only.
+   ========================================================================== */
+@layer components {
+  .pdp-sizes {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--color-line);
+  }
+  .pdp-sizes__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 0 0 12px;
+    font: 400 10.5px/1 var(--f-label);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
+  }
+  .pdp-sizes__head b {
+    font-weight: 400;
+    color: var(--color-ink);
+  }
+  .pdp-sizes__grid {
+    display: grid;
+    gap: 8px;
+  }
+
+  .pdp-size {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    align-content: end;
+    gap: 7px;
+    min-height: 98px;
+    padding: 16px 6px 12px;
+    border: 1px solid var(--color-line-2);
+    border-radius: 3px;
+    background: var(--color-surface);
+    color: var(--color-ink);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      border-color 0.3s var(--ease),
+      background-color 0.3s var(--ease),
+      box-shadow 0.3s var(--ease),
+      translate 0.4s var(--ease-out-strong);
+  }
+  .pdp-size:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+  .pdp-size__bottle {
+    display: flex;
+    align-items: flex-end;
+    height: 34px;
+  }
+  .pdp-size__bottle svg {
+    display: block;
+    transform-origin: 50% 100%;
+    transition:
+      scale 0.5s var(--spring),
+      opacity 0.3s var(--ease);
+  }
+  .pdp-size__ml {
+    font: 400 12.5px/1 var(--f-label);
+    letter-spacing: 0.08em;
+  }
+  .pdp-size__sub {
+    font-size: 11px;
+    line-height: 1;
+    color: var(--color-ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+  /* the choice: an ink border (an inset ring, so nothing around it moves) and the bottle stands a little taller */
+  .pdp-size[aria-checked="true"] {
+    border-color: var(--color-ink);
+    box-shadow: inset 0 0 0 1px var(--color-ink);
+    background: var(--color-w0);
+  }
+  .pdp-size[aria-checked="true"] .pdp-size__bottle svg {
+    scale: 1.08;
+  }
+  .pdp-size[aria-checked="true"] .pdp-size__sub {
+    color: var(--color-ink-2);
+  }
+  /* announced, not on sale: the bottle is quieter */
+  .pdp-size[data-state="soon"] .pdp-size__bottle svg,
+  .pdp-size[data-state="soldout"] .pdp-size__bottle svg {
+    opacity: 0.55;
+  }
+  .pdp-size__tag {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    translate: -50% 0;
+    padding: 3px 8px 2.5px;
+    border: 1px solid var(--color-line-2);
+    border-radius: 999px;
+    background: var(--color-surface);
+    font: 400 8.5px/1 var(--f-label);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--color-ink-2);
+  }
+  .pdp-size__tag.is-best {
+    border-color: var(--color-cta);
+    background: var(--color-cta);
+    color: var(--color-w0);
+  }
+  @media (hover: hover) {
+    .pdp-size:hover {
+      border-color: var(--color-ink-3);
+      translate: 0 -2px;
+    }
+    .pdp-size[aria-checked="true"]:hover {
+      border-color: var(--color-ink);
+    }
+  }
+  @media (max-width: 380px) {
+    .pdp-size {
+      min-height: 92px;
+      padding-inline: 4px;
+    }
+    .pdp-size__tag {
+      padding-inline: 6px;
+      letter-spacing: 0.1em;
+    }
+  }
+
+  /* a size that is not on sale yet: the button's place is held by a quiet, disabled note (never a dead-looking CTA) */
+  .pdp-soon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 18px 32px;
+    border: 1px dashed var(--color-line-2);
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--color-ink) 3%, transparent);
+    color: var(--color-ink-2);
+    font: 400 12px/1 var(--f-label);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: not-allowed;
+  }
+  .pdp-soon--sm {
+    width: auto;
+    padding: 12px 16px;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    white-space: nowrap;
+  }
+  .pdp-soon__alt {
+    margin: 12px 0 0;
+    text-align: center;
+    font-size: 12px;
+    color: var(--color-ink-3);
+  }
+  .pdp-soon__alt button {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  /* choosing a size swaps the gallery: it arrives with a short rise and fade (never on first load) */
+  @keyframes pdp-gal-in {
+    from {
+      opacity: 0;
+      translate: 0 12px;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+  .pdp-gal.is-swap {
+    animation: pdp-gal-in 0.55s var(--ease-out-strong) both;
+  }
+
+  /* the drawn bottle of a size with no photography yet says so */
+  .pdp-note {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    max-width: calc(100% - 24px);
+    margin: 0;
+    padding: 7px 11px 7px 9px;
+    border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--paper) 90%, transparent);
+    font: 400 10px/1.25 var(--f-label);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+    pointer-events: none;
+  }
+  .pdp-note i {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--frag, var(--color-ink-3));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pdp-gal.is-swap {
+      animation: none;
+    }
+    .pdp-size,
+    .pdp-size__bottle svg {
+      transition-duration: 0.01s;
+    }
+    .pdp-size:hover {
+      translate: none;
+    }
+  }
+}

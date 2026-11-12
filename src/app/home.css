@@ -224,7 +224,7 @@
   .rh-mega__pic::after {content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 75%,transparent);opacity:0;transition:opacity .5s var(--ease)}
   .rh-mega__pic .rh-dot {position:absolute;right:6px;bottom:6px;z-index:1;box-shadow:0 0 0 2px var(--hdr-tint)}
   /* the Discovery Set: the three packshots fanned in a frame of the same size; they spread apart on hover */
-  .rh-mega__trio {position:relative;flex:none;width:84px;height:97px}
+  .rh-mega__trio {position:relative;flex:none;width:104px;height:105px;overflow:hidden;border-radius:3px;background:var(--stone);box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 9%,transparent)}
   .rh-mega__trio img {position:absolute;left:calc(var(--k) * 19px);top:calc(12px + var(--k) * 6px);width:46px;height:57px;object-fit:cover;border-radius:2px;border:1px solid color-mix(in srgb,var(--ink) 12%,transparent);background:var(--stone);box-shadow:0 10px 18px -10px color-mix(in srgb,var(--ink) 45%,transparent);rotate:calc((var(--k) - 1) * -3deg);transition:translate .75s var(--expo),rotate .75s var(--expo)}
   @media(prefers-reduced-motion:reduce) {
     .rh-mega.is-open .rh-mega__item {animation:none}
@@ -266,7 +266,7 @@
   .rh-sb__frag {--dot:color-mix(in srgb,var(--c,#999) 88%,var(--ink));--roll-c:color-mix(in srgb,var(--c,#999) 70%,var(--ink));position:relative;isolation:isolate;display:block;padding-block:clamp(6px,1svh,8px)}
   .rh-sb__frag::before {content:"";position:absolute;inset:0 calc(var(--sb-px) * -.45);z-index:-1;border-radius:4px;background:linear-gradient(90deg,color-mix(in srgb,var(--c,#999) 14%,transparent),color-mix(in srgb,var(--c,#999) 2%,transparent));transform:scaleX(0);transform-origin:left center;transition:transform .75s var(--expo)}
   .rh-sb__frag-in {display:grid;grid-template-columns:auto minmax(0,1fr) auto;column-gap:16px;align-items:center}
-  .rh-sb__pic {position:relative;width:50px;aspect-ratio:1000/1150;overflow:hidden;border-radius:3px;background:var(--stone)}
+  .rh-sb__pic {position:relative;width:56px;aspect-ratio:4/5;overflow:hidden;border-radius:3px;background:var(--stone)}
   .rh-sb__pic img {display:block;width:100%;height:100%;object-fit:cover;transition:transform .9s var(--expo)}
   .rh-sb__pic::after {content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c,#999) 75%,transparent);opacity:0;transition:opacity .5s var(--ease)}
   .rh-sb__dot {position:absolute;right:4px;bottom:4px;z-index:1;width:8px;height:8px;border-radius:50%;background:var(--dot);box-shadow:0 0 0 2px var(--paper);transition:transform .55s var(--spring)}
@@ -289,12 +289,12 @@
   }
 
   /* the Discovery Set: the three packshots fanned in the dark card; hover spreads them apart and a sheen crosses the card */
-  .rh-sb__set {position:relative;overflow:hidden;isolation:isolate;display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"pics t t" "pics b p";gap:8px 16px;align-items:center;margin-top:clamp(12px,2.2svh,20px);padding:clamp(12px,2svh,16px) 18px;border:1px solid var(--onyx);background:var(--onyx);color:var(--champagne);transition:border-color .4s var(--ease),box-shadow .6s var(--expo)}
+  .rh-sb__set {position:relative;overflow:hidden;isolation:isolate;display:grid;grid-template-columns:clamp(84px,36%,160px) minmax(0,1fr) auto;grid-template-areas:"pics t t" "pics b p";gap:8px 16px;align-items:center;margin-top:clamp(12px,2.2svh,20px);padding:clamp(12px,2svh,16px) 18px;border:1px solid var(--onyx);background:var(--onyx);color:var(--champagne);transition:border-color .4s var(--ease),box-shadow .6s var(--expo)}
   .rh-sb__set--plain {grid-template-columns:1fr auto;grid-template-areas:"t p" "b p"}
   .rh-sb__set::after {content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(100deg,transparent 38%,rgba(255,244,222,.13) 50%,transparent 62%);transform:translateX(-120%);transition:transform 1.1s var(--expo)}
   .rh-sb__set:focus-visible {outline-color:var(--brass);border-color:var(--brass)}
   .rh-sb__set:focus-visible::after {transform:translateX(120%)}
-  .rh-sb__trio {grid-area:pics;position:relative;width:88px;height:48px;margin-right:4px}
+  .rh-sb__trio {grid-area:pics;position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;border-radius:3px;box-shadow:0 0 0 1px color-mix(in srgb,var(--champagne) 22%,transparent)}
   .rh-sb__trio img {position:absolute;left:calc(var(--k) * 24px);top:0;width:40px;height:46px;object-fit:cover;border-radius:2px;border:1px solid color-mix(in srgb,var(--champagne) 30%,transparent);background:#444;box-shadow:0 8px 14px -8px rgba(0,0,0,.65);rotate:calc((var(--k) - 1) * -3deg);transition:translate .75s var(--expo),rotate .75s var(--expo)}
   .rh-sb__set-t {grid-area:t;font:300 1.05rem/1.25 var(--f-label);letter-spacing:.12em;text-transform:uppercase;text-wrap:balance}
   .rh-sb__set-badge {grid-area:b;justify-self:start;padding:5px 10px;border:1px solid color-mix(in srgb,var(--champagne) 30%,transparent);border-radius:999px;font:500 10px/1 var(--f-label);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;color:color-mix(in srgb,var(--champagne) 80%,transparent)}
@@ -476,6 +476,17 @@
   .rh-tile__price s {color:var(--ink-3);font-size:13px}
   .rh-tile .rh-btn {min-width:min(100%,210px)}
   .rh-quiz {background:var(--stone);padding-block:clamp(64px,9vw,120px);scroll-margin-top:var(--hh)}
+  /* "Not sure which": dark (--onyx) now that the Discovery Set below it is light, so the home page alternates. Like .ac-dark (account.css)
+     it re-points the colour tokens, so the Tailwind-written quiz (text-ink, border-line-2, bg-surface, the buttons) reads right on it. */
+  .rh-quiz--dark {background:var(--onyx);color:var(--champagne);color-scheme:dark;
+    --color-bg:var(--onyx);--color-surface:color-mix(in srgb,var(--champagne) 5%,var(--onyx));--color-surface-2:color-mix(in srgb,var(--champagne) 9%,var(--onyx));
+    --color-ink:var(--champagne);--color-ink-2:color-mix(in srgb,var(--champagne) 78%,var(--onyx));--color-ink-3:color-mix(in srgb,var(--champagne) 62%,var(--onyx));
+    --color-line:color-mix(in srgb,var(--champagne) 13%,var(--onyx));--color-line-2:color-mix(in srgb,var(--champagne) 24%,var(--onyx));
+    --color-cta:var(--champagne);--color-cta-hover:color-mix(in srgb,var(--champagne) 84%,var(--paper));
+    --color-w0:var(--onyx);--color-w1:color-mix(in srgb,var(--champagne) 5%,var(--onyx));--color-w2:color-mix(in srgb,var(--champagne) 24%,var(--onyx));--color-w4:var(--onyx);
+    --ink:var(--champagne);--ink-2:color-mix(in srgb,var(--champagne) 78%,var(--onyx));--ink-3:color-mix(in srgb,var(--champagne) 62%,var(--onyx));
+    --line-2:color-mix(in srgb,var(--champagne) 24%,var(--onyx))}
+  .rh-quiz--dark :focus-visible {outline-color:var(--champagne)}
   .rh-quiz__grid {display:grid;gap:clamp(30px,5vw,52px)}
   .rh-quiz__intro {display:grid;gap:16px;justify-items:start}
   .rh-quiz__bar {display:flex;gap:8px;margin-top:6px}
@@ -680,7 +691,7 @@
     .rh-dset__in>.rh-eyebrow {order:1}
     .rh-dset__h {order:2;margin-top:14px}
     .rh-dset__h2 {order:3;margin-top:10px;align-self:center;max-width:26ch}
-    .rh-dset__scene {order:4;position:relative;inset:auto;z-index:auto;width:100%;aspect-ratio:4/3;margin-top:30px}
+    .rh-dset__scene {order:4;position:relative;inset:auto;z-index:auto;width:100%;aspect-ratio:1/1.1;margin-top:30px}
     .rh-dset__scene .rh-dset__art {filter:none}
     .rh-dset__scene .rh-sc-d {display:none}
     .rh-dset__scene .rh-sc-m {display:block}
@@ -700,7 +711,7 @@
     .rh-dset__scene {max-height:520px}
   }
   @media(min-width:900px) {
-    .rh-dset {display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);align-items:stretch;min-height:clamp(580px,82vh,780px);isolation:auto}
+    .rh-dset {display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);align-items:stretch;min-height:clamp(660px,90vh,880px);isolation:auto}
     .rh-dset__scene {position:relative;inset:auto;z-index:auto;grid-column:1;grid-row:1}
     .rh-dset__scene .rh-dset__art {position:absolute;inset:0;width:100%;height:100%;filter:none}
     .rh-dset__scene::after {display:none}
@@ -940,10 +951,80 @@
     .rh-unbox__grid {grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);column-gap:clamp(48px,6vw,96px);max-width:1280px}
   }
 
+  /* ------------------------------------------------------------------
+     The Discovery Set, light on the home page (.rh-dset--light: the stone ground swaps in for onyx and ink for champagne,
+     so every rule above reads right on it) and the interactive stage (DiscoveryStage, .dset-*).
+     ------------------------------------------------------------------ */
+  .rh-dset--light {--onyx:var(--stone);--champagne:var(--ink);background:var(--stone);color:var(--ink)}
+  .rh-dset--light .rh-dset__scene::after {display:none}
+  .rh-dset--light .rh-eyebrow {color:var(--ink-3)}
+  .rh-dset--light .rh-dset__cta:hover {background:color-mix(in srgb,var(--ink) 86%,var(--paper))}
+  .rh-dset__more {display:none}
+  /* the Discovery cards show ONE picture of the three 10 ml bottles (menu-trio-light / menu-trio-dark.webp), not three fanned packshots */
+  .rh-mega__trio .rh-mega__trio-one {position:absolute;inset:0;left:0;top:0;width:100%;height:100%;object-fit:cover;rotate:none;border:0;border-radius:0;box-shadow:none;background:none;transition:scale .9s var(--expo)}
+  .rh-mega__item:hover .rh-mega__trio .rh-mega__trio-one {translate:none;rotate:none;scale:1.06}
+  .rh-sb__trio .rh-sb__trio-one {position:absolute;inset:0;left:0;top:0;width:100%;height:100%;object-fit:cover;rotate:none;border:0;border-radius:0;box-shadow:none;background:none;transition:scale .9s var(--expo)}
+  .rh-sb__set:hover .rh-sb__trio .rh-sb__trio-one {translate:none;rotate:none;scale:1.07}
+  .dset-art {position:absolute;inset:0;display:block;overflow:hidden;container-type:size;--mx:0;--my:0;-webkit-tap-highlight-color:transparent}
+  a.dset-art {cursor:pointer}
+  .dset-art--dark {color:#f5f2eb;--dset-tag:#f5f2eb}
+  .dset-art--light {color:#1f1d1b;--dset-tag:#1f1d1b}
+  .dset-art:focus-visible {outline:2px solid currentColor;outline-offset:-8px}
+  .dset-cover {position:absolute;inset:0}
+  /* a box that covers its frame the way object-fit:cover would; the bottles are placed in it as a share of the picture */
+  .dset-stage {position:absolute;left:50%;top:50%;width:max(100cqw,calc(100cqh * var(--ar)));aspect-ratio:var(--ar);transform:translate(-50%,-50%)}
+  .dset-bg {position:absolute;inset:0;width:100%;height:100%;display:block;max-width:none;transform:translate3d(calc(var(--mx) * -7px),calc(var(--my) * -4px),0) scale(1.03);transition:transform .9s var(--ease)}
+  .dset-b {position:absolute;display:block;color:inherit;text-decoration:none;transform:translate3d(calc(var(--mx) * var(--d) * 10px),calc(var(--my) * var(--d) * 4px),0);transition:transform .7s var(--ease);-webkit-tap-highlight-color:transparent}
+  .dset-bi {position:relative;display:block;transform-origin:50% 100%;transition:transform .9s var(--expo),opacity .55s var(--ease),filter .55s var(--ease)}
+  .dset-img {position:relative;z-index:1;display:block;width:100%;height:auto;max-width:none}
+  /* the light of the bottle's own fragrance, behind the glass */
+  .dset-glow {position:absolute;z-index:0;left:-90%;right:-90%;top:6%;bottom:-3%;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--tint) 62%,transparent),transparent 74%);opacity:0;transition:opacity .8s var(--ease);pointer-events:none}
+  .dset-art--light .dset-glow {background:radial-gradient(closest-side,color-mix(in srgb,var(--tint) 46%,transparent),transparent 72%)}
+  .dset-rim {position:absolute;z-index:2;left:6.5%;top:24%;bottom:11%;width:2px;border-radius:2px;background:linear-gradient(transparent,rgba(255,255,255,.9),transparent);opacity:0;transition:opacity .7s var(--ease);pointer-events:none}
+  /* the name stands above the bottle, the notes below it: both clear of the cap and of the lifted, enlarged glass */
+  .dset-tag {position:absolute;z-index:3;left:50%;display:block;white-space:nowrap;text-align:center;color:var(--dset-tag);opacity:0;pointer-events:none;transition:opacity .5s var(--ease),transform .8s var(--expo)}
+  .dset-tag--top {bottom:calc(100% + 7% + 12px);transform:translate(-50%,10px)}
+  .dset-tag--bot {top:calc(100% + clamp(14px,2.2cqh,26px));transform:translate(-50%,-10px)}
+  .dset-tag b {display:block;font:500 clamp(11px,1.15vw,14px)/1 var(--f-label);letter-spacing:.28em;text-transform:uppercase;padding-left:.28em}
+  .dset-tag small {display:block;font:400 clamp(9.5px,.95vw,11.5px)/1.2 var(--f-label);letter-spacing:.18em;text-transform:uppercase;opacity:.78;padding-left:.18em}
+  .dset-tag--bot::before {content:"";display:block;width:26px;height:1px;margin:0 auto 9px;background:var(--tint)}
+  .dset-sheen {position:absolute;inset:0;pointer-events:none;background:linear-gradient(104deg,transparent 40%,rgba(255,246,226,.12) 50%,transparent 60%);mix-blend-mode:screen;transform:translateX(-130%);animation:dset-sheen 10s var(--ease) 2.4s infinite}
+  .dset-art--light .dset-sheen {background:linear-gradient(104deg,transparent 40%,rgba(255,255,255,.55) 50%,transparent 60%);mix-blend-mode:soft-light}
+  .dset-hint {position:absolute;z-index:4;left:50%;bottom:clamp(14px,4cqh,40px);display:inline-flex;align-items:center;gap:10px;padding:11px 18px;border:1px solid color-mix(in srgb,currentColor 32%,transparent);border-radius:999px;background:color-mix(in srgb,var(--onyx) 22%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);font:500 10px/1 var(--f-label);letter-spacing:.24em;text-transform:uppercase;white-space:nowrap;opacity:0;transform:translate(-50%,8px);transition:opacity .5s var(--ease),transform .8s var(--expo);pointer-events:none}
+  .dset-art--light .dset-hint {background:color-mix(in srgb,#fff 40%,transparent)}
+  .dset-hint svg {transition:transform .6s var(--expo)}
+  /* arrival: the bottles rise in, one after another, the first time the stage is seen */
+  .dset-art[data-state="pre"] .dset-bi {opacity:0;transform:translateY(5%)}
+  .dset-art[data-state="in"] .dset-bi {animation:dset-rise 1.2s var(--expo) calc(var(--i) * .15s) backwards}
+  @keyframes dset-rise {from {opacity:0;transform:translateY(6%)}}
+  @keyframes dset-sheen {0%,55% {transform:translateX(-130%)} 100% {transform:translateX(130%)}}
+  @media(hover:hover) {
+    .dset-b:is(:hover,:focus-visible) .dset-bi {transform:translateY(-1.8%) scale(1.04)}
+    .dset-b:is(:hover,:focus-visible) .dset-glow, .dset-b:is(:hover,:focus-visible) .dset-rim {opacity:1}
+    .dset-b:is(:hover,:focus-visible) .dset-tag {opacity:1;transform:translate(-50%,0)}
+    .dset-art:has(.dset-b:is(:hover,:focus-visible)) .dset-hint {opacity:0;transform:translate(-50%,8px)}
+    .dset-stage:has(.dset-b:is(:hover,:focus-visible)) .dset-b:not(:is(:hover,:focus-visible)) .dset-bi {opacity:.5;filter:saturate(.7)}
+    a.dset-art:hover .dset-hint, a.dset-art:focus-visible .dset-hint {opacity:1;transform:translate(-50%,0)}
+    a.dset-art:hover .dset-hint svg {transform:translateX(4px)}
+  }
+  @media(hover:none) {
+    .dset-tag {display:none}
+    .dset-hint {opacity:.92;transform:translate(-50%,0)}
+  }
+  @media(max-width:899px) {
+    .dset-hint {font-size:9.5px;padding:10px 15px}
+  }
+  @media(min-width:900px) {
+    .rh-dset--light .rh-dset__more {display:inline-flex;margin-top:26px;color:var(--ink)}
+  }
+  @media(prefers-reduced-motion:reduce) {
+    .dset-sheen {animation:none;display:none}
+    .dset-bg, .dset-b, .dset-bi, .dset-glow, .dset-rim, .dset-tag, .dset-hint, .dset-hint svg {transition-duration:.01s}
+    .dset-art[data-state] .dset-bi {animation:none;opacity:1;transform:none}
+  }
 }
 
   /* touch: the 2.6 s scale-settle of the big hero photo is skipped (it kept the GPU busy while the page was still loading); it must come after the rules that set the animation */
   @media(pointer:coarse) {
     .rh-hero__media .rh-hero__art, .rh-hero__media img {animation:none}
   }
-

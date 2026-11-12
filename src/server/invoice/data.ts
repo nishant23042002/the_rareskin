@@ -17,6 +17,8 @@ import {
   DISCOVERY_SET_SLUG,
   FRAGRANCE_PALETTE,
   isFragranceSlug,
+  familySlug,
+  mlFromName,
   type FragranceSlug,
 } from "@/lib/catalog";
 
@@ -145,10 +147,12 @@ function pickImage(media: ProductDoc["media"] | undefined): string | null {
   );
 }
 
-function concentrationFor(slug: string): string {
+function concentrationFor(slug: string, name?: string): string {
   if (slug === DISCOVERY_SET_SLUG) return "Discovery Set — 3 × 10 ml";
   if (isFragranceSlug(slug)) {
-    return `Extrait de Parfum — ${FRAGRANCE_PALETTE[slug as FragranceSlug].volumeMl} ml`;
+    // a size's order line says its size in its name ("AUREVAN 10 ml")
+    const ml = mlFromName(name) ?? FRAGRANCE_PALETTE[slug as FragranceSlug].volumeMl;
+    return `Extrait de Parfum — ${ml} ml`;
   }
   return "";
 }
@@ -282,11 +286,11 @@ export async function loadInvoiceData(
 
   const items: InvoiceLine[] = o.items.map((i) => {
     const p = byId.get(String(i.productId));
-    const slug = p?.slug ?? i.slug;
+    const slug = familySlug(p?.slug ?? i.slug);
     return {
       name: i.name,
       sku: i.sku,
-      concentration: concentrationFor(slug),
+      concentration: concentrationFor(slug, i.name),
       noteLine: titleCaseNotes(p?.notes ?? []),
       juice: isFragranceSlug(slug)
         ? FRAGRANCE_PALETTE[slug as FragranceSlug].juice

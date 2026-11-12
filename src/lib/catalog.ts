@@ -31,6 +31,32 @@ export function isFragranceSlug(value: string): value is FragranceSlug {
   return (FRAGRANCE_SLUGS as readonly string[]).includes(value);
 }
 
+/**
+ * The fragrance a product slug belongs to. A size is its own product (`aurevan-10ml`), but its artwork, its page, its
+ * reviews and its thumbnails are the fragrance's: `familySlug("aurevan-10ml") === "aurevan"`.
+ */
+export function familySlug(slug: string): string {
+  return slug.replace(/-\d+ml$/, "");
+}
+
+/** the size in a product / order-line name (`AUREVAN 10 ml` -> 10), else null */
+export function mlFromName(name: string | null | undefined): number | null {
+  const m = name?.match(/(\d+)\s*ml\b/i);
+  return m ? Number(m[1]) : null;
+}
+
+/** a size as a customer reads it: `50 ml` */
+export const sizeLabel = (ml: number): string => `${ml} ml`;
+
+/** fluid ounces as a customer reads them: 10 ml -> 0.34, 50 ml -> 1.7, 100 ml -> 3.4 */
+export function flOz(ml: number): string {
+  const v = ml / 29.5735;
+  return v < 1 ? v.toFixed(2) : v.toFixed(1);
+}
+
+/** how big a bottle of this size looks next to the 100 ml one (a bottle's linear size grows with the cube root of its volume) */
+export const sizeScale = (ml: number): number => Math.min(1.2, Math.cbrt(ml / 100));
+
 /** Paise-free INR the way the brand writes it: `₹799`, `₹1,499`. */
 export function formatINR(rupees: number): string {
   return `₹${rupees.toLocaleString("en-IN")}`;
@@ -73,6 +99,28 @@ export function cloudinaryVariant(
   return url.replace("/upload/", `/upload/${parts.join(",")}/`);
 }
 
+/**
+ * One size of a fragrance, as the product page shows it. The first entry of `Fragrance.variants` is always the
+ * fragrance's own (main) record; the others are its size records (`variantOf`). Money in rupees.
+ */
+export interface FragranceVariant {
+  /** the product record's slug (`aurevan`, `aurevan-10ml`) */
+  slug: string;
+  /** inventory SKU — what the bag and checkout carry */
+  sku: string;
+  volumeMl: number;
+  price: number;
+  mrp: number;
+  /** `available`: can be put in the bag now; `soon`: shown, not sold yet; `soldout`: sold out */
+  state: "available" | "soon" | "soldout";
+  /** the chip / button wording while `soon` ("Available soon", "Launching soon") */
+  soonLabel: string;
+  /** pictures uploaded for this size (admin → Catalogue); the main size also has the official set on the page */
+  gallery: { url: string; alt: string }[];
+  /** the fragrance's own record rather than a size record */
+  isMain: boolean;
+}
+
 export interface Fragrance {
   id: string;
   slug: FragranceSlug;
@@ -113,6 +161,8 @@ export interface Fragrance {
   /** denormalised from approved reviews; `count === 0` → nothing to show */
   rating: { average: number; count: number };
   seo: { metaTitle: string | null; metaDescription: string | null };
+  /** every size of this fragrance, smallest first (the main one included); one entry when it has no other size */
+  variants: FragranceVariant[];
 }
 
 export interface DiscoverySetInfo {

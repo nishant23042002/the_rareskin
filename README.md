@@ -104,6 +104,7 @@ pnpm db:migrate         # apply pending migrations
 pnpm db:migrate:status  # show migration state
 pnpm db:seed            # import the catalogue + settings (idempotent)
 pnpm db:check           # connectivity probe
+pnpm variants           # create the 10 ml + 100 ml size records (idempotent; --list shows every size)
 pnpm catalog list       # inspect the live catalogue
 pnpm catalog set aurevan price 749   # edit a field + bump the cache
 pnpm catalog set vayren stock 60     # set an inventory level
@@ -281,6 +282,30 @@ low-priority admin notification — **sign-ups are not stored anywhere yet**; wi
 list provider (or a `subscribers` collection) there before relying on the footer
 form. The client components (`ContactForm`, the footer's `FooterNewsletter`)
 already handle success and error states.
+
+### Sizes (10 / 50 / 100 ml)
+
+Each size is a **product record of its own** — its own SKU, price, stock, status and picture gallery — linked to its
+fragrance by `variantOf` (`aurevan-10ml` → `aurevan`). The fragrance's own record is the main size (50 ml). So the bag,
+checkout, stock ledger, orders and invoices need nothing special: they already key everything by SKU. `familySlug()`
+(`lib/catalog.ts`) maps a size back to its fragrance for artwork, links, reviews and thumbnails.
+
+- **Product page** (`/fragrances/<slug>`, `?size=10` opens on a size): a size chooser in the buy box (bottles drawn at
+  their size, price, "Soon" / "Best value" tags; radio group with arrow keys). Choosing a size swaps the price, the
+  button, the sticky bar **and the whole gallery** (`PdpGallery` is keyed by the size) — each size shows only its own
+  pictures. The 50 ml keeps the official photographs; a 10 ml / 100 ml shows what was uploaded to *its own record*
+  (Admin → Catalogue → the size → Pictures), and until then a drawn bottle at its size (three views: the bottle, the
+  three sizes side by side, a detail) with a "pictures at launch" note.
+- **"Soon"**: a size with `launch.soon` is listed and selectable but cannot be bought — the PDP shows a disabled
+  "Available soon" (wording editable per size), the cart/checkout drop it even if it has stock
+  (`isBuyable` / `hydrateItems`). Switching it on = untick "Not on sale yet" on the size's admin page, add stock, upload
+  its pictures. A price of ₹0 on a soon size reads "Price at launch".
+- **Launch state** (seeded by `pnpm variants`): 10 ml ₹399 "Available soon"; 100 ml "Launching soon" (price not set);
+  all stock 0. Run `pnpm catalog revalidate` after changing sizes from a script.
+- **Admin** (`/admin/catalogue`): sizes sit under their fragrance in the list (not draggable, badge `soon`); a fragrance
+  has a **Sizes** panel with "Add size" (new record copied from the fragrance, no stock, no pictures, `soon` by default);
+  a size's own page shows only what belongs to it (availability, price, stock, pictures) and links back to the fragrance.
+  Stock changes still go through the ledgered panel. API: `POST /api/admin/catalogue/<slug>` `{ action: "add_size", … }`.
 
 ### Product photography
 

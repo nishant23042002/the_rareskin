@@ -11,7 +11,7 @@ import {
   type ProductDoc,
 } from "@/server/models";
 import { nextStatuses } from "@/server/payments";
-import { DISCOVERY_SET_SLUG, isFragranceSlug } from "@/lib/catalog";
+import { DISCOVERY_SET_SLUG, familySlug, isFragranceSlug } from "@/lib/catalog";
 import { itemThumbPath } from "@/lib/item-thumb";
 import {
   ORDER_STATUSES,
@@ -72,9 +72,9 @@ async function itemVisuals(
     .lean<Pick<ProductDoc, "_id" | "slug" | "media">[]>();
   for (const d of docs) {
     out.set(String(d._id), {
-      image: itemThumbPath(d.slug) ?? pickImage(d.media),
-      href: hrefForSlug(d.slug),
-      isFragrance: isFragranceSlug(d.slug),
+      image: itemThumbPath(familySlug(d.slug)) ?? pickImage(d.media),
+      href: hrefForSlug(familySlug(d.slug)),
+      isFragrance: isFragranceSlug(familySlug(d.slug)),
     });
   }
   return out;
@@ -448,6 +448,8 @@ export async function getAdminDashboard(): Promise<AdminDashboard> {
     ]),
     Order.countDocuments({ status: { $in: ["confirmed", "processing"] } }),
     Product.countDocuments({
+      // a size that is not on sale yet has no stock on purpose
+      "launch.soon": { $ne: true },
       "inventory.trackInventory": true,
       $expr: { $lte: ["$inventory.stock", "$inventory.lowStockThreshold"] },
     }),

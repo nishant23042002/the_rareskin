@@ -4,27 +4,28 @@ import { useEffect, useRef, useState } from "react";
 import { Flacon } from "@/components/ui/flacon";
 import { Carousel } from "@/components/ui/carousel";
 import { cn } from "@/lib/cn";
-import type { FragranceImages, FragranceSlug } from "@/lib/catalog";
-import { pdpSlides } from "@/lib/pdp-images";
+import { sizeScale, type FragranceImages, type FragranceSlug, type FragranceVariant } from "@/lib/catalog";
+import { pdpSizeSlides, pdpSlides } from "@/lib/pdp-images";
 import { PdpViewer } from "./pdp-viewer";
+import { usePdpVariant } from "./pdp-variants";
 
 /**
  * PDP gallery — a draggable frame with dots, plus a thumbnail strip. A click on the frame (or its
  * enlarge button) opens `PdpViewer`: the picture lifts out of the page into a full-screen viewer with zoom,
  * swipe, thumbnails, and flies back when it is closed.
  *
- * The official product photographs (`@/config/pdp-gallery`, six per extrait) come
- * first; a photograph uploaded in the admin catalogue (`images.hero|flat|box`)
- * follows them. With neither, it falls back to the vector flacon in three label
- * states (packshot / detail / carton), so the swipe + dot + thumb mechanic is
- * always real.
+ * Every size has a gallery of its own, and choosing a size swaps the whole gallery (`PdpGallery` keys the body
+ * by the size, so the frame, the strip, the loaded pictures and the viewer all start over for the new bottle).
+ * The 50 ml is the fragrance's own: the official product photographs (`@/config/pdp-gallery`, six per extrait)
+ * come first, then any photograph uploaded in the admin catalogue (`images.hero|flat|box`) and its extra
+ * gallery. A 10 ml or 100 ml has what was uploaded to that size's own record (admin → Catalogue → the size →
+ * Product images). Until there is a picture, a size shows its bottle drawn in vector, at its size, in three
+ * views (the bottle, the three sizes side by side, a close detail), so the swipe + dot + thumb mechanic is
+ * always real and it is clear which bottle is on show.
  */
 
-const VECTOR_VIEWS = [
-  { key: "packshot", label: true, volume: true },
-  { key: "detail", label: false, volume: false },
-  { key: "carton", label: true, volume: false },
-] as const;
+const VIEWS = ["packshot", "sizes", "detail"] as const;
+type View = (typeof VIEWS)[number];
 
 const FRAME_BG =
   "linear-gradient(165deg, var(--color-w0), var(--color-w1) 60%, var(--color-w2))";
@@ -38,6 +39,79 @@ export function PdpGallery({
   name: string;
   images: FragranceImages;
 }) {
+  const { selected, variants, swaps } = usePdpVariant();
+  return (
+    <GalleryBody
+      key={selected.slug}
+      slug={slug}
+      name={name}
+      images={images}
+      variant={selected}
+      variants={variants}
+      swapped={swaps > 0}
+    />
+  );
+}
+
+/** The bottle drawn at its size: `packshot` with its label, `detail` bare, `sizes` the whole family, the one on show lit. */
+function Placeholder({
+  view,
+  slug,
+  variant,
+  variants,
+  thumb = false,
+}: {
+  view: View;
+  slug: FragranceSlug;
+  variant: FragranceVariant;
+  variants: FragranceVariant[];
+  thumb?: boolean;
+}) {
+  const ml = variant.volumeMl;
+  // the 100 ml fills the frame's height; the others are drawn smaller by the same ratio as the real bottles
+  const base = thumb ? 44 : 46;
+  if (view === "sizes") {
+    return (
+      <span className="absolute inset-0 flex items-end justify-center gap-[5%] px-[8%] pb-[9%]">
+        {variants.map((v) => (
+          <span
+            key={v.slug}
+            className="flex flex-col items-center gap-[5%] transition-opacity duration-500"
+            style={{ width: `${base * 0.6 * sizeScale(v.volumeMl)}%`, opacity: v.volumeMl === ml ? 1 : 0.34 }}
+          >
+            <Flacon fragrance={slug} />
+            {!thumb && (
+              <i className="text-[10.5px] tracking-[0.14em] text-ink-3 not-italic uppercase">{v.volumeMl} ml</i>
+            )}
+          </span>
+        ))}
+      </span>
+    );
+  }
+  return (
+    <span className="relative z-[1] block" style={{ width: `${base * sizeScale(ml)}%` }}>
+      <Flacon fragrance={slug} label={view === "packshot"} volume={view === "packshot"} ml={ml} />
+    </span>
+  );
+}
+
+function GalleryBody({
+  slug,
+  name,
+  images,
+  variant,
+  variants,
+  swapped,
+}: {
+  slug: FragranceSlug;
+  name: string;
+  images: FragranceImages;
+  variant: FragranceVariant;
+  variants: FragranceVariant[];
+  /** the visitor has chosen a size: this gallery arrives with a short fade (never on first load) */
+  swapped: boolean;
+}) {
+  const label = variant.isMain ? name : `${name} ${variant.volumeMl} ml`;
   const [active, setActive] = useState(0);
   // the full-screen viewer: open / which picture, and whether the page's own picture is hidden (it is
   // while the viewer holds it, so the one that flies is never doubled)
@@ -77,7 +151,9 @@ export function PdpGallery({
 
   // the order lives in `@/lib/pdp-images`, shared with every other surface that
   // shows this product's first picture
-  const all = pdpSlides(slug, images, name);
+  const all = variant.isMain
+    ? pdpSlides(slug, images, name, variant.gallery)
+    : pdpSizeSlides(slug, variant.volumeMl, name, variant.gallery);
   const slides = all.length > 0 ? all : null;
 
   const openViewer = (i: number) => {
@@ -97,7 +173,10 @@ export function PdpGallery({
 
   return (
     <div
-      className="grid gap-3 lg:sticky lg:top-[calc(var(--announce-h)+var(--header-h)+24px)]"
+      className={cn(
+        "pdp-gal grid gap-3 lg:sticky lg:top-[calc(var(--announce-h)+var(--header-h)+24px)]",
+        swapped && "is-swap",
+      )}
       onPointerDownCapture={() => want(active - 1, active + 1)}
       onPointerEnter={() => want(active + 1)}
       onFocusCapture={() => want(active - 1, active + 1)}
@@ -116,74 +195,81 @@ export function PdpGallery({
           openViewer(active);
         }}
       >
-      <Carousel
-        ariaLabel={`${name} images`}
-        dotsInside
-        activeIndex={active}
-        onActiveChange={go}
-        viewportClassName="rounded-[3px] border border-line"
-      >
-        {slides
-          ? slides.map((s, idx) => (
-              <div
-                key={s.key}
-                className="relative aspect-[1/1.06] overflow-hidden"
-                style={{ background: FRAME_BG }}
-              >
-                {wanted.includes(idx) && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={s.full}
-                    srcSet={s.srcSet}
-                    sizes={s.srcSet ? "(min-width: 1024px) 560px, 100vw" : undefined}
-                    alt={s.alt}
-                    className="h-full w-full object-cover"
-                    onLoad={(e) => {
-                      if (s.thumbWidth) return;
-                      const el = e.currentTarget;
-                      if (el.naturalWidth && el.naturalHeight)
-                        setMeasured((m) => (m[idx] ? m : { ...m, [idx]: el.naturalWidth / el.naturalHeight }));
+        <Carousel
+          ariaLabel={`${label} images`}
+          dotsInside
+          activeIndex={active}
+          onActiveChange={go}
+          viewportClassName="rounded-[3px] border border-line"
+        >
+          {slides
+            ? slides.map((s, idx) => (
+                <div
+                  key={s.key}
+                  className="relative aspect-[1/1.06] overflow-hidden"
+                  style={{ background: FRAME_BG }}
+                >
+                  {wanted.includes(idx) && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={s.full}
+                      srcSet={s.srcSet}
+                      sizes={s.srcSet ? "(min-width: 1024px) 560px, 100vw" : undefined}
+                      alt={s.alt}
+                      className="h-full w-full object-cover"
+                      onLoad={(e) => {
+                        if (s.thumbWidth) return;
+                        const el = e.currentTarget;
+                        if (el.naturalWidth && el.naturalHeight)
+                          setMeasured((m) => (m[idx] ? m : { ...m, [idx]: el.naturalWidth / el.naturalHeight }));
+                      }}
+                      // a slide that was asked for is fetched now (a lazy image inside a clipped, sliding
+                      // track is not reliably "near"); the one on show is the priority, a neighbour is not
+                      loading="eager"
+                      fetchPriority={idx === active ? "high" : "low"}
+                      decoding="async"
+                    />
+                  )}
+                </div>
+              ))
+            : VIEWS.map((v) => (
+                <div
+                  key={v}
+                  className="relative grid aspect-[1/1.06] place-items-center overflow-hidden"
+                  style={{ background: FRAME_BG }}
+                >
+                  <span
+                    className="pointer-events-none absolute inset-0 opacity-50"
+                    style={{
+                      background:
+                        "linear-gradient(112deg, transparent 42%, rgba(255,255,255,0.5) 52%, transparent 62%)",
                     }}
-                    // a slide that was asked for is fetched now (a lazy image inside a clipped, sliding
-                    // track is not reliably "near"); the one on show is the priority, a neighbour is not
-                    loading="eager"
-                    fetchPriority={idx === active ? "high" : "low"}
-                    decoding="async"
                   />
-                )}
-              </div>
-            ))
-          : VECTOR_VIEWS.map((v) => (
-              <div
-                key={v.key}
-                className="relative grid aspect-[1/1.06] place-items-center overflow-hidden"
-                style={{ background: FRAME_BG }}
-              >
-                <span
-                  className="pointer-events-none absolute inset-0 opacity-50"
-                  style={{
-                    background:
-                      "linear-gradient(112deg, transparent 42%, rgba(255,255,255,0.5) 52%, transparent 62%)",
-                  }}
-                />
-                <span className="relative z-[1] block w-[46%]">
-                  <Flacon fragrance={slug} label={v.label} volume={v.volume} />
-                </span>
-              </div>
-            ))}
-      </Carousel>
+                  <Placeholder view={v} slug={slug} variant={variant} variants={variants} />
+                </div>
+              ))}
+        </Carousel>
         {slides && (
           <button
             ref={expandRef}
             type="button"
             className="pdp-expand"
             onClick={() => openViewer(active)}
-            aria-label={`Enlarge ${name} picture ${active + 1}`}
+            aria-label={`Enlarge ${label} picture ${active + 1}`}
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
             </svg>
           </button>
+        )}
+        {/* a size with no photography yet says so, so the drawn bottle is never taken for the real thing */}
+        {!slides && !variant.isMain && (
+          <p className="pdp-note" role="status">
+            <i aria-hidden />
+            {variant.state === "soon"
+              ? `${variant.soonLabel || "Available soon"} · pictures at launch`
+              : `Photography of the ${variant.volumeMl} ml is on its way`}
+          </p>
         )}
       </div>
 
@@ -192,7 +278,7 @@ export function PdpGallery({
           open={viewer.open}
           index={viewer.index}
           slides={viewerSlides}
-          name={name}
+          name={label}
           originFor={() => frameRef.current?.getBoundingClientRect() ?? null}
           onIndexChange={(i) => {
             setViewer((v) => ({ ...v, index: i }));
@@ -214,7 +300,7 @@ export function PdpGallery({
                 type="button"
                 onClick={() => go(i)}
                 onPointerEnter={() => want(i)}
-                aria-label={`${name} — view ${i + 1}`}
+                aria-label={`${label} — view ${i + 1}`}
                 aria-current={i === active}
                 className={cn(
                   "aspect-square flex-1 overflow-hidden rounded-[2px] border transition-colors",
@@ -231,22 +317,20 @@ export function PdpGallery({
                 />
               </button>
             ))
-          : VECTOR_VIEWS.map((v, i) => (
+          : VIEWS.map((v, i) => (
               <button
-                key={v.key}
+                key={v}
                 type="button"
                 onClick={() => setActive(i)}
-                aria-label={`${name} — view ${i + 1}`}
+                aria-label={`${label} — view ${i + 1}`}
                 aria-current={i === active}
                 className={cn(
-                  "grid aspect-square flex-1 place-items-center rounded-[2px] border transition-colors",
+                  "relative grid aspect-square flex-1 place-items-center overflow-hidden rounded-[2px] border transition-colors",
                   i === active ? "border-ink-2" : "border-line hover:border-line-2",
                 )}
                 style={{ background: FRAME_BG }}
               >
-                <span className="block w-[42%]">
-                  <Flacon fragrance={slug} label={v.label} volume={v.volume} />
-                </span>
+                <Placeholder view={v} slug={slug} variant={variant} variants={variants} thumb />
               </button>
             ))}
       </div>

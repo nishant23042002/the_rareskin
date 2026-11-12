@@ -1,4 +1,4 @@
-import { isFragranceSlug } from "@/lib/catalog";
+import { familySlug, isFragranceSlug } from "@/lib/catalog";
 
 /**
  * The picture of an ordered item — checkout review, order confirmation, account
@@ -14,5 +14,6 @@ import { isFragranceSlug } from "@/lib/catalog";
  * Isomorphic (no server-only imports): safe in client components.
  */
 export function itemThumbPath(slug: string): string | null {
-  return isFragranceSlug(slug) ? `/images/pdp/${slug}/item-thumb.jpg` : null;
+  const family = familySlug(slug);
+  return isFragranceSlug(family) ? `/images/pdp/${family}/item-thumb.jpg` : null;
 }

@@ -9,6 +9,7 @@ import { getCurrentUser } from "@/server/auth";
 import { COOKIES_SECURE, COOKIE_HOST_PREFIX } from "@/lib/auth";
 import { toRupees } from "@/lib/money";
 import { itemThumbPath } from "@/lib/item-thumb";
+import { familySlug } from "@/lib/catalog";
 import {
   MAX_CART_LINES,
   MAX_LINE_QTY,
@@ -286,7 +287,7 @@ interface HydratedCart {
  *  only the Discovery Set and unknown products ever get there). */
 function lineImage(doc: ProductDoc): string | null {
   return (
-    itemThumbPath(doc.slug) ??
+    itemThumbPath(familySlug(doc.slug)) ??
     doc.media?.flat?.url ??
     doc.media?.hero?.url ??
     null
@@ -329,6 +330,7 @@ export async function hydrateItems(
     const sellable =
       doc &&
       doc.status === "active" &&
+      !doc.launch?.soon &&
       (!doc.inventory.trackInventory ||
         doc.inventory.allowBackorder ||
         doc.inventory.stock > 0);
@@ -344,8 +346,9 @@ export async function hydrateItems(
     const unitPrice = toRupees(doc.pricing.price);
     lines.push({
       productId: String(doc._id),
-      slug: doc.slug,
-      name: doc.name,
+      // a size's artwork, page and reviews are its fragrance's; its name says which size it is
+      slug: familySlug(doc.slug),
+      name: doc.variantOf ? `${doc.name} ${doc.volumeMl} ml` : doc.name,
       sku,
       image: lineImage(doc),
       qty,

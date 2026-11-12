@@ -12,7 +12,7 @@ import {
 } from "@/server/models";
 import { getSiteSettings } from "@/server/data/settings";
 import { formatPaise } from "@/lib/money";
-import { DISCOVERY_SET_SLUG, isFragranceSlug } from "@/lib/catalog";
+import { DISCOVERY_SET_SLUG, isFragranceSlug, mlFromName } from "@/lib/catalog";
 import { itemThumbPath } from "@/lib/item-thumb";
 import { SITE, CONTACT, absoluteUrl } from "@/lib/site";
 
@@ -109,9 +109,10 @@ async function productVisuals(
   return out;
 }
 
-function concentrationFor(slug: string): string {
+function concentrationFor(slug: string, name?: string): string {
   if (slug === DISCOVERY_SET_SLUG) return "Discovery Set · 3 × 10 ml";
-  return "Extrait de Parfum · 50 ml";
+  // a size's order line says its size in its name ("AUREVAN 10 ml")
+  return `Extrait de Parfum · ${mlFromName(name) ?? 50} ml`;
 }
 
 function itemsFor(
@@ -134,7 +135,7 @@ function itemsFor(
     return {
       name: i.name,
       slug: i.slug,
-      concentration: concentrationFor(i.slug),
+      concentration: concentrationFor(i.slug, i.name),
       noteLine: notes.length
         ? notes
             .map((n) => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase())

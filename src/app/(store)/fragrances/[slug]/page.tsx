@@ -8,15 +8,16 @@ import { Flacon } from "@/components/ui/flacon";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { AddToBagButton } from "@/components/cart/add-to-bag-button";
 import { PdpGallery } from "@/components/product/pdp-gallery";
+import { PdpBuyBox } from "@/components/product/pdp-buybox";
+import { PdpSizeLine, PdpVariantsProvider } from "@/components/product/pdp-variants";
 import { PdpScent } from "@/components/product/pdp-scent";
 import { PdpStickyBar } from "@/components/product/pdp-sticky-bar";
 import { Accordion } from "@/components/ui/accordion";
 import { Stars } from "@/components/ui/stars";
 import { PdpReviews } from "@/components/product/pdp-reviews";
 import { FAQ_GROUPS } from "@/lib/faq";
-import { FRAGRANCE_PALETTE, formatINR, type Fragrance } from "@/lib/catalog";
+import { FRAGRANCE_PALETTE, formatINR, type Fragrance, type FragranceVariant } from "@/lib/catalog";
 import { pdpCover } from "@/lib/pdp-images";
-import { Ticker } from "@/components/ui/ticker";
 import { SITE, absoluteUrl } from "@/lib/site";
 import { breadcrumbJsonLd } from "@/lib/seo";
 import {
@@ -65,10 +66,15 @@ const faqAnswer = (q: string): string | undefined =>
 
 export default async function FragrancePage({
   params,
+  searchParams,
 }: PageProps<"/fragrances/[slug]">) {
   const { slug } = await params;
   const f = await getFragranceBySlug(slug);
   if (!f) notFound();
+
+  // `?size=10` opens on that size (a shared link, the bag's "view" link); anything else opens on the fragrance's own
+  const asked = Number((await searchParams).size);
+  const initialMl = f.variants.find((v) => v.volumeMl === asked)?.volumeMl ?? f.volumeMl;
 
   const [related, reviews, settings, catalog] = await Promise.all([
     getRelatedFragrances(slug),
@@ -92,7 +98,6 @@ export default async function FragrancePage({
     ...(codOn ? [{ icon: "banknote" as const, title: "Cash on delivery", sub: "Pay when it arrives" }] : []),
     { icon: "returns", title: "7-day returns", sub: "For unopened bottles" },
   ];
-  const savePct = f.mrp > f.price ? Math.round(((f.mrp - f.price) / f.mrp) * 100) : 0;
 
   const set = settings.flags.discoverySetEnabled ? catalog.discoverySet : null;
   const cover = pdpCover(f.slug, f.images, f.name);
@@ -106,7 +111,7 @@ export default async function FragrancePage({
     { q: "Is it for men or women?", a: faqAnswer("Are the fragrances for men or women?") },
     {
       q: "What’s in the box",
-      a: `One ${f.volumeMl} ml Extrait de Parfum in the THE RARESKIN flacon, inside a recyclable outer carton with a short card on how to wear it.`,
+      a: "One Extrait de Parfum, in the size you choose, in the THE RARESKIN flacon, inside a recyclable outer carton with a short card on how to wear it.",
     },
     {
       q: "Shipping & returns",
@@ -124,6 +129,24 @@ export default async function FragrancePage({
       ? "https://schema.org/InStock"
       : "https://schema.org/PreOrder"
     : "https://schema.org/OutOfStock";
+  // one offer per size that can be bought or is sold out; a size that is only announced is not an offer yet
+  const offerOf = (v: FragranceVariant) => ({
+    "@type": "Offer",
+    sku: v.sku,
+    price: String(v.price),
+    priceCurrency: SITE.currency,
+    availability: v.isMain
+      ? availability
+      : v.state === "available"
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+    url: v.isMain ? url : `${url}?size=${v.volumeMl}`,
+    priceValidUntil: "2027-03-31",
+    seller: { "@type": "Organization", name: SITE.legalName },
+  });
+  const offers = f.variants
+    .filter((v) => v.isMain || (v.state !== "soon" && v.price > 0))
+    .map(offerOf);
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -139,15 +162,7 @@ export default async function FragrancePage({
       { "@type": "PropertyValue", name: "Volume", value: `${f.volumeMl} ml` },
       { "@type": "PropertyValue", name: "Notes", value: f.notes.join(", ") },
     ],
-    offers: {
-      "@type": "Offer",
-      price: String(f.price),
-      priceCurrency: SITE.currency,
-      availability,
-      url,
-      priceValidUntil: "2027-03-31",
-      seller: { "@type": "Organization", name: SITE.legalName },
-    },
+    offers: offers.length === 1 ? offers[0] : offers,
     ...(reviewsEnabled && reviews.summary.count > 0
       ? {
           aggregateRating: {
@@ -197,6 +212,7 @@ export default async function FragrancePage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJson) }}
       />
 
+      <PdpVariantsProvider variants={f.variants} initialMl={initialMl}>
       <Container className="max-w-[1280px]">
         <nav
           aria-label="Breadcrumb"
@@ -218,7 +234,7 @@ export default async function FragrancePage({
 
           <div>
             <p className="text-[10.5px] tracking-[0.24em] text-ink-3 uppercase">
-              Extrait de Parfum · {f.volumeMl} ml
+              <PdpSizeLine prefix="Extrait de Parfum · " />
             </p>
             <h1 className="mt-3 text-[clamp(2.1rem,4.6vw,3.1rem)] leading-[1.04] font-light tracking-[0.1em]">
               {f.name}
@@ -250,43 +266,8 @@ export default async function FragrancePage({
               {f.poem}
             </p>
 
-            {/* buy box — the page's conversion focus: price, one button, four reassurances */}
-            <div
-              data-buybox
-              className="mt-7 rounded-[4px] border border-line-2 bg-surface p-[clamp(18px,3vw,28px)] [box-shadow:var(--sh-card)]"
-            >
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                <span className="text-[clamp(2rem,3.8vw,2.6rem)] leading-none font-light tracking-[0.01em]">
-                  <Ticker text={formatINR(f.price)} />
-                </span>
-                {f.mrp > f.price && (
-                  <s className="text-[15px] text-ink-3">{formatINR(f.mrp)}</s>
-                )}
-                {savePct > 0 && (
-                  <span className="rounded-full bg-cta px-2.5 py-1 text-[9.5px] tracking-[0.14em] text-w0 uppercase">
-                    Launch price · {savePct}% off
-                  </span>
-                )}
-              </div>
-              <p className="mt-2.5 text-[11.5px] leading-relaxed text-ink-3">
-                {f.volumeMl} ml (1.7 fl oz) · inclusive of all taxes
-                {f.mrp > f.price ? ` · you save ${formatINR(f.mrp - f.price)}` : ""}
-              </p>
-
-              <AddToBagButton
-                sku={f.sku}
-                name={f.name}
-                price={f.price}
-                mrp={f.mrp}
-                fragrance={f.slug}
-                href={`/fragrances/${f.slug}`}
-                meta={`Extrait · ${f.volumeMl} ml`}
-                label={`Add to bag · ${formatINR(f.price)}`}
-                variant="solid"
-                size="lg"
-                className="mt-5 w-full"
-              />
-
+            {/* buy box — the page's conversion focus: the size, its price, one button, four reassurances */}
+            <PdpBuyBox name={f.name} slug={f.slug} juice={f.juice}>
               <ul className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3.5 border-t border-line pt-5">
                 {trust.map((t) => (
                   <li key={t.title} className="flex items-start gap-2.5">
@@ -302,7 +283,7 @@ export default async function FragrancePage({
                   </li>
                 ))}
               </ul>
-            </div>
+            </PdpBuyBox>
 
             {/* the soft alternative for someone who is not ready for 50 ml */}
             {set && (
@@ -444,15 +425,8 @@ export default async function FragrancePage({
         </section>
       </Container>
 
-      <PdpStickyBar
-        sku={f.sku}
-        name={f.name}
-        price={f.price}
-        mrp={f.mrp}
-        slug={f.slug}
-        volumeMl={f.volumeMl}
-        image={cover ? cover.tiny : null}
-      />
+      <PdpStickyBar name={f.name} slug={f.slug} image={cover ? cover.tiny : null} />
+      </PdpVariantsProvider>
     </main>
   );
 }

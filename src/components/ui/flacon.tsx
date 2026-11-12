@@ -1,5 +1,5 @@
 import { cn } from "@/lib/cn";
-import { FRAGRANCE_PALETTE, type FragranceSlug } from "@/lib/catalog";
+import { FRAGRANCE_PALETTE, flOz, type FragranceSlug } from "@/lib/catalog";
 
 /**
  * Vector stand-in for the real flacon photography: clear rectangular bottle,
@@ -13,6 +13,7 @@ export function Flacon({
   fragrance,
   label = false,
   volume = false,
+  ml,
   className,
 }: {
   fragrance: FragranceSlug;
@@ -20,6 +21,8 @@ export function Flacon({
   label?: boolean;
   /** add the "50 ml | 1.7 FL.OZ" line (implies label) */
   volume?: boolean;
+  /** the size printed on the label's volume line (a size record's own); the fragrance's default otherwise */
+  ml?: number;
   className?: string;
 }) {
   const f = FRAGRANCE_PALETTE[fragrance];
@@ -71,7 +74,7 @@ export function Flacon({
           </text>
           {volume && (
             <text x="80" y="252" fontSize="4.6" letterSpacing="1.1">
-              {`${f.volumeMl} ml  |  1.7 FL.OZ`}
+              {`${ml ?? f.volumeMl} ml  |  ${flOz(ml ?? f.volumeMl)} FL.OZ`}
             </text>
           )}
         </g>

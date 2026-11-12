@@ -21,18 +21,20 @@ interface PdpPhoto {
   /** width of the small file */
   small: number;
   alt: string;
+  /** folder under /images/pdp/ when it is not the fragrance's slug (a size's own set, `aurevan-10ml`) */
+  dir?: string;
 }
 
 /** width of the `tiny` file: the gallery's strip thumbnails (`scripts/brand-assets/make_pdp_tiny.py`) */
 export const PDP_TINY_WIDTH = 160;
 
 export function pdpPhotoSrc(
-  slug: FragranceSlug,
+  slug: FragranceSlug | string,
   p: PdpPhoto,
   size: "full" | "small" | "tiny",
 ): string {
   const w = size === "full" ? p.width : size === "small" ? p.small : PDP_TINY_WIDTH;
-  return `/images/pdp/${slug}/${p.stem}-${w}.webp`;
+  return `/images/pdp/${p.dir ?? slug}/${p.stem}-${w}.webp`;
 }
 
 export const PDP_GALLERY: Record<FragranceSlug, PdpPhoto[]> = {
@@ -61,3 +63,33 @@ export const PDP_GALLERY: Record<FragranceSlug, PdpPhoto[]> = {
     { stem: "06-with-carton", width: 1254, height: 1040, small: 640, alt: "VAYREN beside its carton on a pale shelf" },
   ],
 };
+
+/**
+ * The product pictures of a fragrance's smaller sizes (2026-11-12): the 10 ml of each extrait, made from the approved 10 ml
+ * flacon (slim cylinder, black leather-grain cap, silver collar, clear liquid, `ESSENTIALS | 10ml` label). Files:
+ * `public/images/pdp/<slug>-10ml/<stem>-<width>.webp`. The packshot leads, like the 50 ml's. Pictures uploaded to the
+ * size's own record in the admin follow these.
+ */
+function tenMl(slug: FragranceSlug, name: string, notes: string): PdpPhoto[] {
+  const dir = `${slug}-10ml`;
+  return [
+    { dir, stem: "01-packshot", width: 1000, height: 1150, small: 640, alt: `${name} extrait, 10 ml, on a plain studio background` },
+    { dir, stem: "02-dark-studio", width: 1600, height: 1600, small: 640, alt: `${name} 10 ml standing on a dark polished surface, lit from behind` },
+    { dir, stem: "03-label-detail", width: 1600, height: 1600, small: 640, alt: `Close-up of the ${name} 10 ml label: THE RARESKIN®, ${name}, ESSENTIALS | 10ml` },
+    { dir, stem: "04-notes", width: 1600, height: 1600, small: 640, alt: `${name} 10 ml beside its notes: ${notes}` },
+  ];
+}
+
+export const PDP_SIZE_GALLERY: Partial<Record<FragranceSlug, Record<number, PdpPhoto[]>>> = {
+  aurevan: { 10: tenMl("aurevan", "AUREVAN", "citrus, bergamot, white florals, musk, cedar") },
+  orvelis: { 10: tenMl("orvelis", "ORVELIS", "spices, amber, woods, vanilla, patchouli") },
+  vayren: { 10: tenMl("vayren", "VAYREN", "spices, leather, oud, smoke, amber") },
+};
+
+/** The Discovery Set's pictures (the set page): the three 10 ml extraits together. `public/images/pdp/discovery-set/`. */
+export const DISCOVERY_SET_GALLERY: PdpPhoto[] = [
+  { dir: "discovery-set", stem: "01-trio-packshot", width: 1000, height: 1150, small: 640, alt: "The three 10 ml extraits, AUREVAN, ORVELIS and VAYREN, side by side on a plain studio background" },
+  { dir: "discovery-set", stem: "02-trio-dark-studio", width: 1600, height: 1600, small: 640, alt: "The three 10 ml extraits standing on a dark polished surface, lit from behind" },
+  { dir: "discovery-set", stem: "03-meet-all-three", width: 1600, height: 1600, small: 640, alt: "Meet all three: AUREVAN fresh and elegant, ORVELIS warm and sophisticated, VAYREN bold and intense, with their notes" },
+  { dir: "discovery-set", stem: "04-how-it-works", width: 1600, height: 1600, small: 640, alt: "The Discovery Set in three steps: meet them, choose yours, the set price credited back toward your first 50 ml" },
+];

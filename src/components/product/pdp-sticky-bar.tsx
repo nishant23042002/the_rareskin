@@ -7,6 +7,8 @@ import { useCart } from "@/components/providers/cart-provider";
 import { cn } from "@/lib/cn";
 import { formatINR } from "@/lib/catalog";
 import type { FragranceSlug } from "@/lib/catalog";
+import { pdpSizeSlides } from "@/lib/pdp-images";
+import { usePdpVariant } from "./pdp-variants";
 
 /**
  * A slim buy bar for the product page. It slides up once the buy box has scrolled out of view above,
@@ -14,25 +16,22 @@ import type { FragranceSlug } from "@/lib/catalog";
  * reviews. It steps aside as soon as the bag has something in it (the bag bar takes the bottom strip
  * then, with Checkout), and while the bag drawer is open. While it is up it sets `data-pdp-bar` on
  * <html>, which lifts the floating offer note and the back-to-top button above it (`pdp.css`).
+ *
+ * It follows the size chosen in the buy box: that size's price, picture and SKU; a size that is not on sale
+ * yet shows a quiet "Available soon" in place of the button.
  */
 export function PdpStickyBar({
-  sku,
   name,
-  price,
-  mrp,
   slug,
-  volumeMl,
   image,
 }: {
-  sku: string;
   name: string;
-  price: number;
-  mrp: number;
   slug: FragranceSlug;
-  volumeMl: number;
+  /** the fragrance's cover picture (the 50 ml's); a size with pictures of its own shows its first */
   image: string | null;
 }) {
   const { count, isOpen } = useCart();
+  const { selected: v } = usePdpVariant();
   const [past, setPast] = useState(false);
 
   useEffect(() => {
@@ -53,13 +52,16 @@ export function PdpStickyBar({
     return () => document.documentElement.removeAttribute("data-pdp-bar");
   }, [show]);
 
+  const pic = v.isMain ? image : (pdpSizeSlides(slug, v.volumeMl, name, v.gallery)[0]?.tiny ?? image);
+  const priced = v.price > 0;
+
   return (
     <div className={cn("pdp-bar", show && "is-on")} aria-hidden={!show} inert={!show}>
       <div className="mx-auto flex w-full max-w-[1280px] items-center gap-3 px-4 py-3 sm:gap-4 sm:px-14 xl:px-[92px]">
-        {image ? (
+        {pic ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={image}
+            src={pic}
             alt=""
             width={44}
             height={44}
@@ -68,25 +70,37 @@ export function PdpStickyBar({
           />
         ) : null}
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[12px] tracking-[0.14em] uppercase">{name}</p>
+          <p className="truncate text-[12px] tracking-[0.14em] uppercase">
+            {name}
+            <span className="text-ink-3"> · {v.volumeMl} ml</span>
+          </p>
           <p className="mt-0.5 text-[12.5px] tabular-nums text-ink-2">
-            {formatINR(price)}
-            <s className="ml-1.5 text-[11px] text-ink-3">{formatINR(mrp)}</s>
+            {priced ? formatINR(v.price) : "Price at launch"}
+            {priced && v.mrp > v.price && (
+              <s className="ml-1.5 text-[11px] text-ink-3">{formatINR(v.mrp)}</s>
+            )}
           </p>
         </div>
-        <AddToBagButton
-          sku={sku}
-          name={name}
-          price={price}
-          mrp={mrp}
-          fragrance={slug}
-          href={`/fragrances/${slug}`}
-          meta={`Extrait · ${volumeMl} ml`}
-          label="Add to bag"
-          variant="solid"
-          size="sm"
-          className="shrink-0"
-        />
+        {v.state === "available" ? (
+          <AddToBagButton
+            key={v.sku}
+            sku={v.sku}
+            name={name}
+            price={v.price}
+            mrp={v.mrp}
+            fragrance={slug}
+            href={v.isMain ? `/fragrances/${slug}` : `/fragrances/${slug}?size=${v.volumeMl}`}
+            meta={`Extrait · ${v.volumeMl} ml`}
+            label="Add to bag"
+            variant="solid"
+            size="sm"
+            className="shrink-0"
+          />
+        ) : (
+          <span className="pdp-soon pdp-soon--sm shrink-0" aria-disabled="true">
+            {v.state === "soon" ? v.soonLabel || "Available soon" : "Sold out"}
+          </span>
+        )}
       </div>
     </div>
   );

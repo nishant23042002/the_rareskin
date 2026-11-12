@@ -11,6 +11,7 @@ import {
   cloudinaryVariant,
   isFragranceSlug,
   type BagSuggestion,
+  type FragranceVariant,
   type CatalogNavItem,
   type DiscoverySetInfo,
   type Fragrance,
@@ -52,11 +53,38 @@ function imagesFor(doc: ProductDoc): FragranceImages {
 
 function isBuyable(doc: ProductDoc): boolean {
   if (doc.status !== "active") return false;
+  // a size that is shown but not on sale yet (launch.soon) can never be bought
+  if (doc.launch?.soon) return false;
   const inv = doc.inventory;
   return !inv.trackInventory || inv.allowBackorder || inv.stock > 0;
 }
 
-function toFragrance(doc: ProductDoc): Fragrance {
+function toVariant(doc: ProductDoc, isMain: boolean): FragranceVariant {
+  const soon = Boolean(doc.launch?.soon);
+  return {
+    slug: doc.slug,
+    sku: doc.inventory.sku,
+    volumeMl: doc.volumeMl,
+    price: toRupees(doc.pricing.price),
+    mrp: toRupees(doc.pricing.mrp),
+    state: soon ? "soon" : isBuyable(doc) ? "available" : "soldout",
+    soonLabel: doc.launch?.label ?? "",
+    // only real (Cloudinary) pictures: a leftover local placeholder path is never shown
+    gallery: (doc.media?.gallery ?? [])
+      .filter((m) => /^https?:\/\//.test(m.url))
+      .map((m) => ({ url: m.url, alt: m.alt ?? "" })),
+    isMain,
+  };
+}
+
+/** the fragrance's own record plus its size records, smallest first */
+function variantsOf(doc: ProductDoc, sizes: ProductDoc[]): FragranceVariant[] {
+  return [toVariant(doc, true), ...sizes.map((d) => toVariant(d, false))].sort(
+    (a, b) => a.volumeMl - b.volumeMl,
+  );
+}
+
+function toFragrance(doc: ProductDoc, sizes: ProductDoc[] = []): Fragrance {
   return {
     id: String(doc._id),
     slug: isFragranceSlug(doc.slug) ? doc.slug : "aurevan",
@@ -95,7 +123,24 @@ function toFragrance(doc: ProductDoc): Fragrance {
       metaTitle: doc.seo?.metaTitle ?? null,
       metaDescription: doc.seo?.metaDescription ?? null,
     },
+    variants: variantsOf(doc, sizes),
   };
+}
+
+/** the active size records of these fragrances, keyed by fragrance slug */
+async function sizesBySlug(slugs: string[]): Promise<Map<string, ProductDoc[]>> {
+  const map = new Map<string, ProductDoc[]>();
+  if (slugs.length === 0) return map;
+  const docs = await Product.find({
+    kind: "fragrance",
+    status: "active",
+    variantOf: { $in: slugs },
+  }).lean<ProductDoc[]>();
+  for (const d of docs) {
+    const key = d.variantOf as string;
+    map.set(key, [...(map.get(key) ?? []), d]);
+  }
+  return map;
 }
 
 function toDiscoverySet(doc: ProductDoc): DiscoverySetInfo {
@@ -133,10 +178,12 @@ function toDiscoverySet(doc: ProductDoc): DiscoverySetInfo {
 export const getFragrances = unstable_cache(
   async (): Promise<Fragrance[]> => {
     await dbConnect();
-    const docs = await Product.find({ kind: "fragrance", status: "active" })
+    // the fragrances themselves: size records (variantOf) are not listed on their own
+    const docs = await Product.find({ kind: "fragrance", status: "active", variantOf: null })
       .sort({ order: 1 })
       .lean<ProductDoc[]>();
-    return docs.map(toFragrance);
+    const sizes = await sizesBySlug(docs.map((d) => d.slug));
+    return docs.map((d) => toFragrance(d, sizes.get(d.slug) ?? []));
   },
   ["catalog:fragrances"],
   { tags: [CATALOG_TAG], revalidate: REVALIDATE_SECONDS },
@@ -151,8 +198,11 @@ export function getFragranceBySlug(slug: string): Promise<Fragrance | null> {
         slug,
         kind: "fragrance",
         status: "active",
+        variantOf: null,
       }).lean<ProductDoc | null>();
-      return doc ? toFragrance(doc) : null;
+      if (!doc) return null;
+      const sizes = await sizesBySlug([doc.slug]);
+      return toFragrance(doc, sizes.get(doc.slug) ?? []);
     },
     ["catalog:fragrance", slug],
     { tags: [CATALOG_TAG, productTag(slug)], revalidate: REVALIDATE_SECONDS },

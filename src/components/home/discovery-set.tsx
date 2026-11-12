@@ -1,39 +1,37 @@
-import type { CSSProperties } from "react";
+import Link from "next/link";
 
 import { BagButton } from "@/components/cart/bag-button";
-import { Flacon } from "@/components/ui/flacon";
+import { RhIcon } from "@/components/ui/rh-icon";
 import {
   cloudinaryVariant,
   formatINR,
   type DiscoverySetInfo,
   type Fragrance,
 } from "@/lib/catalog";
-import { getHomeAsset, isFinal } from "@/lib/home-images";
-import { HomeImage } from "./home-image";
+import { DiscoveryStage } from "./discovery-stage";
 
 /**
- * The Discovery Set — a dark band where the picture and the words never share a
- * surface, so real photography can drop in without fighting the type. Wide
- * screens: the picture is the left half, the pitch sits on solid colour beside
- * it. Phones and tablets: heading, a clean 4:3 picture frame, the three vials'
- * names, the credit logic, then ONE full-width champagne bar. The set price is
- * credited in full toward a first 50 ml bottle — that is the whole argument.
- * Data comes from the catalogue (`@/server/data/catalog`).
+ * The Discovery Set — a band where the picture and the words never share a surface. Wide screens: the picture is the
+ * left half, the pitch sits on solid colour beside it. Phones and tablets: heading, a clean 4:3 picture frame, the
+ * three vials' names, the credit logic, then ONE full-width bar. The set price is credited in full toward a first
+ * 50 ml bottle — that is the whole argument. Data comes from the catalogue (`@/server/data/catalog`).
+ *
+ * Two looks, one component:
+ *  - `home`: LIGHT (stone ground, ink type, ink button); the whole picture is a link to /discovery-set.
+ *  - `page`: DARK (onyx), the set page's own band; each bottle links to its 10 ml page.
+ * The picture is the interactive stage (`DiscoveryStage`: the three bottles lift, light up and drift on the pointer);
+ * a photograph uploaded for the set in the catalogue still wins over it. (The flat dark picture of the manifest,
+ * `discovery-set-10ml`, is kept but no longer drawn.)
  */
-
-// where the three vials stand in the picture, as a share of it
-const STAND = [
-  { i: 0, left: "6%", width: "28%", bottom: "15%", rotate: -9 },
-  { i: 2, left: "66%", width: "28%", bottom: "15%", rotate: 9 },
-  { i: 1, left: "33%", width: "34%", bottom: "11%", rotate: 0 },
-];
 
 function Art({
   set,
   fragrances,
+  variant,
 }: {
   set: DiscoverySetInfo;
   fragrances: Fragrance[];
+  variant: "home" | "page";
 }) {
   const photo = cloudinaryVariant(set.image, { w: 1400, q: "auto:best" });
   if (photo) {
@@ -48,60 +46,29 @@ function Art({
       />
     );
   }
-  // the shipped picture (`discovery-set-10ml.webp`, 4:5) once it is final; the
-  // photograph uploaded for the set in the catalogue (above) still wins
-  const shipped = getHomeAsset("discovery-set-10ml");
-  if (isFinal(shipped)) {
-    return <HomeImage asset={shipped} fill className="rh-dset__art" />;
-  }
   return (
-    <div
-      aria-hidden="true"
-      className="rh-dset__art"
-      style={{
-        background: "var(--onyx)",
-      }}
-    >
-      <span
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "radial-gradient(62% 62% at 50% 48%,color-mix(in srgb,var(--champagne) 14%,transparent),transparent)",
-        }}
-      />
-      {STAND.map((s) => {
-        const f = fragrances[s.i];
-        if (!f) return null;
-        return (
-          <span
-            key={f.slug}
-            style={
-              {
-                position: "absolute",
-                left: s.left,
-                width: s.width,
-                bottom: s.bottom,
-                transform: `rotate(${s.rotate}deg)`,
-                transformOrigin: "50% 92%",
-                filter: "drop-shadow(0 22px 20px rgba(0,0,0,.55))",
-              } as CSSProperties
-            }
-          >
-            <Flacon fragrance={f.slug} label />
-          </span>
-        );
-      })}
-    </div>
+    <DiscoveryStage
+      tone={variant === "home" ? "light" : "dark"}
+      fragrances={fragrances.map((f) => ({ slug: f.slug, name: f.name, mood: f.mood, notes: f.notes ?? [] }))}
+      href={variant === "home" ? "/discovery-set" : undefined}
+      linkBottles={variant === "page"}
+      label={
+        variant === "home"
+          ? `${set.name}: three ${set.perVialMl} ml extraits, ${fragrances.map((f) => f.name).join(", ")}. Open the set`
+          : `${set.name}: ${fragrances.map((f) => f.name).join(", ")}`
+      }
+    />
   );
 }
 
 export function DiscoverySet({
   set,
   fragrances,
+  variant = "home",
 }: {
   set: DiscoverySetInfo;
   fragrances: Fragrance[];
+  variant?: "home" | "page";
 }) {
   // "Meet all three. Keep the one that becomes yours." → a heading + an italic line
   const [lead, ...rest] = set.headline.split(/(?<=[.!?])\s+/);
@@ -118,12 +85,12 @@ export function DiscoverySet({
 
   return (
     <section
-      className="rh-dset rh-dark"
+      className={`rh-dset ${variant === "home" ? "rh-dset--light" : "rh-dark"}`}
       id="discovery"
       aria-labelledby="dset-h"
     >
       <div className="rh-dset__scene">
-        <Art set={set} fragrances={fragrances} />
+        <Art set={set} fragrances={fragrances} variant={variant} />
       </div>
       <div className="rh-wrap rh-dset__in">
         <p className="rh-eyebrow">The Discovery Set</p>
@@ -150,6 +117,11 @@ export function DiscoverySet({
             &middot; COD available &middot; Free shipping across India
           </span>
         </p>
+        {variant === "home" && (
+          <Link className="rh-link-u rh-dset__more" href="/discovery-set">
+            Explore the set <RhIcon name="arrow" small />
+          </Link>
+        )}
         <div className="rh-dset__vials">
           {fragrances.map((f) => (
             <div key={f.slug}>

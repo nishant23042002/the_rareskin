@@ -8,7 +8,7 @@ import {
   type ProductDoc,
 } from "@/server/models";
 import { toRupees } from "@/lib/money";
-import { DISCOVERY_SET_SLUG, isFragranceSlug } from "@/lib/catalog";
+import { DISCOVERY_SET_SLUG, familySlug, isFragranceSlug } from "@/lib/catalog";
 import { itemThumbPath } from "@/lib/item-thumb";
 
 /**
@@ -65,9 +65,9 @@ async function productVisuals(
   for (const d of docs) {
     out.set(String(d._id), {
       // the official item thumbnail first (same as the checkout), then an upload
-      image: itemThumbPath(d.slug) ?? pickImage(d.media),
-      href: hrefForSlug(d.slug),
-      isFragrance: isFragranceSlug(d.slug),
+      image: itemThumbPath(familySlug(d.slug)) ?? pickImage(d.media),
+      href: hrefForSlug(familySlug(d.slug)),
+      isFragrance: isFragranceSlug(familySlug(d.slug)),
       notes: (d.notes ?? []).slice(0, 4),
     });
   }

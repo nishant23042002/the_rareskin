@@ -47,6 +47,7 @@ export {
   reorderProducts,
   duplicateProduct,
   deleteProduct,
+  addSize,
   bumpCatalogCache,
 } from "./catalog-actions";
 export type { CatalogActionResult } from "./catalog-actions";

@@ -36,6 +36,10 @@ const mediaRefSchema = new Schema<MediaRefSub>(
 export interface ProductDoc {
   _id: Types.ObjectId;
   slug: string;
+  /** the fragrance this size belongs to (its slug); null / absent = a main product */
+  variantOf?: string | null;
+  /** `soon` keeps the product on its page but out of the bag */
+  launch?: { soon: boolean; label: string };
   kind: (typeof PRODUCT_KINDS)[number];
   status: (typeof PRODUCT_STATUSES)[number];
 
@@ -115,6 +119,11 @@ const productSchema = new Schema<ProductDoc>(
       lowercase: true,
       trim: true,
       index: { unique: true, name: "slug_unique" },
+    },
+    variantOf: { type: String, lowercase: true, trim: true, default: null, index: true },
+    launch: {
+      soon: { type: Boolean, default: false },
+      label: { type: String, default: "" },
     },
     kind: { type: String, enum: PRODUCT_KINDS, required: true },
     status: { type: String, enum: PRODUCT_STATUSES, default: "draft" },

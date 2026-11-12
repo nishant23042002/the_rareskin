@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/container";
 import { PageIntro } from "@/components/layout/page-intro";
 import { DiscoverySet } from "@/components/home/discovery-set";
+import { DiscoverySetGallery } from "@/components/product/discovery-set-gallery";
 import { formatINR } from "@/lib/catalog";
 import { pageMeta } from "@/lib/seo";
 import { getFragrances, getDiscoverySet } from "@/server/data/catalog";
@@ -57,7 +58,9 @@ export default async function DiscoverySetPage() {
         lede={`Three ${set.perVialMl} ml extraits, credited back in full toward your first bottle.`}
       />
 
-      <DiscoverySet set={set} fragrances={fragrances} />
+      <DiscoverySet set={set} fragrances={fragrances} variant="page" />
+
+      <DiscoverySetGallery />
 
       <Container className="max-w-[980px] py-[clamp(48px,9vw,110px)]">
         <h2 data-rv className="eyebrow mb-[clamp(24px,4vw,40px)]">
