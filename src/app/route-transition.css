@@ -5,9 +5,10 @@
    on `transform` / `opacity`, which the browser runs on the compositor thread, so
    the curtain stays smooth while the main thread is busy rendering the next page.
 
-   The ground is `--onyx`, the announcement bar's own obsidian, and the ink is
-   `--champagne`, so the curtain is the same material as the bar and follows the
-   colour theme (themes.css lists `.rh-curtain` among the dark scopes).
+   The curtain is LIGHT: the ground is `--paper` (the same paper as the header and the cards), the wordmark
+   and the label are `--ink`, and the brass is the light-ground brass. The wordmark is a `currentColor`
+   mask, so it simply takes the ink colour and is as legible here as it was cream on obsidian. (It was the
+   announcement bar's obsidian until 2026-11-12; the colour theme is followed through the same tokens.)
 
    It is a `popover="manual"`: that puts it in the browser's top layer, above an
    open modal <dialog> (menu, bag, sign-in), which no z-index can do. Browsers
@@ -19,7 +20,14 @@
   .rh-curtain {
     --seam-y: 50%;
     --seam-x: 50%;
-    --rule: var(--tri);
+    /* the rule that draws under the wordmark: pale brass, brass, ink (the default `--tri` starts on a cream
+       that would vanish on paper); on the way to a fragrance the component sets this to the scent's colour */
+    --rule: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--brass) 55%, var(--paper)) 0%,
+      var(--brass) 55%,
+      var(--ink) 100%
+    );
 
     display: none;
     position: fixed;
@@ -33,7 +41,7 @@
     border: 0;
     overflow: hidden;
     background: transparent;
-    color: var(--champagne);
+    color: var(--ink);
     /* fallback for a browser without the top layer; a popover ignores it */
     z-index: 2147483000;
     contain: layout paint style;
@@ -55,17 +63,18 @@
     background: transparent;
   }
 
-  /* a classic scrollbar's gutter lies outside every fixed layer, so while the page is locked it would show as a pale
-     strip down the edge of the dark curtain: paint the canvas in the curtain's own ground for that time */
+  /* a classic scrollbar's gutter lies outside every fixed layer, so while the page is locked it would show as a
+     strip of the page's own colour down the edge of the curtain: paint the canvas in the curtain's ground for that time */
   :root:has(> body.route-locked) {
-    background-color: var(--onyx);
+    background-color: var(--paper);
   }
 
-  /* a soft shade over the page while the aperture closes: depth, and it dims anything that swaps behind the gap */
+  /* a soft wash of paper over the page while the aperture closes: the page fades toward the curtain (never to dark),
+     and it veils anything that swaps behind the gap */
   .rh-curtain__dim {
     position: absolute;
     inset: 0;
-    background: var(--onyx);
+    background: var(--paper);
     opacity: 0;
     will-change: opacity;
   }
@@ -76,8 +85,16 @@
     position: absolute;
     left: 0;
     right: 0;
-    background: var(--onyx);
+    background: var(--paper);
     will-change: transform;
+  }
+  /* paper on a paper page: each leading edge casts a soft shadow so the halves read as they travel (dropped once they
+     meet, or the lower half's shadow would lay a band across the wordmark) */
+  .rh-curtain:not(.is-closed) .rh-curtain__half--top {
+    box-shadow: 0 20px 38px -26px color-mix(in srgb, var(--ink) 38%, transparent);
+  }
+  .rh-curtain:not(.is-closed) .rh-curtain__half--bottom {
+    box-shadow: 0 -20px 38px -26px color-mix(in srgb, var(--ink) 38%, transparent);
   }
   .rh-curtain__half--top {
     top: 0;
@@ -89,14 +106,14 @@
     bottom: 0;
     transform: translate3d(0, 101%, 0);
   }
-  /* the announcement bar's brass hairline, carried on the leading edge of each half */
+  /* a brass hairline carried on the leading edge of each half */
   .rh-curtain__half::after {
     content: "";
     position: absolute;
     left: 0;
     right: 0;
     height: 1px;
-    background: color-mix(in srgb, var(--brass) 34%, transparent);
+    background: color-mix(in srgb, var(--brass) 70%, transparent);
   }
   .rh-curtain__half--top::after {
     bottom: 0;
@@ -120,8 +137,8 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      color-mix(in srgb, var(--champagne) 70%, transparent) 30%,
-      color-mix(in srgb, var(--champagne) 70%, transparent) 70%,
+      color-mix(in srgb, var(--brass) 85%, transparent) 30%,
+      color-mix(in srgb, var(--brass) 85%, transparent) 70%,
       transparent 100%
     );
     opacity: 0;
@@ -139,7 +156,7 @@
     border-radius: 50%;
     background: radial-gradient(
       closest-side,
-      color-mix(in srgb, var(--brass) 52%, transparent),
+      color-mix(in srgb, var(--brass) 46%, transparent),
       transparent
     );
     opacity: 0;
@@ -167,14 +184,14 @@
   .rh-curtain__logo {
     width: clamp(150px, 42vw, 224px);
   }
-  /* a faint champagne track under the rule, so a dark scent colour (vayren's brown) still reads on the obsidian */
+  /* a faint ink track under the rule, so a pale scent colour (aurevan's) still reads on the paper */
   .rh-curtain__track {
     display: block;
     width: min(300px, 62vw);
     height: 2px;
     border-radius: 2px;
     overflow: hidden;
-    background: color-mix(in srgb, var(--champagne) 14%, transparent);
+    background: color-mix(in srgb, var(--ink) 10%, transparent);
   }
   .rh-curtain__rule {
     position: relative;
@@ -195,7 +212,7 @@
     background: linear-gradient(
       90deg,
       transparent,
-      color-mix(in srgb, var(--champagne) 85%, transparent),
+      color-mix(in srgb, var(--paper) 90%, transparent),
       transparent
     );
     transform: translate3d(-100%, 0, 0);
@@ -209,7 +226,7 @@
     font: 400 10px/1 var(--f-label);
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--champagne) 62%, transparent);
+    color: color-mix(in srgb, var(--ink) 62%, transparent);
   }
   .rh-curtain__label[hidden] {
     display: none;

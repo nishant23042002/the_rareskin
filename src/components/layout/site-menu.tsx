@@ -8,7 +8,7 @@ import { useSlideDialog } from "@/hooks/use-slide-dialog";
 import { Logo } from "@/components/ui/logo";
 import { RhIcon } from "@/components/ui/rh-icon";
 import { Roll } from "@/components/ui/roll";
-import { PDP_GALLERY, pdpPhotoSrc } from "@/config/pdp-gallery";
+import { pdpPackshot as packshot } from "@/lib/pdp-images";
 import { MenuFooter } from "./menu-footer";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useCart } from "@/components/providers/cart-provider";
@@ -22,16 +22,6 @@ const LINKS = [
   { label: "The Craft & Concentration", href: "/#why" },
   { label: "Shipping & Returns", href: "/shipping" },
 ];
-
-/** the official packshot of a fragrance (the first picture of its product page), as a small responsive set; null if it has none */
-function packshot(slug: CatalogNavItem["slug"]) {
-  const p = PDP_GALLERY[slug]?.[0];
-  if (!p) return null;
-  return {
-    src: pdpPhotoSrc(slug, p, "tiny"),
-    srcSet: `${pdpPhotoSrc(slug, p, "tiny")} 160w, ${pdpPhotoSrc(slug, p, "small")} ${p.small}w`,
-  };
-}
 
 /**
  * Left drawer opened by the header's burger (every breakpoint): the three

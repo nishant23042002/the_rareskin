@@ -69,6 +69,20 @@ export function pdpSlides(
   return [...official, ...uploaded];
 }
 
+/**
+ * The official packshot of a fragrance (the first picture of its product page) as a small responsive set:
+ * the 160 px file and the 640 px file, for a thumbnail that is sharp on a retina screen. Used by the
+ * header's Fragrances dropdown and the menu drawer. Null when the fragrance has no official picture.
+ */
+export function pdpPackshot(slug: FragranceSlug): { src: string; srcSet: string } | null {
+  const p = PDP_GALLERY[slug]?.[0];
+  if (!p) return null;
+  return {
+    src: pdpPhotoSrc(slug, p, "tiny"),
+    srcSet: `${pdpPhotoSrc(slug, p, "tiny")} 160w, ${pdpPhotoSrc(slug, p, "small")} ${p.small}w`,
+  };
+}
+
 /** The picture the PDP opens with, or null when the product has none (callers then draw the vector flacon). */
 export function pdpCover(
   slug: FragranceSlug,

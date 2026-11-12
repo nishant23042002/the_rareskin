@@ -7,19 +7,21 @@ Every in-app page navigation plays a full-viewport branded transition:
 
 ## The design
 
-An obsidian curtain in two halves that **close toward the point you tapped**: the
+A light (paper) curtain in two halves that **close toward the point you tapped**: the
 seam meets at your tap's Y, a hairline of light draws outward from your tap's X
 and flashes as the halves meet, and a soft brass glow marks where the finger
 landed. The page dims as it closes. The curtain holds for a beat on the
 RARESKIN wordmark and a 2px rule, then **parts from that same seam** to reveal
 the next page.
 
-- **Colour:** the ground is `--onyx`, the announcement bar's own obsidian, and the
-  ink is `--champagne`, so the curtain is the same material as the bar and follows
-  the colour theme (`themes.css` lists `.rh-curtain` with the dark scopes).
+- **Colour:** LIGHT (changed 2026-11-12; it was the announcement bar's obsidian before). The ground is `--paper`
+  (the header's and the cards' paper), the wordmark and label are `--ink` (the wordmark is a `currentColor` mask, so it
+  is legible on the light ground with no second asset), the brass is the light-ground brass (`themes.css` no longer lists
+  `.rh-curtain` among the dark scopes), and each half casts a soft shadow from its leading edge until the two meet. The
+  veil over the page is a wash of paper, never a dark shade.
 - **Context:** on the way to a fragrance the rule becomes that scent's own colour
-  and its name appears; elsewhere it is the brand rule (`--tri`). A faint champagne
-  track sits under the rule so a dark scent colour (vayren) still reads.
+  and its name appears; elsewhere it is a brass-to-ink rule. A faint ink
+  track sits under the rule so a pale scent colour (aurevan) still reads on the paper.
 - **Waiting:** if a route takes longer than ~280ms once the curtain is closed, a
   slow glint travels along the rule so it reads as "working", not frozen.
 - **Reduced motion:** a plain dissolve (160ms in, 200ms out), no movement.

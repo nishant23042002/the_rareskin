@@ -51,12 +51,12 @@
        (3.95:1 on Botanical's --onyx) and gilt (2.23:1) are below 4.5:1 there, so they are
        lifted toward --champagne to 5.4:1 (so they also hold 4.5:1 on the lifted card
        surfaces inside the drawers). The dark scopes below
-       (.rh-announce, .rh-curtain, .rh-dark, .rs-dark, .rh-sb__set, .ac-dark) read these instead.
+       (.rh-announce, .rh-dark, .rs-dark, .rh-sb__set, .ac-dark) read these instead. (The route curtain was one
+       until 2026-11-12; it is light now.)
    ========================================================================== */
 
 /* dark grounds read the accents in their on-dark form (equal to the accent in the default theme) */
 .rh-announce,
-.rh-curtain,
 .rh-dark,
 .rs-dark,
 .rh-sb__set,

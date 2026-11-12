@@ -17,7 +17,9 @@ import { CampaignNote } from "@/components/layout/campaign-note";
 import { BackToTop } from "@/components/layout/back-to-top";
 import { StaffThemeSwitcher } from "@/components/auth/staff-tools";
 import { MotionLayer } from "@/components/providers/motion-layer";
+import { CARD_SLUGS, DEFAULT_CARD_CONCEPT, type CardSlug } from "@/config/homepage-assets";
 import { DISCOVERY_SET_SLUG } from "@/lib/catalog";
+import { getVariant, homeImageSrc, resolveCardAsset } from "@/lib/home-images";
 import { getCatalogNav, getBagSuggestions } from "@/server/data/catalog";
 import { getSiteSettings } from "@/server/data/settings";
 import { getCurrentUser } from "@/server/auth";
@@ -71,6 +73,15 @@ export default async function StoreLayout({
   // The launch price (first fragrance) and the Discovery Set price feed the
   // announcement bar's built-in messages and the header / sidebar copy.
   const launch = nav[0] ? { price: nav[0].price, mrp: nav[0].mrp } : null;
+
+  // The pictures the "The Three" section of the homepage shows (the finalized card direction), for the
+  // header's Fragrances dropdown: resolved here, on the server, so the header never imports the image manifest.
+  const cardPics: Record<string, string> = {};
+  for (const f of nav) {
+    if (!(CARD_SLUGS as readonly string[]).includes(f.slug)) continue;
+    const card = resolveCardAsset(f.slug as CardSlug, DEFAULT_CARD_CONCEPT);
+    if (card) cardPics[f.slug] = homeImageSrc(getVariant(card).file);
+  }
   const setPrice =
     bagSuggestions.find((s) => s.slug === DISCOVERY_SET_SLUG)?.price ?? null;
 
@@ -103,6 +114,7 @@ export default async function StoreLayout({
                 />
                 <Header
                   nav={nav}
+                  pics={cardPics}
                   setPrice={setPrice}
                   whatsapp={settings.contact.whatsapp ?? settings.contact.phone}
                   freeShippingAbove={freeShippingAbove}

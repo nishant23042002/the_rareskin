@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/logo";
@@ -10,6 +11,7 @@ import { useScrolled } from "@/hooks/use-scrolled";
 import { useCart } from "@/components/providers/cart-provider";
 import { useAuth } from "@/components/providers/auth-provider";
 import { formatINR, type CatalogNavItem } from "@/lib/catalog";
+import { pdpPackshot } from "@/lib/pdp-images";
 import { SiteMenu } from "./site-menu";
 
 /**
@@ -27,11 +29,14 @@ import { SiteMenu } from "./site-menu";
  */
 export function Header({
   nav,
+  pics: cardPics = {},
   setPrice = null,
   whatsapp = null,
   freeShippingAbove = 0,
 }: {
   nav: CatalogNavItem[];
+  /** slug -> the picture the homepage's "The Three" shows for it (the finalized card direction), for the dropdown */
+  pics?: Record<string, string>;
   /** Discovery Set price, rupees — shown in the dropdown and the sidebar card */
   setPrice?: number | null;
   /** concierge number (WhatsApp, else phone) for the sidebar footer link */
@@ -42,6 +47,18 @@ export function Header({
   const scrolled = useScrolled(8);
   const [menuOpen, setMenuOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
+  // The dropdown's pictures are fetched once, when the browser is idle or the moment the dropdown first
+  // opens (whichever is first): not with the first paint, and ready by the time anyone hovers.
+  const [pics, setPics] = useState(false);
+  if (megaOpen && !pics) setPics(true);
+  useEffect(() => {
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(() => setPics(true), { timeout: 5000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(() => setPics(true), 3500);
+    return () => window.clearTimeout(id);
+  }, []);
   const { count, openCart, toast } = useCart();
   const { status, openSignIn } = useAuth();
   const headerRef = useRef<HTMLElement>(null);
@@ -343,7 +360,39 @@ export function Header({
                   style={{ "--c": f.accent, "--k": k } as CSSProperties}
                   onClick={closeMega}
                 >
-                  <span className="rh-dot" />
+                  <span className="rh-mega__pic" aria-hidden="true">
+                    {pics &&
+                      (cardPics[f.slug] ? (
+                        <Image
+                          src={cardPics[f.slug]}
+                          alt=""
+                          width={84}
+                          height={105}
+                          sizes="84px"
+                          quality={80}
+                          loading="eager"
+                          fetchPriority="low"
+                        />
+                      ) : (
+                        (() => {
+                          // no card picture for this one: its packshot
+                          const shot = pdpPackshot(f.slug);
+                          return shot ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={shot.src}
+                              srcSet={shot.srcSet}
+                              sizes="84px"
+                              alt=""
+                              width={84}
+                              height={97}
+                              decoding="async"
+                            />
+                          ) : null;
+                        })()
+                      ))}
+                    <i className="rh-dot" />
+                  </span>
                   <span className="rh-mega__txt">
                     <b>{f.name}</b>
                     <em>{f.title}</em>
@@ -358,7 +407,25 @@ export function Header({
                 style={{ "--k": nav.length } as CSSProperties}
                 onClick={closeMega}
               >
-                <span className="rh-dot rh-dot--ring" />
+                <span className="rh-mega__trio" aria-hidden="true">
+                  {pics &&
+                    nav.map((f, k) =>
+                      cardPics[f.slug] ? (
+                        <Image
+                          key={f.slug}
+                          src={cardPics[f.slug]}
+                          alt=""
+                          width={46}
+                          height={57}
+                          sizes="46px"
+                          quality={75}
+                          loading="eager"
+                          fetchPriority="low"
+                          style={{ "--k": k } as CSSProperties}
+                        />
+                      ) : null,
+                    )}
+                </span>
                 <span className="rh-mega__txt">
                   <b>Discovery Set</b>
                   <em>Three 10 ml travel companions</em>
