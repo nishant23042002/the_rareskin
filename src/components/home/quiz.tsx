@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Flacon } from "@/components/ui/flacon";
+import { pdpCover } from "@/lib/pdp-images";
 import { AddToBagButton } from "@/components/cart/add-to-bag-button";
 import { QUIZ, tallyWinner } from "@/lib/quiz";
 import { formatINR, type Fragrance, type FragranceSlug } from "@/lib/catalog";
@@ -52,7 +53,7 @@ export function Quiz({ fragrances }: { fragrances: Fragrance[] }) {
   const filled = step >= STEPS ? STEPS : step + 1;
 
   return (
-    <section id="quiz" className="rh-quiz rh-quiz--dark rh-dark" aria-labelledby="quiz-h">
+    <section id="quiz" className="rh-quiz" aria-labelledby="quiz-h">
       <div className="rh-wrap rh-quiz__grid">
         <div className="rh-quiz__intro">
           <p className="rh-eyebrow">Not sure which</p>
@@ -117,15 +118,32 @@ export function Quiz({ fragrances }: { fragrances: Fragrance[] }) {
                 <p className="text-[10px] tracking-[0.22em] text-ink-3 uppercase">
                   Your match
                 </p>
-                <div className="mt-4 grid items-center gap-6 sm:grid-cols-[120px_1fr] sm:gap-8">
-                  <span
-                    className="mx-auto block w-full max-w-[120px] sm:mx-0"
-                    style={{
-                      filter: `drop-shadow(0 22px 28px ${match.juice}44)`,
-                    }}
-                  >
-                    <Flacon fragrance={match.slug} />
-                  </span>
+                <div className="mt-4 grid items-center gap-6 sm:grid-cols-[clamp(150px,17vw,200px)_1fr] sm:gap-8">
+                  {(() => {
+                    // the product page's FIRST picture (the packshot), in a tile that crops in on the bottle: the same on a phone and on a wide screen
+                    const cover = pdpCover(match.slug, match.images, match.name);
+                    return cover ? (
+                      <span className="rh-quiz__pic mx-auto block w-full max-w-[220px] sm:mx-0 sm:max-w-none">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={cover.thumb}
+                          srcSet={cover.srcSet}
+                          sizes="(min-width: 640px) 200px, 220px"
+                          alt={`${match.name}, extrait de parfum`}
+                          width={640}
+                          height={736}
+                          decoding="async"
+                        />
+                      </span>
+                    ) : (
+                      <span
+                        className="mx-auto block w-full max-w-[120px] sm:mx-0"
+                        style={{ filter: `drop-shadow(0 22px 28px ${match.juice}44)` }}
+                      >
+                        <Flacon fragrance={match.slug} />
+                      </span>
+                    );
+                  })()}
                   <div>
                     <h3 className="text-[clamp(1.9rem,5vw,2.7rem)] tracking-[0.1em]">
                       {match.name}

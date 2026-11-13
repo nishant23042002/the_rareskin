@@ -406,7 +406,7 @@ export function CheckoutPanel() {
       sku: l.sku,
       // the same item thumbnail the quote returns, so the photo doesn't pop in
       // after the first price check
-      image: l.fragrance ? itemThumbPath(l.fragrance) : null,
+      image: l.fragrance ? itemThumbPath(l.fragrance) : l.href === "/discovery-set" ? itemThumbPath("discovery-set") : null,
       qty: l.qty,
       unitPrice: l.price,
       mrp: l.mrp ?? l.price,

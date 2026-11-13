@@ -8,12 +8,14 @@ import { PdpViewer, type ViewerSlide } from "./pdp-viewer";
 
 /**
  * The Discovery Set in pictures (the set page): the trio on a plain ground, in the dark studio, the "Meet all three"
- * card and the three steps. Four square cells; the packshot (1000x1150) is cropped to a square around the bottles.
+ * card, the three steps and the set on stepped travertine in low sun. Square cells (an odd last one spans the row, cropped to 5:4); the packshot (1000x1150) is cropped to a square around the bottles.
  * A click on any picture opens the same viewer as a product page (`PdpViewer`: the picture lifts out of the page,
  * zoom, swipe / arrows, thumbnails, Esc) and it flies back to its cell when closed.
  * Files: `public/images/pdp/discovery-set/`, config: `DISCOVERY_SET_GALLERY` in `@/config/pdp-gallery`.
  */
 const SLUG = "discovery-set";
+/** an odd number of pictures: the last one takes the whole row (wide screens) so the grid has no hole */
+const wideLast = DISCOVERY_SET_GALLERY.length % 2 === 1;
 
 const SLIDES: ViewerSlide[] = DISCOVERY_SET_GALLERY.map((p) => ({
   key: p.stem,
@@ -43,7 +45,11 @@ export function DiscoverySetGallery() {
       </h2>
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
         {DISCOVERY_SET_GALLERY.map((p, i) => (
-          <li key={p.stem} data-rv className="overflow-hidden rounded-[3px] border border-line">
+          <li
+            key={p.stem}
+            data-rv
+            className={`overflow-hidden rounded-[3px] border border-line${wideLast && i === DISCOVERY_SET_GALLERY.length - 1 ? " sm:col-span-2" : ""}`}
+          >
             <button
               type="button"
               ref={(n) => {
@@ -63,7 +69,7 @@ export function DiscoverySetGallery() {
                 height={p.height}
                 loading={i < 2 ? "eager" : "lazy"}
                 decoding="async"
-                className="aspect-square h-auto w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.035]"
+                className={`aspect-square h-auto w-full object-cover${wideLast && i === DISCOVERY_SET_GALLERY.length - 1 ? " sm:aspect-[5/4]" : ""} transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.035]`}
                 style={viewing && viewer.index === i ? { visibility: "hidden" } : undefined}
               />
               <span

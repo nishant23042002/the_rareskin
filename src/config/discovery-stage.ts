@@ -1,17 +1,18 @@
 /**
  * The Discovery Set stage: where the three 10 ml bottles stand in each background, as a share of it
- * (`design-explorations/discovery-set/scenes_stage.py` writes these numbers and the files in
- * `public/images/homepage/stage/`: `<tone>-<layout>.webp` backgrounds without bottles, `bottle-<slug>.webp` transparent bottles).
+ * (`design-explorations/discovery-set/build_stage_final.py` writes these numbers and the files in
+ * `public/images/homepage/stage/`: `dark-<layout>.webp` = the photograph with the bottles taken out, `bottle-<slug>.webp` = the clear, bright 10 ml bottle (the same one as on the light pictures: `bottle_light` in scenelib.py, built with LIGHT=1).
+ * The light stage files (`light-*.webp`, drawn by the older scenes_stage.py) are retired: they no longer match these bottle layers.)
  * `desktop` is the wide picture of the split layout (from 900px), `mobile` the 4:3 band below it.
  * Plain data: no imports of components.
  */
 export type StageTone = "light" | "dark";
 export type StageLayout = "desktop" | "mobile";
 
-export const STAGE_VERSION = 12; // bump when a file in public/images/homepage/stage changes (plain files, browser cache)
+export const STAGE_VERSION = 17; // bump when a file in public/images/homepage/stage changes (plain files, browser cache)
 export const STAGE_BASE = "/images/homepage/stage";
 /** the transparent bottle files are this tall (px); width follows the ratio below */
-export const STAGE_BOTTLE = { w: 236, h: 1100 } as const;
+export const STAGE_BOTTLE = { w: 290, h: 1349 } as const;
 
 export const STAGE_LAYOUT: Record<
   StageLayout,
@@ -21,18 +22,18 @@ export const STAGE_LAYOUT: Record<
     w: 2000,
     h: 1560,
     bottles: [
-      { slug: "aurevan", left: 26.475, top: 18.59, width: 10.85 },
-      { slug: "orvelis", left: 44.15, top: 15.385, width: 11.7 },
-      { slug: "vayren", left: 62.675, top: 18.59, width: 10.85 },
+      { slug: "aurevan", left: 21.319, top: 16.636, width: 11.824 },
+      { slug: "orvelis", left: 43.947, top: 16.636, width: 11.824 },
+      { slug: "vayren", left: 66.291, top: 16.636, width: 11.824 },
     ],
   },
   mobile: {
     w: 1600,
     h: 1200,
     bottles: [
-      { slug: "aurevan", left: 28.406, top: 18.333, width: 10.438 },
-      { slug: "orvelis", left: 44.375, top: 15, width: 11.25 },
-      { slug: "vayren", left: 61.156, top: 18.333, width: 10.438 },
+      { slug: "aurevan", left: 19.863, top: 13.589, width: 12.414 },
+      { slug: "orvelis", left: 43.622, top: 13.589, width: 12.414 },
+      { slug: "vayren", left: 67.08, top: 13.589, width: 12.414 },
     ],
   },
 };

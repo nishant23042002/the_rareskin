@@ -5,6 +5,7 @@ import { unstable_cache } from "next/cache";
 import { dbConnect } from "@/server/db";
 import { Product, type ProductDoc } from "@/server/models";
 import { toRupees } from "@/lib/money";
+import { DISCOVERY_SET_THUMB } from "@/lib/item-thumb";
 import { pdpCover } from "@/lib/pdp-images";
 import {
   DISCOVERY_SET_SLUG,
@@ -281,7 +282,7 @@ export async function getBagSuggestions(): Promise<BagSuggestion[]> {
       name: discoverySet.name,
       // the set's own page opens with its catalogue photograph when it has one;
       // without it the bag draws the three flacons
-      image: cloudinaryVariant(discoverySet.image, { w: 400 }),
+      image: cloudinaryVariant(discoverySet.image, { w: 400 }) ?? DISCOVERY_SET_THUMB,
       meta: `${discoverySet.vialCount} × ${discoverySet.perVialMl} ml`,
       price: discoverySet.price,
       mrp: discoverySet.mrp,

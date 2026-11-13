@@ -1,0 +1,55 @@
+/* ==========================================================================
+   The developer credit at the end of the footer (components/layout/footer-credit.tsx).
+   A capsule on the light wordmark band: a seal (a ring of words turning around a monogram), "Designed & developed by" + the name,
+   and the Instagram handle. Hover / focus: the capsule fills with onyx from the left, the monogram becomes the Instagram mark,
+   the ring speeds up, the letters of the name roll, the handle slides in. Opacity / transform only; still under reduced motion.
+   ========================================================================== */
+@layer components {
+  .fc-wrap {display:flex;justify-content:center;margin-top:clamp(18px,2.4vw,28px)}
+  .fc {--fc-ink:var(--color-onyx,#100e0c);--fc-paper:var(--color-champagne,#f5f2eb);position:relative;isolation:isolate;display:inline-flex;align-items:center;gap:14px;padding:6px 24px 6px 6px;border:1px solid color-mix(in srgb,var(--fc-ink) 22%,transparent);border-radius:999px;color:var(--fc-ink);text-decoration:none;overflow:hidden;transition:color .5s ease,border-color .5s ease,box-shadow .6s ease}
+  .fc::before {content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:var(--fc-ink);transform:scaleX(0);transform-origin:left center;transition:transform .7s cubic-bezier(.16,1,.3,1)}
+  .fc:focus-visible {outline:2px solid var(--color-brass,#c5a880);outline-offset:4px}
+
+  .fc__seal {position:relative;flex:none;display:grid;place-items:center;width:64px;aspect-ratio:1;border-radius:50%;background:var(--fc-ink);color:var(--fc-paper);transition:background-color .5s ease,color .5s ease}
+  .fc__ring {position:absolute;inset:0;width:100%;height:100%;overflow:visible;animation:fc-spin 26s linear infinite}
+  .fc__ring text {font:500 9.6px/1 var(--f-label,ui-monospace,monospace);fill:var(--fc-paper);opacity:.78;transition:fill .5s ease}
+  .fc__mono {font:500 13px/1 var(--f-label,ui-monospace,monospace);letter-spacing:.12em;padding-left:.12em;transition:opacity .35s ease,transform .6s cubic-bezier(.16,1,.3,1)}
+  .fc__ig {position:absolute;opacity:0;transform:rotate(-40deg) scale(.6);transition:opacity .35s ease,transform .6s cubic-bezier(.16,1,.3,1)}
+
+  .fc__txt {display:grid;gap:3px;text-align:left}
+  .fc__txt small {font:500 9px/1 var(--f-label,ui-monospace,monospace);letter-spacing:.24em;text-transform:uppercase;opacity:.62}
+  .fc__name {font:italic 400 clamp(1.05rem,1.5vw,1.2rem)/1.1 var(--f-serif,Georgia,serif);letter-spacing:.01em;--roll-c:var(--color-brass,#c5a880)}
+  .fc__handle {display:inline-flex;align-items:center;gap:7px;margin-left:4px;padding-left:16px;border-left:1px solid color-mix(in srgb,currentColor 24%,transparent);font:500 10px/1 var(--f-label,ui-monospace,monospace);letter-spacing:.14em;opacity:.7;transition:opacity .4s ease}
+  .fc__handle svg {transition:transform .5s cubic-bezier(.16,1,.3,1)}
+
+  @media(hover:hover) {
+    .fc:hover {color:var(--fc-paper);border-color:var(--fc-ink);box-shadow:0 18px 40px -22px rgba(16,14,12,.55)}
+    .fc:hover::before {transform:none}
+    .fc:hover .fc__seal {background:var(--fc-paper);color:var(--fc-ink)}
+    .fc:hover .fc__ring {animation-duration:7s}
+    .fc:hover .fc__ring text {fill:var(--fc-ink)}
+    .fc:hover .fc__mono {opacity:0;transform:scale(.6)}
+    .fc:hover .fc__ig {opacity:1;transform:none}
+    .fc:hover .fc__handle {opacity:1}
+    .fc:hover .fc__handle svg {transform:translate(2px,-2px)}
+    .fc:hover .rh-roll__a > span {transform:translateY(-120%)}
+    .fc:hover .rh-roll__b > span {transform:none}
+  }
+  .fc:focus-visible::before {transform:none}
+  .fc:focus-visible {color:var(--fc-paper)}
+  .fc:focus-visible .fc__seal {background:var(--fc-paper);color:var(--fc-ink)}
+  .fc:focus-visible .fc__ring text {fill:var(--fc-ink)}
+  .fc:focus-visible .fc__mono {opacity:0}
+  .fc:focus-visible .fc__ig {opacity:1;transform:none}
+
+  /* phones: the handle goes (the seal + name is the one tap target) */
+  @media(max-width:520px) {
+    .fc {gap:12px;padding-right:18px}
+    .fc__handle {display:none}
+  }
+  @media(prefers-reduced-motion:reduce) {
+    .fc__ring {animation:none}
+    .fc, .fc::before, .fc__seal, .fc__mono, .fc__ig, .fc__handle svg {transition-duration:.01s}
+  }
+}
+@keyframes fc-spin {to {transform:rotate(360deg)}}

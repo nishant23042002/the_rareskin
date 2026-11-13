@@ -17,6 +17,8 @@
 @import "./hero.css";
 /* the content pages: arrival, reveals, reading line, section nav, small interactions */
 @import "./pages.css";
+/* the developer credit at the end of the footer */
+@import "./footer-credit.css";
 
 /* ==========================================================================
    THE RARESKIN — design tokens

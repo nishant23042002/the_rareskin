@@ -119,7 +119,6 @@ export default async function StoreLayout({
                   pics={cardPics}
                   setPrice={setPrice}
                   whatsapp={settings.contact.whatsapp ?? settings.contact.phone}
-                  freeShippingAbove={freeShippingAbove}
                 />
               </div>
               {children}

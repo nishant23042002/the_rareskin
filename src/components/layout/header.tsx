@@ -33,7 +33,6 @@ export function Header({
   pics: cardPics = {},
   setPrice = null,
   whatsapp = null,
-  freeShippingAbove = 0,
 }: {
   nav: CatalogNavItem[];
   /** slug -> the picture the homepage's "The Three" shows for it (the finalized card direction), for the dropdown */
@@ -42,8 +41,6 @@ export function Header({
   setPrice?: number | null;
   /** concierge number (WhatsApp, else phone) for the sidebar footer link */
   whatsapp?: string | null;
-  /** order value (rupees) from which delivery is free; 0 = always free (the sidebar footer line) */
-  freeShippingAbove?: number;
 }) {
   const scrolled = useScrolled(8);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -434,7 +431,7 @@ export function Header({
               >
                 <span className="rh-mega__trio" aria-hidden="true">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img className="rh-mega__trio-one" src="/images/pdp/discovery-set/menu-trio-light.webp?v=16" alt="" width={112} height={120} decoding="async" loading="lazy" />
+                  <img className="rh-mega__trio-one" src="/images/pdp/discovery-set/menu-trio-light.webp?v=20" alt="" width={112} height={120} decoding="async" loading="lazy" />
                 </span>
                 <span className="rh-mega__txt">
                   <b>Discovery Set</b>
@@ -463,7 +460,6 @@ export function Header({
         pics={cardPics}
         setPrice={setPrice}
         whatsapp={whatsapp}
-        freeShippingAbove={freeShippingAbove}
       />
     </>
   );

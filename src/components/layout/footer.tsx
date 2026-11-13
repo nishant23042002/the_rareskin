@@ -17,6 +17,7 @@ import {
   WhatsAppGlyph,
   type SocialKey,
 } from "./footer-icons";
+import { FooterCredit } from "./footer-credit";
 import { FooterNewsletter } from "./footer-newsletter";
 
 /**
@@ -352,6 +353,7 @@ export async function Footer() {
             &copy; {year} The Rareskin (Velocity Ventures Group). All rights
             reserved.
           </p>
+          <FooterCredit />
         </Container>
       </div>
     </footer>

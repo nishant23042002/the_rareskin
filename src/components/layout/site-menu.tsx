@@ -49,7 +49,6 @@ export function SiteMenu({
   pics = {},
   setPrice = null,
   whatsapp = null,
-  freeShippingAbove = 0,
 }: {
   open: boolean;
   onClose: () => void;
@@ -211,7 +210,7 @@ export function SiteMenu({
           >
             <span className="rh-sb__trio" aria-hidden="true">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="rh-sb__trio-one" src="/images/pdp/discovery-set/menu-trio-dark.webp?v=16" alt="" width={148} height={111} decoding="async" fetchPriority="low" />
+              <img className="rh-sb__trio-one" src="/images/pdp/discovery-set/menu-trio-dark.webp?v=20" alt="" width={148} height={111} decoding="async" fetchPriority="low" />
             </span>
             <span className="rh-sb__set-t">The Discovery Set</span>
             <span className="rh-sb__set-badge">3 × 10 ml</span>
@@ -270,7 +269,7 @@ export function SiteMenu({
           </div>
         </div>
 
-        <MenuFooter whatsapp={whatsapp} freeShippingAbove={freeShippingAbove} />
+        <MenuFooter whatsapp={whatsapp} />
       </aside>
     </dialog>
   );

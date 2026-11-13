@@ -16,9 +16,10 @@ import { DiscoveryStage } from "./discovery-stage";
  * three vials' names, the credit logic, then ONE full-width bar. The set price is credited in full toward a first
  * 50 ml bottle — that is the whole argument. Data comes from the catalogue (`@/server/data/catalog`).
  *
- * Two looks, one component:
- *  - `home`: LIGHT (stone ground, ink type, ink button); the whole picture is a link to /discovery-set.
- *  - `page`: DARK (onyx), the set page's own band; each bottle links to its 10 ml page.
+ * Two uses, one DARK look (onyx; the quiz above it is the light band, so the page alternates):
+ *  - `home`: the whole picture is a link to /discovery-set.
+ *  - `page`: the set page's own band; each bottle links to its 10 ml page.
+ * (`.rh-dset--light` in home.css and the light stage files are kept, unused.)
  * The picture is the interactive stage (`DiscoveryStage`: the three bottles lift, light up and drift on the pointer);
  * a photograph uploaded for the set in the catalogue still wins over it. (The flat dark picture of the manifest,
  * `discovery-set-10ml`, is kept but no longer drawn.)
@@ -48,7 +49,7 @@ function Art({
   }
   return (
     <DiscoveryStage
-      tone={variant === "home" ? "light" : "dark"}
+      tone="dark"
       fragrances={fragrances.map((f) => ({ slug: f.slug, name: f.name, mood: f.mood, notes: f.notes ?? [] }))}
       href={variant === "home" ? "/discovery-set" : undefined}
       linkBottles={variant === "page"}
@@ -86,7 +87,7 @@ export function DiscoverySet({
 
   return (
     <section
-      className={`rh-dset ${variant === "home" ? "rh-dset--light" : "rh-dark"}`}
+      className="rh-dset rh-dark"
       id="discovery"
       aria-labelledby="dset-h"
     >

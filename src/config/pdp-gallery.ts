@@ -98,7 +98,7 @@ export const DISCOVERY_SET_GALLERY: PdpPhoto[] = [
   { dir: "discovery-set", stem: "01-trio-packshot", width: 1000, height: 1150, small: 640, alt: "The three 10 ml extraits, AUREVAN, ORVELIS and VAYREN, side by side on a plain studio background" },
   { dir: "discovery-set", stem: "02-trio-dark-studio", width: 1600, height: 1600, small: 640, alt: "The three 10 ml extraits standing on a dark polished surface, lit from behind" },
   { dir: "discovery-set", stem: "03-meet-all-three", width: 1600, height: 1600, small: 640, alt: "Meet all three: AUREVAN fresh and elegant, ORVELIS warm and sophisticated, VAYREN bold and intense, with their notes" },
-  { dir: "discovery-set", stem: "04-how-it-works", width: 1600, height: 1600, small: 640, alt: "The Discovery Set in three steps: meet them, choose yours, the set price credited back toward your first 50 ml" },
+  { dir: "discovery-set", stem: "04-how-it-works", width: 1600, height: 1600, small: 640, alt: "The Discovery Set in three steps: meet them, choose yours, the set price credited back toward your first 50 ml" },  { dir: "discovery-set", stem: "05-golden-hour-steps", width: 1600, height: 1600, small: 640, alt: "The three 10 ml extraits on stepped travertine blocks in low afternoon sun, a gentle ascent from AUREVAN through ORVELIS to VAYREN" },
 ];
 
 /**

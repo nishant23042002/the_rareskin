@@ -273,21 +273,23 @@
   .rh-sb__top {flex:none;display:flex;align-items:center;justify-content:space-between;height:var(--hh);padding-inline:var(--sb-px);border-bottom:1px solid var(--sb-hair)}
   .rh-sb__close {display:grid;place-items:center;width:44px;height:44px;margin-right:-12px;border-radius:50%;transition:background-color .35s var(--ease),transform .5s var(--ease)}
   .rh-sb__close:hover {background:color-mix(in srgb,var(--ink) 7%,transparent);transform:rotate(90deg)}
-  .rh-sb__scroll {flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:clamp(16px,2.6svh,24px) var(--sb-px) 16px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+  /* the drawer does not scroll: everything in it is sized from the screen's height (svh) so the whole menu is always on screen */
+  .rh-sb__scroll {flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;padding:clamp(8px,1.8svh,24px) var(--sb-px) clamp(6px,1.2svh,14px)}
+  .rh-sb__scroll > * {flex:none}
   .rh-rise {opacity:0;transform:translateY(12px);transition:opacity .4s var(--ease),transform .5s var(--ease)}
   .rh-sb.is-open .rh-rise {opacity:1;transform:none;transition:opacity .6s var(--ease) calc(var(--i,0)*60ms + 160ms),transform .9s var(--ease) calc(var(--i,0)*60ms + 160ms)}
-  .rh-sb__eye {margin:0 0 clamp(4px,1svh,8px);font:400 10px/1.5 var(--f-label);letter-spacing:.28em;text-transform:uppercase;color:var(--ink-3)}
+  .rh-sb__eye {margin:0 0 clamp(2px,.7svh,8px);font:400 10px/1.5 var(--f-label);letter-spacing:.28em;text-transform:uppercase;color:var(--ink-3)}
   /* the three extraits: packshot, name, volume. Hover: a wash in the fragrance's colour sweeps in behind the row, the picture draws closer inside its
      frame, a ring in the colour closes round it, the name rolls, an arrow slides in. Only opacity / transforms change: nothing shifts. */
-  .rh-sb__frag {--dot:color-mix(in srgb,var(--c,#999) 88%,var(--ink));--roll-c:color-mix(in srgb,var(--c,#999) 70%,var(--ink));position:relative;isolation:isolate;display:block;padding-block:clamp(6px,1svh,8px)}
+  .rh-sb__frag {--dot:color-mix(in srgb,var(--c,#999) 88%,var(--ink));--roll-c:color-mix(in srgb,var(--c,#999) 70%,var(--ink));position:relative;isolation:isolate;display:block;padding-block:clamp(3px,.8svh,8px)}
   .rh-sb__frag::before {content:"";position:absolute;inset:0 calc(var(--sb-px) * -.45);z-index:-1;border-radius:4px;background:linear-gradient(90deg,color-mix(in srgb,var(--c,#999) 14%,transparent),color-mix(in srgb,var(--c,#999) 2%,transparent));transform:scaleX(0);transform-origin:left center;transition:transform .75s var(--expo)}
   .rh-sb__frag-in {display:grid;grid-template-columns:auto minmax(0,1fr) auto;column-gap:16px;align-items:center}
-  .rh-sb__pic {position:relative;width:56px;aspect-ratio:4/5;overflow:hidden;border-radius:3px;background:var(--stone)}
+  .rh-sb__pic {position:relative;width:clamp(34px,6.1svh,56px);aspect-ratio:4/5;overflow:hidden;border-radius:3px;background:var(--stone)}
   .rh-sb__pic img {display:block;width:100%;height:100%;object-fit:cover;transition:transform .9s var(--expo)}
   .rh-sb__pic::after {content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c,#999) 75%,transparent);opacity:0;transition:opacity .5s var(--ease)}
   .rh-sb__dot {position:absolute;right:4px;bottom:4px;z-index:1;width:8px;height:8px;border-radius:50%;background:var(--dot);box-shadow:0 0 0 2px var(--paper);transition:transform .55s var(--spring)}
-  .rh-sb__txt {display:grid;gap:6px;min-width:0}
-  .rh-sb__name {font:300 1.25rem/1.15 var(--f-label);letter-spacing:.14em;text-transform:uppercase}
+  .rh-sb__txt {display:grid;gap:clamp(2px,.7svh,6px);min-width:0}
+  .rh-sb__name {font:300 clamp(1.02rem,2.7svh,1.25rem)/1.15 var(--f-label);letter-spacing:.14em;text-transform:uppercase}
   .rh-sb__meta {font:400 10px/1.3 var(--f-label);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
   .rh-sb__go {width:15px;height:15px;color:var(--ink-3);opacity:0;translate:-8px 0;transition:opacity .4s var(--ease),translate .6s var(--expo)}
   .rh-sb__frag:focus-visible {outline-offset:-2px}
@@ -305,14 +307,14 @@
   }
 
   /* the Discovery Set: the three packshots fanned in the dark card; hover spreads them apart and a sheen crosses the card */
-  .rh-sb__set {position:relative;overflow:hidden;isolation:isolate;display:grid;grid-template-columns:clamp(84px,36%,160px) minmax(0,1fr) auto;grid-template-areas:"pics t t" "pics b p";gap:8px 16px;align-items:center;margin-top:clamp(12px,2.2svh,20px);padding:clamp(12px,2svh,16px) 18px;border:1px solid var(--onyx);background:var(--onyx);color:var(--champagne);transition:border-color .4s var(--ease),box-shadow .6s var(--expo)}
+  .rh-sb__set {position:relative;overflow:hidden;isolation:isolate;display:grid;grid-template-columns:clamp(72px,30%,160px) minmax(0,1fr) auto;grid-template-areas:"pics t t" "pics b p";gap:clamp(4px,1svh,8px) 14px;align-items:center;margin-top:clamp(6px,1.6svh,20px);padding:clamp(8px,1.7svh,16px) 18px;border:1px solid var(--onyx);background:var(--onyx);color:var(--champagne);transition:border-color .4s var(--ease),box-shadow .6s var(--expo)}
   .rh-sb__set--plain {grid-template-columns:1fr auto;grid-template-areas:"t p" "b p"}
   .rh-sb__set::after {content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(100deg,transparent 38%,rgba(255,244,222,.13) 50%,transparent 62%);transform:translateX(-120%);transition:transform 1.1s var(--expo)}
   .rh-sb__set:focus-visible {outline-color:var(--brass);border-color:var(--brass)}
   .rh-sb__set:focus-visible::after {transform:translateX(120%)}
   .rh-sb__trio {grid-area:pics;position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;border-radius:3px;box-shadow:0 0 0 1px color-mix(in srgb,var(--champagne) 22%,transparent)}
   .rh-sb__trio img {position:absolute;left:calc(var(--k) * 24px);top:0;width:40px;height:46px;object-fit:cover;border-radius:2px;border:1px solid color-mix(in srgb,var(--champagne) 30%,transparent);background:#444;box-shadow:0 8px 14px -8px rgba(0,0,0,.65);rotate:calc((var(--k) - 1) * -3deg);transition:translate .75s var(--expo),rotate .75s var(--expo)}
-  .rh-sb__set-t {grid-area:t;font:300 1.05rem/1.25 var(--f-label);letter-spacing:.12em;text-transform:uppercase;text-wrap:balance}
+  .rh-sb__set-t {grid-area:t;font:300 clamp(.82rem,2.3svh,1.05rem)/1.2 var(--f-label);letter-spacing:.1em;text-transform:uppercase;text-wrap:balance}
   .rh-sb__set-badge {grid-area:b;justify-self:start;padding:5px 10px;border:1px solid color-mix(in srgb,var(--champagne) 30%,transparent);border-radius:999px;font:500 10px/1 var(--f-label);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;color:color-mix(in srgb,var(--champagne) 80%,transparent)}
   .rh-sb__set-price {grid-area:p;justify-self:end;font:400 1.05rem/1 var(--f-sans);letter-spacing:.04em;font-variant-numeric:tabular-nums;white-space:nowrap}
   @media(hover:hover) {
@@ -322,10 +324,10 @@
   }
 
   /* the links: the label rolls, a brass line is drawn under the row, an arrow slides in */
-  .rh-sb__links {margin-top:clamp(14px,2.4svh,22px);padding-top:clamp(4px,1svh,8px);border-top:1px solid var(--sb-hair)}
+  .rh-sb__links {margin-top:clamp(6px,1.8svh,22px);padding-top:clamp(2px,.6svh,8px);border-top:1px solid var(--sb-hair)}
   .rh-sb__links li {position:relative;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid color-mix(in srgb,var(--sb-hair) 55%,transparent)}
   .rh-sb__links li::after {content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,var(--brass),color-mix(in srgb,var(--brass) 0%,transparent) 92%);transform:scaleX(0);transform-origin:left center;transition:transform .85s var(--expo)}
-  .rh-sb__links a {display:inline-flex;align-items:center;gap:10px;min-height:46px;font:300 15px/1.3 var(--f-sans);letter-spacing:.04em;color:var(--ink-2);transition:color .3s var(--ease)}
+  .rh-sb__links a {display:inline-flex;align-items:center;gap:10px;min-height:clamp(32px,5.6svh,46px);font:300 15px/1.3 var(--f-sans);letter-spacing:.04em;color:var(--ink-2);transition:color .3s var(--ease)}
   .rh-sb__links a:not(.rh-sb__sub) {flex:1}
   .rh-sb__links a:not(.rh-sb__sub) .rh-sb__go {margin-left:auto}
   .rh-sb__links a:is(:hover,:focus-visible) {color:var(--ink)}
@@ -336,19 +338,23 @@
   }
   .rh-sb__links li:focus-within .rh-sb__go {opacity:1;translate:0 0}
   .rh-sb__links .rh-sb__sub {font:400 10px/1.3 var(--f-label);letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3)}
-  .rh-sb__pills {display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px;margin-top:clamp(12px,2.2svh,20px)}
-  .rh-sb__pill {display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding-inline:14px;border:1px solid var(--line-2);border-radius:999px;font:400 11px/1 var(--f-label);letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;transition:background-color .35s var(--ease),border-color .35s var(--ease),color .35s var(--ease)}
+  .rh-sb__pills {display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px;margin-top:clamp(6px,1.6svh,20px)}
+  .rh-sb__pill {display:inline-flex;align-items:center;justify-content:center;min-height:clamp(38px,6svh,46px);padding-inline:14px;border:1px solid var(--line-2);border-radius:999px;font:400 11px/1 var(--f-label);letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;transition:background-color .35s var(--ease),border-color .35s var(--ease),color .35s var(--ease)}
   .rh-sb__pill:hover, .rh-sb__pill:focus-visible {background:var(--ink);border-color:var(--ink);color:var(--paper)}
-  .rh-sb__foot {flex:none;display:grid;gap:2px;padding:clamp(10px,1.6svh,14px) var(--sb-px) calc(clamp(6px,1.2svh,10px) + env(safe-area-inset-bottom,0px));border-top:1px solid var(--sb-hair)}
-  .rh-sb__assure {margin:0;font:italic 400 13px/1.5 var(--f-serif);color:var(--ink-2)}
-  .rh-sb__assure span {white-space:nowrap}
+  .rh-sb__foot {flex:none;display:grid;gap:2px;padding:clamp(4px,1svh,14px) var(--sb-px) calc(clamp(2px,.8svh,10px) + env(safe-area-inset-bottom,0px));border-top:1px solid var(--sb-hair)}
   /* phones (the drawer is 88vw below 477px): the two reassurance phrases stack, and the Discovery card gives its title the full width, badge and price sharing the second row */
   @media(max-width:477px) {
-    .rh-sb__assure span {display:block}
-    .rh-sb__assure .rh-sb__sep {display:none}
     .rh-sb__set--plain {grid-template-areas:"t t" "b p"}
   }
-  .rh-sb__concierge {display:inline-flex;align-items:center;flex-wrap:wrap;gap:0 6px;justify-self:start;min-height:44px;font:400 12px/1.4 var(--f-sans);letter-spacing:.03em;color:var(--ink-3)}
+  /* very short screens (a small phone, a landscape one): the menu is tightened once more so it still needs no scrolling */
+  @media(max-height:620px) {
+    .rh-sb__eye {display:none}
+    .rh-sb__pic {width:30px}
+    .rh-sb__links a {min-height:30px}
+    .rh-sb__pill {min-height:34px}
+    .rh-sb__set-badge {padding-block:3px}
+  }
+  .rh-sb__concierge {display:inline-flex;align-items:center;flex-wrap:wrap;gap:0 6px;justify-self:start;min-height:clamp(34px,5.4svh,44px);font:400 12px/1.4 var(--f-sans);letter-spacing:.03em;color:var(--ink-3)}
   .rh-sb__concierge span {color:var(--ink);padding-bottom:2px;background:linear-gradient(currentColor,currentColor) left bottom/100% 1px no-repeat;transition:background-size .5s var(--ease)}
   .rh-sb__concierge:hover span, .rh-sb__concierge:focus-visible span {background-size:40% 1px}
 
@@ -505,6 +511,9 @@
   .rh-quiz--dark :focus-visible {outline-color:var(--champagne)}
   .rh-quiz__grid {display:grid;gap:clamp(30px,5vw,52px)}
   .rh-quiz__intro {display:grid;gap:16px;justify-items:start}
+  /* the quiz result's picture: the product page's first photograph, cropped in on the flacon (the studio margin is trimmed) */
+  .rh-quiz__pic {position:relative;aspect-ratio:7/8;overflow:hidden;border-radius:3px;border:1px solid var(--line-2);background:#ebeae6;box-shadow:0 22px 34px -26px rgba(16,14,12,.5)}
+  .rh-quiz__pic img {position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:50% 54%;transform:scale(1.34);transform-origin:50% 54%}
   .rh-quiz__bar {display:flex;gap:8px;margin-top:6px}
   .rh-quiz__bar i {width:28px;height:2px;background:var(--line-2);transition:background-color .3s}
   .rh-quiz__bar i.rh-on {background:var(--ink)}
