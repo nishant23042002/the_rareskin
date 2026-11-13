@@ -98,6 +98,7 @@ const nextConfig: NextConfig = {
       to("/collections/bestsellers", "/"),
       // pages that were renamed or split
       to("/about", "/the-idea"),
+      to("/our-story", "/the-idea"),
       to("/shipping-returns", "/shipping"),
       to("/privacy-terms", "/privacy"),
       // old app routes that no longer exist as pages

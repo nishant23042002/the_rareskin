@@ -4,9 +4,12 @@ import { Container } from "@/components/ui/container";
 import { PageIntro } from "@/components/layout/page-intro";
 import { DiscoverySet } from "@/components/home/discovery-set";
 import { DiscoverySetGallery } from "@/components/product/discovery-set-gallery";
-import { formatINR } from "@/lib/catalog";
-import { pageMeta } from "@/lib/seo";
+import { formatINR, DISCOVERY_SET_SLUG } from "@/lib/catalog";
+import { DISCOVERY_SET_GALLERY, pdpPhotoSrc } from "@/config/pdp-gallery";
+import { SITE, absoluteUrl } from "@/lib/site";
+import { absoluteImage, pageMeta, shippingDetailsJsonLd } from "@/lib/seo";
 import { getFragrances, getDiscoverySet } from "@/server/data/catalog";
+import { getSiteSettings } from "@/server/data/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const set = await getDiscoverySet();
@@ -21,11 +24,47 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function DiscoverySetPage() {
-  const [set, fragrances] = await Promise.all([
+  const [set, fragrances, settings] = await Promise.all([
     getDiscoverySet(),
     getFragrances(),
+    getSiteSettings(),
   ]);
   if (!set) notFound();
+
+  // Product schema for the set: its own photographs, the price, and what delivery costs (from Site Settings)
+  const url = absoluteUrl("/discovery-set");
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: set.name,
+    description: set.detail,
+    sku: set.sku,
+    brand: { "@type": "Brand", name: SITE.name },
+    category: "Fragrance > Extrait de Parfum > Discovery Set",
+    image: DISCOVERY_SET_GALLERY.map((p) => absoluteImage(pdpPhotoSrc(DISCOVERY_SET_SLUG, p, "full"))),
+    url,
+    isRelatedTo: fragrances.map((f) => ({
+      "@type": "Product",
+      name: `${f.name} Extrait de Parfum`,
+      url: absoluteUrl(`/fragrances/${f.slug}`),
+    })),
+    offers: {
+      "@type": "Offer",
+      sku: set.sku,
+      price: String(set.price),
+      priceCurrency: SITE.currency,
+      availability: set.available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      url,
+      priceValidUntil: "2027-03-31",
+      itemCondition: "https://schema.org/NewCondition",
+      seller: { "@type": "Organization", name: SITE.legalName },
+      shippingDetails: shippingDetailsJsonLd(
+        set.price,
+        settings.shipping.freeAbovePaise / 100,
+        settings.shipping.flatRatePaise / 100,
+      ),
+    },
+  };
 
   const steps = [
     {
@@ -51,6 +90,10 @@ export default async function DiscoverySetPage() {
 
   return (
     <main id="main" data-reveal>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <PageIntro
         eyebrow="The set"
         crumb={{ name: "Discovery Set", path: "/discovery-set" }}

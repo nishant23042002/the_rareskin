@@ -29,6 +29,9 @@ export const SITE = {
  */
 export const WORDMARK_WEB_SRC = "/brand/rareskin-wordmark-web.webp";
 
+/** The founder, as named on the Our Story page (a note from founder Vijay More). */
+export const FOUNDER = { name: "Vijay More" } as const;
+
 /** Real support + registered contact details. */
 export const CONTACT = {
   email: "therareskinsupport@velocityventuresgroup.in",

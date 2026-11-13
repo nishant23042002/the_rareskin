@@ -18,9 +18,9 @@ import { Stars } from "@/components/ui/stars";
 import { PdpReviews } from "@/components/product/pdp-reviews";
 import { FAQ_GROUPS } from "@/lib/faq";
 import { FRAGRANCE_PALETTE, formatINR, type Fragrance, type FragranceVariant } from "@/lib/catalog";
-import { pdpCover } from "@/lib/pdp-images";
+import { pdpCover, pdpSlides } from "@/lib/pdp-images";
 import { SITE, absoluteUrl } from "@/lib/site";
-import { breadcrumbJsonLd } from "@/lib/seo";
+import { absoluteImage, breadcrumbJsonLd, shippingDetailsJsonLd } from "@/lib/seo";
 import {
   getFragranceBySlug,
   getFragranceSlugs,
@@ -143,7 +143,9 @@ export default async function FragrancePage({
         : "https://schema.org/OutOfStock",
     url: v.isMain ? url : `${url}?size=${v.volumeMl}`,
     priceValidUntil: "2027-03-31",
+    itemCondition: "https://schema.org/NewCondition",
     seller: { "@type": "Organization", name: SITE.legalName },
+    shippingDetails: shippingDetailsJsonLd(v.price, freeAbove, flatRate),
   });
   const offers = f.variants
     .filter((v) => v.isMain || (v.state !== "soon" && v.price > 0))
@@ -156,7 +158,12 @@ export default async function FragrancePage({
     sku: slug,
     brand: { "@type": "Brand", name: SITE.name, logo: absoluteUrl("/icon") },
     category: "Fragrance > Extrait de Parfum",
-    image: `${url}/opengraph-image`,
+    // the real photographs of the page, in the gallery's order (Google Images and Shopping read these);
+    // the share card stays last as a fallback for a product with no photographs
+    image: [
+      ...pdpSlides(f.slug, f.images, f.name).map((s) => absoluteImage(s.full)),
+      `${url}/opengraph-image`,
+    ],
     url,
     additionalProperty: [
       { "@type": "PropertyValue", name: "Concentration", value: "Extrait de Parfum" },

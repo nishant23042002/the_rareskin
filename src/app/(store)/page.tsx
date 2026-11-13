@@ -19,6 +19,8 @@ import {
   type ShowcasePhoto,
 } from "@/server/data/reviews";
 import { getSiteSettings } from "@/server/data/settings";
+import { absoluteUrl } from "@/lib/site";
+import { organizationSameAs, websiteJsonLd } from "@/lib/seo";
 
 /**
  * Homepage. Catalogue data is read once from the database here (cached, tagged
@@ -57,8 +59,30 @@ export default async function HomePage() {
   const { campaign } = settings;
   const endsAt = campaign.active && campaign.endsAt ? campaign.endsAt : null;
 
+  // Structured data for the homepage: the site itself, the brand's own profiles (Organization `sameAs`, joined to
+  // the root layout's Organization by @id) and the three fragrances as a list, so the range reads as one thing
+  const sameAs = organizationSameAs(settings.social);
+  const rangeJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "THE RARESKIN fragrances",
+    itemListElement: fragrances.map((f, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: `${f.name} Extrait de Parfum`,
+      url: absoluteUrl(`/fragrances/${f.slug}`),
+    })),
+  };
+
   return (
     <main id="main" className="rh-main">
+      {[websiteJsonLd, rangeJsonLd, ...(sameAs ? [sameAs] : [])].map((ld, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+        />
+      ))}
       <Hero photo={settings.heroImage} price={lead.price} mrp={lead.mrp} fragrances={fragrances} />
       <LaunchOffer
         price={lead.price}
