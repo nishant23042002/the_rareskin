@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { useAuth } from "@/components/providers/auth-provider";
 import { normalizeIndianMobile, maskPhone, OTP_LENGTH } from "@/lib/auth";
+import { track } from "@/lib/analytics";
 import { TurnstileWidget, turnstileEnabled } from "./turnstile-widget";
 import { OtpInput } from "./otp-input";
 
@@ -179,6 +180,8 @@ export function SignInForm({
         });
         const data = (await res.json()) as {
           ok: boolean;
+          /** true when this verification created the account (the first sign-in) */
+          created?: boolean;
           error?: string;
           burned?: boolean;
           retryAfter?: number;
@@ -195,6 +198,7 @@ export function SignInForm({
           setCodeKey((k) => k + 1);
           return;
         }
+        track(data.created ? "sign_up" : "login", { method: "phone" });
         await refresh();
         onAuthenticated();
       } catch {
@@ -330,9 +334,11 @@ export function SignInForm({
               variant="solid"
               size="lg"
               disabled={busy}
+              loading={status === "sending"}
+              loadingLabel="Sending code…"
               className="w-full"
             >
-              {status === "sending" ? "Sending code…" : "Send verification code"}
+              Send verification code
             </Button>
           </div>
 
@@ -354,7 +360,11 @@ export function SignInForm({
           )}
 
           {error && (
-            <p role="alert" className="flex items-start gap-2 text-[13px] text-error">
+            <p
+              key={error.message}
+              role="alert"
+              className="rh-shake flex items-start gap-2 text-[13px] text-error"
+            >
               <AlertIcon />
               {error.message}
             </p>
@@ -420,7 +430,11 @@ export function SignInForm({
 
           <div aria-live="polite" className="min-h-[18px]">
             {error ? (
-              <p role="alert" className="flex items-start gap-2 text-[13px] text-error">
+              <p
+                key={error.message}
+                role="alert"
+                className="rh-shake flex items-start gap-2 text-[13px] text-error"
+              >
                 <AlertIcon />
                 {error.message}
               </p>
@@ -438,9 +452,11 @@ export function SignInForm({
               variant="solid"
               size="lg"
               disabled={busy || code.length !== OTP_LENGTH}
+              loading={status === "verifying"}
+              loadingLabel="Verifying…"
               className="w-full"
             >
-              {status === "verifying" ? "Verifying…" : "Verify and sign in"}
+              Verify and sign in
             </Button>
           </div>
 

@@ -75,6 +75,12 @@ export function CartBar({
   const visible = hydrated && count > 0 && scrolled && !isOpen && !overFooter;
   const items = `${count} ${count === 1 ? "item" : "items"}`;
 
+  // lets the toast lift itself clear of this bar while it is up (micro.css, `.rh-toast-host`)
+  useEffect(() => {
+    document.documentElement.toggleAttribute("data-cart-bar", visible);
+    return () => document.documentElement.removeAttribute("data-cart-bar");
+  }, [visible]);
+
   const thumbs = lines.slice(0, MAX_THUMBS);
   const extra = lines.length - thumbs.length;
 

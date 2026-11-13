@@ -5,6 +5,7 @@
 @import "./themes.css";
 /* the tactile layer: button physics, card tilt, reveals, parallax, ticker (read only the tokens above) */
 @import "./motion.css";
+@import "./micro.css";
 /* the route transition curtain ("The Aperture"): obsidian halves in the top layer, driven by the Web Animations API */
 @import "./route-transition.css";
 @import "./morph.css";

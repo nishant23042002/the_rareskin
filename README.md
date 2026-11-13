@@ -233,7 +233,7 @@ See `.env.example`. All optional:
 | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | canonical domain (metadata, sitemap, OG). Defaults to `https://www.therareskin.com` (the host the old site was indexed under). |
 | `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` / `RAZORPAY_WEBHOOK_SECRET` | the checkout provider — see [`docs/payments.md`](docs/payments.md). Server-side only: the key id reaches the browser through the checkout response, there is no `NEXT_PUBLIC_` copy. |
-| `NEXT_PUBLIC_GTM_ID` | Google Tag Manager id (`GTM-…`), storefront only. Production environment only; build-time. |
+| `NEXT_PUBLIC_GTM_ID` | Google Tag Manager id (`GTM-…`), storefront only. Production environment only; build-time. The loader stays silent on localhost / LAN / `*.vercel.app` anyway. Events, container contract and GA4 setup: [`docs/analytics.md`](docs/analytics.md). |
 
 ---
 

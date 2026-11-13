@@ -4,6 +4,8 @@ import { useRef, useState, type CSSProperties, type KeyboardEvent } from "react"
 import Link from "next/link";
 
 import { BagButton } from "@/components/cart/bag-button";
+import { ListImpression } from "@/components/analytics/list-impression";
+import { itemFromProduct } from "@/lib/analytics";
 import { Flacon } from "@/components/ui/flacon";
 import { useDragX } from "@/hooks/use-drag-x";
 import { FOCUS_SCENES } from "@/config/focus-scenes";
@@ -210,11 +212,11 @@ export function InFocus({ fragrances }: { fragrances: Fragrance[] }) {
                     </p>
                     <div className="rh-fslide__buy">
                       <span className="rh-fslide__price rh-tnum">{price}</span>
-                      <BagButton line={line} className="rh-link-u">
+                      <BagButton line={line} list="In Focus" className="rh-link-u">
                         Add to bag
                       </BagButton>
                     </div>
-                    <BagButton line={line} className="rh-fslide__cta">
+                    <BagButton line={line} list="In Focus" className="rh-fslide__cta">
                       <span>Add to bag</span>
                       <span className="rh-tnum">{price}</span>
                     </BagButton>
@@ -250,6 +252,19 @@ export function InFocus({ fragrances }: { fragrances: Fragrance[] }) {
           </button>
         ))}
       </div>
+      <ListImpression
+        listName="In Focus"
+        items={fragrances.map((f) =>
+          itemFromProduct({
+            sku: f.sku,
+            name: f.name,
+            slug: f.slug,
+            volumeMl: f.volumeMl,
+            price: f.price,
+            mrp: f.mrp,
+          }),
+        )}
+      />
     </section>
   );
 }

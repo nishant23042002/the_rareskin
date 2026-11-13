@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import { Spinner } from "@/components/ui/spinner";
 
 type Variant =
   | "solid"
@@ -44,7 +45,22 @@ const variants: Record<Variant, string> = {
     "border-[var(--txt)] bg-[var(--txt)] text-[var(--txt-inv)] hover:bg-[var(--txt-inv)] hover:text-[var(--txt)]",
 };
 
-type StyleProps = { variant?: Variant; size?: Size; className?: string; children: ReactNode };
+type StyleProps = {
+  variant?: Variant;
+  size?: Size;
+  className?: string;
+  children: ReactNode;
+  /**
+   * Opt in to a busy state by passing `loading` (true or false). While true the
+   * button is disabled (no double submit), reports `aria-busy`, and its label slides
+   * out for a spinner + `loadingLabel`. Both labels share one grid cell, so the button
+   * keeps the width of the longer one and nothing around it moves. Buttons that never
+   * pass `loading` render exactly as before.
+   */
+  loading?: boolean;
+  /** the sentence shown beside the spinner while `loading` ("Sending code…") */
+  loadingLabel?: ReactNode;
+};
 
 type ButtonProps = StyleProps &
   Omit<ComponentPropsWithoutRef<"button">, "className" | "children"> & { href?: never };
@@ -57,6 +73,8 @@ export function Button({
   size = "md",
   className,
   children,
+  loading,
+  loadingLabel,
   ...rest
 }: ButtonProps | LinkProps) {
   const classes = cn(base, sizes[size], variants[variant], className);
@@ -69,9 +87,33 @@ export function Button({
     );
   }
 
+  const buttonProps = rest as ComponentPropsWithoutRef<"button">;
+  // a button that never mentions `loading` keeps its plain children
+  if (loading === undefined && loadingLabel === undefined) {
+    return (
+      <button className={classes} {...buttonProps}>
+        {children}
+      </button>
+    );
+  }
+
   return (
-    <button className={classes} {...(rest as ComponentPropsWithoutRef<"button">)}>
-      {children}
+    <button
+      className={classes}
+      {...buttonProps}
+      disabled={buttonProps.disabled || loading}
+      aria-busy={loading || undefined}
+      data-busy={loading ? "" : undefined}
+    >
+      <span className="rh-lb" data-loading={loading ? "" : undefined}>
+        <span className="rh-lb__idle" aria-hidden={loading || undefined}>
+          {children}
+        </span>
+        <span className="rh-lb__busy" aria-hidden={!loading}>
+          <Spinner />
+          {loadingLabel}
+        </span>
+      </span>
     </button>
   );
 }

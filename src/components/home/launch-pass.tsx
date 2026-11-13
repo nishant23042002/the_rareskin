@@ -237,7 +237,13 @@ export function LaunchPass({
             </span>
           </p>
           {/* a phone gets one quiet line instead of the meter and the chips (see app/hero.css) */}
-          <a className="rh-pass__go" href="#collection">
+          <a
+            className="rh-pass__go"
+            href="#collection"
+            data-ga-promo="Launch price pass"
+            data-ga-slot="launch-pass"
+            data-ga-view
+          >
             See the three extraits <RhIcon name="arrow" />
           </a>
           {items.length > 0 && (

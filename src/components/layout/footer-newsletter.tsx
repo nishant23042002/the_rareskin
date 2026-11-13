@@ -1,9 +1,12 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 import { Icon } from "@/components/ui/icon";
+import { Spinner, TickMark } from "@/components/ui/spinner";
+import { shake } from "@/lib/attention";
 import { cn } from "@/lib/cn";
+import { track } from "@/lib/analytics";
 
 type Status = "idle" | "invalid" | "submitting" | "success" | "error";
 
@@ -22,10 +25,16 @@ export function FooterNewsletter() {
   const [message, setMessage] = useState("");
   const inputId = useId();
   const noteId = useId();
+  const rowRef = useRef<HTMLDivElement>(null);
 
   const value = email.trim();
   const valid = EMAIL_RE.test(value);
   const invalid = status === "invalid" || status === "error";
+
+  // a refused address shakes the field row (and the row is what the message is about)
+  useEffect(() => {
+    if (invalid) shake(rowRef.current);
+  }, [invalid, message]);
 
   function onChange(next: string) {
     setEmail(next);
@@ -66,6 +75,7 @@ export function FooterNewsletter() {
         error?: string;
       };
       if (res.ok && data.ok) {
+        track("generate_lead", { form_name: "newsletter" });
         setStatus("success");
       } else {
         setStatus("error");
@@ -87,11 +97,15 @@ export function FooterNewsletter() {
       </label>
 
       {status === "success" ? (
-        <p className="serif-italic flex h-14 items-center text-[1.2rem] text-champagne">
+        <p className="serif-italic rh-phase-in flex h-14 items-center gap-3 text-[1.2rem] text-champagne">
+          <span className="grid size-6 shrink-0 place-items-center rounded-full border border-brass/60 text-brass">
+            <TickMark className="size-3" />
+          </span>
           Welcome — your place is reserved.
         </p>
       ) : (
         <div
+          ref={rowRef}
           className={cn(
             "flex h-14 items-center border-b transition-colors duration-300",
             invalid
@@ -121,10 +135,14 @@ export function FooterNewsletter() {
             className="group inline-flex h-11 shrink-0 items-center gap-2 pl-4 text-[11px] tracking-[0.2em] text-champagne uppercase transition-colors duration-300 hover:text-brass disabled:opacity-60"
           >
             {status === "submitting" ? "Joining" : "Join"}
-            <Icon
-              name="arrowRight"
-              className="size-4 transition-transform duration-300 ease-[var(--ease-out-strong)] group-hover:translate-x-1"
-            />
+            {status === "submitting" ? (
+              <Spinner className="size-4" />
+            ) : (
+              <Icon
+                name="arrowRight"
+                className="size-4 transition-transform duration-300 ease-[var(--ease-out-strong)] group-hover:translate-x-1"
+              />
+            )}
           </button>
         </div>
       )}

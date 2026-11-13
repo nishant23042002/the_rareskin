@@ -3,10 +3,13 @@
 import { useRef, useState, type CSSProperties } from "react";
 import { Flacon } from "@/components/ui/flacon";
 import { Icon } from "@/components/ui/icon";
+import { Odometer } from "@/components/ui/odometer";
+import { haptic } from "@/lib/haptics";
 import { gsap } from "@/lib/gsap";
 import { useCart } from "@/components/providers/cart-provider";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { FRAGRANCE_PALETTE, formatINR } from "@/lib/catalog";
+import { cn } from "@/lib/cn";
 import { MAX_QTY, type CartLine } from "@/lib/cart";
 
 /** "50 ml · Extrait de Parfum" / "3 × 10 ml · Discovery Set", from the line's own meta */
@@ -35,10 +38,12 @@ export function CartLineRow({
   /** position in the drawer's rise-in stagger (see `.rh-in` in home.css) */
   slot?: number;
 }) {
-  const { setQty, removeItem, suggestions } = useCart();
+  const { setQty, removeItem, suggestions, isOpen } = useCart();
   const reduced = useReducedMotion();
   const rowRef = useRef<HTMLLIElement>(null);
   const [leaving, setLeaving] = useState(false);
+  // a line that appears while the bag is open (a one-tap add-on, an Undo) lights up and skips the open stagger
+  const [fresh] = useState(isOpen);
 
   const f = line.fragrance ? FRAGRANCE_PALETTE[line.fragrance] : null;
   // the cart line keeps no picture, so borrow the catalogue's by SKU; a size (10 ml, 100 ml) is not a suggestion
@@ -74,8 +79,8 @@ export function CartLineRow({
     <li
       ref={rowRef}
       data-cart-line
-      className="rh-in overflow-hidden border-b border-line/70"
-      style={{ "--i": Math.min(slot, 6) } as CSSProperties}
+      className={cn("rh-in overflow-hidden border-b border-line/70", fresh && "rh-fresh")}
+      style={{ "--i": fresh ? 0 : Math.min(slot, 6) } as CSSProperties}
     >
       <div className="flex gap-4 bg-surface px-5 py-5">
         {/* product picture */}
@@ -131,12 +136,12 @@ export function CartLineRow({
 
           <div className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
             <p className="text-[16px] leading-none font-semibold tabular-nums text-ink">
-              {formatINR(line.price * line.qty)}
+              <Odometer text={formatINR(line.price * line.qty)} />
             </p>
             {saved > 0 && (
               <>
                 <span className="text-[11.5px] leading-none tabular-nums text-ink-3 line-through">
-                  {formatINR(line.mrp! * line.qty)}
+                  <Odometer text={formatINR(line.mrp! * line.qty)} />
                 </span>
                 <span className="rounded-full bg-ok/15 px-2 py-[3px] text-[10px] leading-none font-medium tracking-[0.06em] text-ok uppercase tabular-nums">
                   Save {formatINR(saved)}
@@ -153,7 +158,11 @@ export function CartLineRow({
           >
             <button
               type="button"
-              onClick={() => (atOne ? remove() : setQty(line.sku, line.qty - 1))}
+              onClick={() => {
+                haptic("soft");
+                if (atOne) remove();
+                else setQty(line.sku, line.qty - 1);
+              }}
               aria-label={
                 atOne
                   ? `Remove ${line.name} from bag`
@@ -165,13 +174,16 @@ export function CartLineRow({
             </button>
             <span
               aria-live="polite"
-              className="min-w-[24px] px-0.5 text-center text-[13px] font-medium tabular-nums text-ink"
+              className="inline-flex min-w-[24px] justify-center px-0.5 text-center text-[13px] leading-none font-medium tabular-nums text-ink"
             >
-              {line.qty}
+              <Odometer text={String(line.qty)} />
             </span>
             <button
               type="button"
-              onClick={() => setQty(line.sku, line.qty + 1)}
+              onClick={() => {
+                haptic("soft");
+                setQty(line.sku, line.qty + 1);
+              }}
               disabled={line.qty >= MAX_QTY}
               aria-label={`Increase ${line.name} quantity`}
               className="grid h-9 w-9 place-items-center rounded-full transition-[transform,color,background-color] duration-150 hover:bg-ink/10 hover:text-ink active:scale-90 disabled:pointer-events-none disabled:opacity-30"

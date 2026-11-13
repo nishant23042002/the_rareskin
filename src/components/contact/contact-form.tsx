@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
+import { track } from "@/lib/analytics";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -68,6 +69,7 @@ export function ContactForm() {
       });
       const json = (await res.json()) as { ok?: boolean; error?: string };
       if (res.ok && json.ok) {
+        track("generate_lead", { form_name: "contact" });
         setStatus("success");
       } else {
         setStatus("error");
@@ -132,11 +134,14 @@ export function ContactForm() {
           variant="solid"
           size="md"
           disabled={status === "submitting"}
+          loading={status === "submitting"}
+          loadingLabel="Sending…"
         >
-          {status === "submitting" ? "Sending" : "Send message"}
+          Send message
         </Button>
         <p
-          className="text-[11px] tracking-[0.03em] text-gilt/90"
+          key={status === "error" ? message : "ok"}
+          className={cn("text-[11px] tracking-[0.03em] text-gilt/90", status === "error" && "rh-shake")}
           role="alert"
         >
           {status === "error" ? message : ""}

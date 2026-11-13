@@ -4,6 +4,8 @@ import { Container } from "@/components/ui/container";
 import { PageIntro } from "@/components/layout/page-intro";
 import { DiscoverySet } from "@/components/home/discovery-set";
 import { DiscoverySetGallery } from "@/components/product/discovery-set-gallery";
+import { ViewItem } from "@/components/analytics/view-item";
+import { itemFromProduct } from "@/lib/analytics";
 import { formatINR, DISCOVERY_SET_SLUG } from "@/lib/catalog";
 import { DISCOVERY_SET_GALLERY, pdpPhotoSrc } from "@/config/pdp-gallery";
 import { SITE, absoluteUrl } from "@/lib/site";
@@ -90,6 +92,17 @@ export default async function DiscoverySetPage() {
 
   return (
     <main id="main" data-reveal>
+      <ViewItem
+        item={itemFromProduct({
+          sku: set.sku,
+          name: set.name,
+          volumeMl: set.perVialMl,
+          price: set.price,
+          mrp: set.mrp,
+          isSet: true,
+          meta: `${set.vialCount} × ${set.perVialMl} ml`,
+        })}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}

@@ -21,12 +21,24 @@ import {
   readCart,
   writeCart,
   initialCartState,
+  MAX_QTY,
   type CartLine,
 } from "@/lib/cart";
 import { useAuth } from "@/components/providers/auth-provider";
 import { isFragranceSlug, type BagSuggestion } from "@/lib/catalog";
+import * as ga from "@/lib/analytics";
 
 const noopSubscribe = () => () => {};
+
+/** Where an add-to-bag came from when the button did not say: the page it happened on. */
+function listFromPath(): string {
+  if (typeof window === "undefined") return "Site";
+  const p = window.location.pathname;
+  if (p === "/") return "Home";
+  if (p.startsWith("/fragrances/")) return "Product page";
+  if (p.startsWith("/discovery-set")) return "Discovery Set page";
+  return "Site";
+}
 
 /** The drawer is one panel that slides between three views. */
 type CartView = "bag" | "checkout" | "done";
@@ -36,6 +48,27 @@ interface PlacedOrder {
   method: "razorpay" | "cod";
   /** true once payment is confirmed (Razorpay) — COD stays false */
   paid: boolean;
+  /** what the confirmation's receipt shows (the bag is already empty by then) */
+  summary?: {
+    totalPaise: number;
+    items: number;
+    email: string;
+  };
+}
+
+export type ToastTone = "added" | "removed" | "info";
+export interface ToastAction {
+  label: string;
+  run: () => void;
+}
+export interface ToastState {
+  /** a fresh id per toast, so the same words twice still replay the animation */
+  id: number;
+  message: string;
+  tone: ToastTone;
+  action: ToastAction | null;
+  /** how long it stays (ms); drives the countdown hairline */
+  ms: number;
 }
 
 interface CartContextValue {
@@ -55,6 +88,9 @@ interface CartContextValue {
   /** the order just placed, shown on the `done` view */
   placedOrder: PlacedOrder | null;
   toast: string | null;
+  /** the toast's detail: its kind, an optional action (Undo), how long it stays */
+  toastState: ToastState | null;
+  dismissToast: () => void;
   openCart: () => void;
   closeCart: () => void;
   /** slide to the checkout view (opening the drawer if needed) */
@@ -79,7 +115,8 @@ interface CartContextValue {
   modalSuspended: boolean;
   suspendModal: () => void;
   resumeModal: () => void;
-  addItem: (line: Omit<CartLine, "qty"> & { qty?: number }) => void;
+  /** `list` names where the add happened, for analytics only (defaults to the page it is on) */
+  addItem: (line: Omit<CartLine, "qty"> & { qty?: number }, list?: string) => void;
   setQty: (sku: string, qty: number) => void;
   removeItem: (sku: string) => void;
   clear: () => void;
@@ -102,7 +139,9 @@ export function CartProvider({
   const [view, setView] = useState<CartView>("bag");
   const [placedOrder, setPlacedOrder] = useState<PlacedOrder | null>(null);
   const [modalSuspended, setModalSuspended] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
+  const [toastState, setToastState] = useState<ToastState | null>(null);
+  const toast = toastState?.message ?? null;
+  const toastId = useRef(0);
   const toastTimer = useRef<number | undefined>(undefined);
   const resetTimer = useRef<number | undefined>(undefined);
   const { hydrated } = state;
@@ -131,9 +170,24 @@ export function CartProvider({
   const prevStatus = useRef(status);
   const stateRef = useRef(state);
   const mergingRef = useRef(false);
+  const viewRef = useRef<CartView>("bag");
+  const isOpenRef = useRef(false);
   useEffect(() => {
     stateRef.current = state;
+    viewRef.current = view;
+    isOpenRef.current = isOpen;
   });
+
+  // GA4 view_cart: the drawer just opened on the bag (not on checkout) with something in it.
+  const wasOpenRef = useRef(false);
+  useEffect(() => {
+    const justOpened = isOpen && !wasOpenRef.current;
+    wasOpenRef.current = isOpen;
+    if (justOpened && view === "bag" && state.lines.length > 0) {
+      ga.viewCart(state.lines.map((l) => ga.itemFromLine(l)));
+    }
+  }, [isOpen, view, state.lines]);
+
   useEffect(() => {
     const was = prevStatus.current;
     prevStatus.current = status;
@@ -217,10 +271,30 @@ export function CartProvider({
     return () => clearTimeout(t);
   }, [state.lines, status, hydrated]);
 
-  const notify = useCallback((message: string) => {
-    setToast(message);
+  const notify = useCallback(
+    (
+      message: string,
+      opts: { tone?: ToastTone; action?: ToastAction; ms?: number } = {},
+    ) => {
+      // a toast with an Undo stays long enough to read it and decide
+      const ms = opts.ms ?? (opts.action ? 5200 : 2200);
+      toastId.current += 1;
+      setToastState({
+        id: toastId.current,
+        message,
+        tone: opts.tone ?? "added",
+        action: opts.action ?? null,
+        ms,
+      });
+      window.clearTimeout(toastTimer.current);
+      toastTimer.current = window.setTimeout(() => setToastState(null), ms);
+    },
+    [],
+  );
+
+  const dismissToast = useCallback(() => {
     window.clearTimeout(toastTimer.current);
-    toastTimer.current = window.setTimeout(() => setToast(null), 2000);
+    setToastState(null);
   }, []);
 
   useEffect(
@@ -253,6 +327,10 @@ export function CartProvider({
 
   const goToCheckout = useCallback(() => {
     if (!checkoutAvailable) return;
+    // GA4 begin_checkout — once per trip into checkout, not on every re-press
+    if (viewRef.current !== "checkout") {
+      ga.beginCheckout(stateRef.current.lines.map((l) => ga.itemFromLine(l)));
+    }
     window.clearTimeout(resetTimer.current);
     setPlacedOrder(null);
     setView("checkout");
@@ -281,6 +359,8 @@ export function CartProvider({
       view,
       placedOrder,
       toast,
+      toastState,
+      dismissToast,
       openCart,
       closeCart,
       goToCheckout,
@@ -290,12 +370,45 @@ export function CartProvider({
       modalSuspended,
       suspendModal,
       resumeModal,
-      addItem: (line) => {
-        dispatch({ type: "add", line });
-        notify(`${line.name} added to bag`);
+      addItem: (line, list) => {
+        const tagged = { ...line, list: line.list ?? list ?? listFromPath() };
+        dispatch({ type: "add", line: tagged });
+        // GA4 add_to_cart — only the units that really went in (a line is capped at MAX_QTY)
+        const have = stateRef.current.lines.find((l) => l.sku === line.sku)?.qty ?? 0;
+        const added = Math.min(MAX_QTY, have + (line.qty ?? 1)) - have;
+        if (added > 0) ga.addToCart([ga.itemFromLine({ ...tagged, qty: added })]);
+        // with the bag open the new line lights up in the list itself; a toast on top of that is noise
+        if (!isOpenRef.current) notify(`${line.name} added to bag`);
       },
-      setQty: (sku, qty) => dispatch({ type: "setQty", sku, qty }),
-      removeItem: (sku) => dispatch({ type: "remove", sku }),
+      setQty: (sku, qty) => {
+        const cur = stateRef.current.lines.find((l) => l.sku === sku);
+        dispatch({ type: "setQty", sku, qty });
+        if (cur) {
+          // the stepper: more → add_to_cart for the difference, fewer (or 0) → remove_from_cart
+          const next = qty <= 0 ? 0 : Math.min(MAX_QTY, Math.max(1, Math.round(qty)));
+          const delta = next - cur.qty;
+          if (delta > 0) ga.addToCart([ga.itemFromLine(cur, delta)]);
+          else if (delta < 0) ga.removeFromCart([ga.itemFromLine(cur, -delta)]);
+        }
+      },
+      removeItem: (sku) => {
+        const cur = stateRef.current.lines.find((l) => l.sku === sku);
+        dispatch({ type: "remove", sku });
+        if (!cur) return;
+        ga.removeFromCart([ga.itemFromLine(cur)]);
+        // taking something out is the one action people regret: say so, and offer the way back
+        notify(`${cur.name} removed`, {
+          tone: "removed",
+          action: {
+            label: "Undo",
+            run: () => {
+              dispatch({ type: "add", line: cur });
+              ga.addToCart([ga.itemFromLine(cur)]);
+              dismissToast();
+            },
+          },
+        });
+      },
       clear: () => dispatch({ type: "clear" }),
     }),
     [
@@ -309,6 +422,8 @@ export function CartProvider({
       suspendModal,
       resumeModal,
       toast,
+      toastState,
+      dismissToast,
       notify,
       openCart,
       closeCart,

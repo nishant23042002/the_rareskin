@@ -103,6 +103,7 @@ export function DiscoverySet({
         <p className="rh-dset__detail">{set.detail}</p>
         <BagButton
           line={line}
+          list="Discovery Set"
           className="rh-dset__cta"
           added={<span style={{ margin: "0 auto" }}>Added ✓</span>}
         >

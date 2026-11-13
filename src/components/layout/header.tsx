@@ -348,6 +348,7 @@ export function Header({
               type="button"
               className="rh-nav-btn"
               onClick={openCart}
+              data-bag-target
               aria-label={`Open bag, ${count} ${count === 1 ? "item" : "items"}`}
             >
               <RhIcon name="bag" />

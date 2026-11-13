@@ -5,6 +5,8 @@ import type { CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
 import { PayStack } from "@/components/ui/payment-marks";
 import { Icon } from "@/components/ui/icon";
+import { Odometer } from "@/components/ui/odometer";
+import { haptic } from "@/lib/haptics";
 import { useCart } from "@/components/providers/cart-provider";
 import { formatINR } from "@/lib/catalog";
 import { BagSuggestions } from "./bag-suggestions";
@@ -128,13 +130,16 @@ export function BagView({
               {shippingFree || feeKnown ? "Total" : "Bag total"}
             </dt>
             <dd className="serif text-[1.6rem] leading-none tabular-nums text-ink">
-              {formatINR(payable)}
+              <Odometer text={formatINR(payable)} />
             </dd>
           </div>
         </dl>
 
         <Button
-          onClick={goToCheckout}
+          onClick={() => {
+            haptic("tap");
+            goToCheckout();
+          }}
           disabled={!checkoutAvailable}
           size="lg"
           className="group mt-4 w-full whitespace-nowrap max-[479px]:px-4 max-[479px]:tracking-[0.12em] [@media(max-height:720px)]:mt-3 [@media(max-height:720px)]:py-3.5"
@@ -146,7 +151,9 @@ export function BagView({
                 <span className="max-[419px]:hidden">Proceed to </span>
                 Checkout
                 <span aria-hidden> • </span>
-                <span className="tabular-nums">{formatINR(payable)}</span>
+                <span className="tabular-nums">
+                  <Odometer text={formatINR(payable)} />
+                </span>
               </span>
               <span className="flex shrink-0 items-center gap-3">
                 <PayStack />
@@ -191,7 +198,7 @@ function SummaryRow({
               : "tabular-nums text-ink"
         }
       >
-        {value}
+        {/\d/.test(value) ? <Odometer text={value} /> : value}
       </dd>
     </div>
   );

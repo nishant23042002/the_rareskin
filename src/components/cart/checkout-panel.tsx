@@ -12,7 +12,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Flacon } from "@/components/ui/flacon";
 import { Icon, type IconName } from "@/components/ui/icon";
+import { Odometer } from "@/components/ui/odometer";
 import { PaymentBadges, UpiAppStrip } from "@/components/ui/payment-marks";
+import { Spinner, TickMark } from "@/components/ui/spinner";
+import { PaymentOverlay, type PayPhase } from "@/components/cart/payment-overlay";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useCart } from "@/components/providers/cart-provider";
 import { cn } from "@/lib/cn";
@@ -22,6 +25,10 @@ import { maskPhone, normalizeIndianMobile } from "@/lib/auth";
 import { isFragranceSlug } from "@/lib/catalog";
 import { itemThumbPath } from "@/lib/item-thumb";
 import { openRazorpayCheckout } from "@/lib/razorpay-checkout";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { shake } from "@/lib/attention";
+import { haptic } from "@/lib/haptics";
+import * as ga from "@/lib/analytics";
 import type {
   CheckoutQuoteResponse,
   PaymentConfirmResponse,
@@ -104,7 +111,11 @@ function issueFromConfirm(vd: PaymentConfirmResponse | null): PaymentIssue {
 const labelCls =
   "block text-[10.5px] font-medium tracking-[0.12em] text-ink-3 uppercase";
 const fieldCls =
-  "mt-1.5 w-full border-0 border-b border-line-2 bg-transparent pb-2 text-[15px] text-ink transition-colors focus:border-ink focus:outline-none";
+  "rh-fld mt-1.5 w-full border-0 border-b border-line-2 bg-transparent pb-2 text-[15px] text-ink transition-colors focus:border-ink focus:outline-none";
+
+/** the least time the "confirming with your bank" step stays on screen, so a fast verification still reads as a step */
+const MIN_CONFIRM_MS = 1100;
+const wait = (ms: number) => new Promise<void>((r) => window.setTimeout(r, ms));
 
 function Field({
   label,
@@ -116,6 +127,7 @@ function Field({
   maxLength,
   error,
   required,
+  trailing,
 }: {
   label: string;
   value: string;
@@ -126,10 +138,13 @@ function Field({
   maxLength?: number;
   error?: string | null;
   required?: boolean;
+  /** a small live status at the field's right edge (the PIN's spinner, tick or cross) */
+  trailing?: React.ReactNode;
 }) {
   const id = useId();
+  const errId = `${id}-err`;
   return (
-    <div>
+    <div data-field className="relative">
       <label htmlFor={id} className={labelCls}>
         {label}
         {required ? " *" : ""}
@@ -143,10 +158,20 @@ function Field({
         maxLength={maxLength}
         autoComplete={autoComplete}
         aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errId : undefined}
         onChange={(e) => onChange(e.target.value)}
-        className={cn(fieldCls, error && "border-error focus:border-error")}
+        className={cn(fieldCls, trailing ? "pr-7" : undefined, error && "border-error focus:border-error")}
       />
-      {error && <p className="mt-1 text-[11.5px] text-error">{error}</p>}
+      {trailing && (
+        <span aria-hidden="true" className="absolute right-0 bottom-2.5 grid size-4 place-items-center">
+          {trailing}
+        </span>
+      )}
+      {error && (
+        <p id={errId} className="mt-1 text-[11.5px] text-error">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -214,6 +239,18 @@ export function CheckoutPanel() {
   const [cartChanged, setCartChanged] = useState<QuoteWarning[] | null>(null);
 
   const [paying, setPaying] = useState(false);
+  /** where the current payment attempt is (null = none); drives the overlay and the button's busy label */
+  const [phase, setPhase] = useState<PayPhase | null>(null);
+  const busy = phase !== null || placing || paying;
+  const reduced = useReducedMotion();
+  /** a coupon the server refused: kept here, because the rejected code is dropped from the quote */
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const couponRowRef = useRef<HTMLDivElement>(null);
+  /** bumps whenever Pay is pressed with something missing; the effect below walks the shopper to it */
+  const [attn, setAttn] = useState<{ n: number; target: "address" | "email" }>({
+    n: 0,
+    target: "address",
+  });
   const [paymentIssue, setPaymentIssue] = useState<PaymentIssue | null>(null);
   const [payState, setPayState] = useState<
     { kind: "dev"; intentId: string } | { kind: "retry" } | null
@@ -226,6 +263,31 @@ export function CheckoutPanel() {
       scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [paymentIssue]);
+
+  // Pay pressed with something missing: scroll to the first thing that needs fixing, focus it, shake it.
+  useEffect(() => {
+    if (attn.n === 0) return;
+    const root = scrollRef.current;
+    if (!root) return;
+    // a frame later, so a field that has only just been opened is laid out
+    const id = requestAnimationFrame(() => {
+      const bad = root.querySelector<HTMLElement>('[aria-invalid="true"]');
+      const target =
+        bad ?? root.querySelector<HTMLElement>(`[data-section="${attn.target}"]`);
+      if (!target) return;
+      target.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
+      bad?.focus({ preventScroll: true });
+      shake(bad?.closest("[data-field]") ?? target);
+    });
+    return () => cancelAnimationFrame(id);
+  }, [attn, reduced]);
+
+  // a refused coupon: the input row (back on screen once the chip is dropped) shakes
+  useEffect(() => {
+    if (!couponError) return;
+    const id = requestAnimationFrame(() => shake(couponRowRef.current));
+    return () => cancelAnimationFrame(id);
+  }, [couponError]);
 
   // Dedupes a COD double-submit. Online checkout is payment-first — each attempt
   // mints a fresh Razorpay order, so no client key is needed there.
@@ -334,6 +396,9 @@ export function CheckoutPanel() {
     const t = setTimeout(() => {
       if (quote.coupon && quote.coupon.applied === false) {
         setAppliedCoupon((c) => (c ? null : c));
+        // keep the reason on screen (the next quote no longer mentions the dropped code) and shake the field
+        setCouponError(quote.coupon.reason);
+        haptic("error");
       }
       if (!quote.methods.includes("cod")) {
         setMethod((m) => (m === "cod" ? "razorpay" : m));
@@ -341,6 +406,27 @@ export function CheckoutPanel() {
     }, 0);
     return () => clearTimeout(t);
   }, [quote]);
+
+  // ── analytics (GA4; see src/lib/analytics.ts) ────────────────────────
+  // add_shipping_info + add_payment_info go out once per visit to checkout (a retry after a failed
+  // payment is not a second one); leaving the checkout view re-arms them.
+  const infoSent = useRef(false);
+  useEffect(() => {
+    if (view !== "checkout") infoSent.current = false;
+  }, [view]);
+  // a coupon the shopper tried: did the server take it?
+  const couponSeen = useRef<string | null>(null);
+  useEffect(() => {
+    const c = quote?.coupon;
+    if (!c) return;
+    const key = `${c.code}:${c.applied}`;
+    if (couponSeen.current === key) return;
+    couponSeen.current = key;
+    ga.track("apply_coupon", { coupon: c.code, coupon_result: c.applied ? "applied" : "rejected" });
+    if (c.applied) haptic("success");
+  }, [quote]);
+  // the server's pricing of the order being paid for — kept for the dev-simulate path, which learns the order number later
+  const pricingRef = useRef<PlaceOrderSuccess["pricing"] | null>(null);
 
   // ── gates / early returns ────────────────────────────────────────────
   if (!hydrated || status === "loading") {
@@ -394,8 +480,31 @@ export function CheckoutPanel() {
   const emailValid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim());
   const addressResolved =
     addressMode === "saved" ? Boolean(savedId) : isNewAddrComplete(addr);
-  const canPay =
-    Boolean(quote) && !quoting && !pinBlocked && addressResolved && emailValid;
+  // The button is live as soon as the price is known. Missing details are not a reason to grey it out
+  // (that leaves no hint why): pressing it walks the shopper to what is missing instead.
+  const ready = Boolean(quote) && !quoting && !pinBlocked;
+  const missing: "address" | "email" | null = !addressResolved
+    ? "address"
+    : !emailValid
+      ? "email"
+      : null;
+
+  // the coupon, as the server sees it: still being checked, accepted, or (via couponError) refused
+  const couponAccepted =
+    appliedCoupon && quote?.coupon?.applied === true && quote.coupon.code === appliedCoupon
+      ? quote.coupon
+      : null;
+  const couponChecking = Boolean(appliedCoupon) && !couponAccepted;
+
+  // the PIN's live status: a spinner while it is being checked, then a tick or a cross
+  const pinComplete = /^[1-9]\d{5}$/.test(addr.pincode);
+  const pinStatus = !pinComplete
+    ? null
+    : service && service.pincode === addr.pincode
+      ? service.serviceable
+        ? "ok"
+        : "bad"
+      : "checking";
 
   const reviewLines: QuoteLine[] =
     quote?.lines ??
@@ -439,6 +548,26 @@ export function CheckoutPanel() {
     return Object.keys(e).length === 0;
   }
 
+  /**
+   * A field's error stays only while the field is still wrong: fix it and the message goes at once
+   * (it comes back if they break it again). Validation runs on Pay; this keeps its red from outliving the fix.
+   */
+  function shownErr(
+    k: "name" | "phone" | "line1" | "city" | "state" | "pincode",
+  ): string | undefined {
+    const msg = addrErr[k];
+    if (!msg) return undefined;
+    const ok = {
+      name: addr.name.trim().length >= 2,
+      phone: /^\+?[0-9\s-]{10,14}$/.test(addr.phone),
+      line1: addr.line1.trim().length >= 4,
+      city: addr.city.trim().length >= 2,
+      state: Boolean(addr.state),
+      pincode: /^[1-9]\d{5}$/.test(addr.pincode),
+    }[k];
+    return ok ? undefined : msg;
+  }
+
   function onPincodeChange(v: string) {
     const digits = v.replace(/\D/g, "").slice(0, 6);
     setAddr((a) => {
@@ -453,31 +582,71 @@ export function CheckoutPanel() {
 
   function applyCoupon() {
     const code = couponInput.trim().toUpperCase();
-    if (code.length >= 3) setAppliedCoupon(code);
+    if (code.length < 3) return;
+    setCouponError(null);
+    setAppliedCoupon(code);
+  }
+
+  /** Something is missing: shake it, scroll to it, give the phone a tap. */
+  function needAttention(target: "address" | "email") {
+    haptic("error");
+    setAttn((a) => ({ n: a.n + 1, target }));
   }
 
   /** The one action: validate what's on screen, then place + pay. */
   function onPay() {
     setPlaceError(null);
     setEmailErr(null);
-    if (!emailValid) {
-      setEmailErr("Enter a valid email for the receipt.");
-      setEmailEditing(true);
-      return;
-    }
     if (addressMode === "new" && !validateAddress()) {
       setEditingAddress(true);
+      needAttention("address");
       return;
     }
     if (addressMode === "saved" && !savedId) {
       setEditingAddress(true);
+      needAttention("address");
       return;
     }
     if (pinBlocked) {
       setEditingAddress(true);
+      needAttention("address");
       return;
     }
+    if (!emailValid) {
+      setEmailErr("Enter a valid email for the receipt.");
+      setEmailEditing(true);
+      needAttention("email");
+      return;
+    }
+    if (!infoSent.current) {
+      infoSent.current = true;
+      const coupon = appliedCoupon && quote?.coupon?.applied ? appliedCoupon : undefined;
+      const items = cartLines.map((l) => ga.itemFromLine(l));
+      ga.addShippingInfo(items, quote?.pricing.shippingPaise === 0 ? "Free shipping" : "Standard", coupon);
+      ga.addPaymentInfo(items, method === "cod" ? "Cash on delivery" : "Online (Razorpay)", coupon);
+    }
     void placeOrder();
+  }
+
+  /** what the confirmation's receipt shows: the bag is already empty by then, so it is taken now */
+  function summaryOf(pricing: PlaceOrderSuccess["pricing"]) {
+    return {
+      totalPaise: pricing.grandTotalPaise,
+      items: cartLines.reduce((n, l) => n + l.qty, 0),
+      email: email.trim().toLowerCase(),
+    };
+  }
+
+  /** GA4 purchase for a confirmed order — goods revenue (items − coupon); shipping + COD fee reported apart. */
+  function reportPurchase(orderNumber: string, pricing: PlaceOrderSuccess["pricing"]) {
+    ga.purchase({
+      transactionId: orderNumber,
+      value: (pricing.itemsSubtotalPaise - pricing.discountPaise) / 100,
+      shipping: (pricing.shippingPaise + pricing.codFeePaise) / 100,
+      tax: pricing.gst.totalPaise / 100,
+      coupon: appliedCoupon && quote?.coupon?.applied ? appliedCoupon : undefined,
+      items: cartLines.map((l) => ga.itemFromLine(l)),
+    });
   }
 
   async function placeOrder() {
@@ -529,6 +698,7 @@ export function CheckoutPanel() {
     }
 
     setPlacing(true);
+    setPhase("securing");
     try {
       const res = await fetch("/api/checkout/place", {
         method: "POST",
@@ -540,6 +710,8 @@ export function CheckoutPanel() {
         await handlePayment(data);
         return;
       }
+      // why a checkout stalled — "not-serviceable" in particular is demand we cannot serve yet
+      if (data.code !== "auth-required") ga.track("checkout_error", { reason: data.code });
       if (data.code === "cart-changed") {
         setCartChanged((data.details as QuoteWarning[]) ?? []);
         void fetchQuote();
@@ -547,6 +719,7 @@ export function CheckoutPanel() {
         openSignIn();
       } else {
         setPlaceError(data.message ?? "Something went wrong. Please try again.");
+        haptic("error");
         if (
           data.code === "address-required" ||
           data.code === "not-serviceable"
@@ -556,8 +729,10 @@ export function CheckoutPanel() {
       }
     } catch {
       setPlaceError("We couldn’t reach the server. Check your connection.");
+      haptic("error");
     } finally {
       setPlacing(false);
+      setPhase(null);
     }
   }
 
@@ -565,9 +740,17 @@ export function CheckoutPanel() {
 
   async function handlePayment(placed: PlaceOrderSuccess) {
     if (placed.kind === "cod") {
-      completeOrder({ orderNumber: placed.orderNumber, method: "cod", paid: false });
+      reportPurchase(placed.orderNumber, placed.pricing);
+      haptic("success");
+      completeOrder({
+        orderNumber: placed.orderNumber,
+        method: "cod",
+        paid: false,
+        summary: summaryOf(placed.pricing),
+      });
       return;
     }
+    pricingRef.current = placed.pricing;
     const { payment } = placed;
     if (payment.kind === "razorpay-dev") {
       setPayState({ kind: "dev", intentId: placed.intentId });
@@ -579,6 +762,7 @@ export function CheckoutPanel() {
     // The drawer is a top-layer <dialog>; drop it to non-modal so Razorpay's
     // hosted checkout opens in front of it, not behind.
     suspendModal();
+    setPhase("window");
     try {
       const outcome = await openRazorpayCheckout({
         keyId: payment.keyId,
@@ -587,8 +771,12 @@ export function CheckoutPanel() {
         prefill: payment.prefill,
         reference: "THE RARESKIN order",
       });
+      // the payment window is closed: the drawer is the top layer again from here on
+      resumeModal();
 
       if (outcome.status === "success") {
+        setPhase("confirming");
+        const confirmStarted = Date.now();
         // The modal's "success" is only a signed payload — the server confirms
         // with Razorpay that money was actually CAPTURED before any order
         // exists. `completeOrder` (→ the "done" view) is reachable from exactly
@@ -605,13 +793,20 @@ export function CheckoutPanel() {
           vd = null; // network / non-JSON → unconfirmed, never success
         }
         if (vd?.ok === true && vd.orderNumber) {
+          // let "confirming with your bank" register as a step even when the server answers at once
+          await wait(Math.max(0, MIN_CONFIRM_MS - (Date.now() - confirmStarted)));
+          reportPurchase(vd.orderNumber, placed.pricing);
+          haptic("success");
           completeOrder({
             orderNumber: vd.orderNumber,
             method: "razorpay",
             paid: true,
+            summary: summaryOf(placed.pricing),
           });
           return;
         }
+        haptic("error");
+        ga.track("payment_failed", { payment_type: "razorpay", reason: vd?.error ?? "unconfirmed" });
         setPayState({ kind: "retry" });
         setPaymentIssue(issueFromConfirm(vd));
         return;
@@ -619,6 +814,11 @@ export function CheckoutPanel() {
 
       // failed (bank / UPI app declined) or dismissed (window closed) — no
       // order, bag untouched, drawer stays on the checkout view.
+      haptic("error");
+      ga.track("payment_failed", {
+        payment_type: "razorpay",
+        reason: outcome.status === "failed" ? "declined" : "dismissed",
+      });
       setPayState({ kind: "retry" });
       setPaymentIssue({
         tone: "failed",
@@ -628,6 +828,7 @@ export function CheckoutPanel() {
             : "the payment window was closed before the payment completed",
       });
     } catch (err) {
+      ga.track("payment_failed", { payment_type: "razorpay", reason: "window_failed" });
       setPayState({ kind: "retry" });
       setPaymentIssue({
         tone: "failed",
@@ -643,6 +844,7 @@ export function CheckoutPanel() {
   async function simulatePayment(outcome: "paid" | "failed") {
     if (payState?.kind !== "dev") return;
     setPaying(true);
+    setPhase("confirming");
     setPaymentIssue(null);
     try {
       const r = await fetch("/api/payments/dev-simulate", {
@@ -652,12 +854,16 @@ export function CheckoutPanel() {
       });
       const d = (await r.json()) as PaymentConfirmResponse;
       if (d.ok && d.orderNumber) {
+        if (pricingRef.current) reportPurchase(d.orderNumber, pricingRef.current);
+        haptic("success");
         completeOrder({
           orderNumber: d.orderNumber,
           method: "razorpay",
           paid: true,
+          summary: pricingRef.current ? summaryOf(pricingRef.current) : undefined,
         });
       } else {
+        haptic("error");
         setPaymentIssue({
           tone: "failed",
           reason:
@@ -672,34 +878,41 @@ export function CheckoutPanel() {
       setPaymentIssue({ tone: "unconfirmed", reason: "network error" });
     } finally {
       setPaying(false);
+      setPhase(null);
     }
   }
 
   /** Last attempt did not complete and the shopper is on Razorpay again. */
   const retrying = payState?.kind === "retry" && method === "razorpay";
-  const footerLabel =
-    placing || paying
-      ? method === "cod"
-        ? "Placing your order…"
-        : "Opening secure payment…"
-      : method === "cod"
-        ? "Place order"
-        : retrying
-          ? "Retry payment"
-          : "Pay securely";
+  const idleLabel =
+    method === "cod" ? "Place order" : retrying ? "Retry payment" : "Pay securely";
+  // what the button says while it is working: the same sentence the overlay is showing
+  const busyLabel =
+    method === "cod"
+      ? "Placing your order…"
+      : phase === "confirming"
+        ? "Confirming payment…"
+        : phase === "window"
+          ? "Waiting for payment…"
+          : "Securing your order…";
 
   return (
     <>
+      {/* a hairline runs along the top while anything is being worked out (a re-price, an order, a payment) */}
+      {(quoting || busy) && <div className="rh-live" aria-hidden="true" />}
+      {phase && <PaymentOverlay phase={phase} method={method} />}
+
       <div
         ref={scrollRef}
         data-lenis-prevent
-        className="flex-1 overflow-y-auto overscroll-contain"
+        inert={phase !== null}
+        className="flex-1 overflow-x-hidden overflow-y-auto overscroll-contain"
       >
         {/* ── payment did not complete — top of the panel, can't be missed ── */}
         {paymentIssue && (
           <div
             role="alert"
-            className="border-b border-error/40 bg-error/10 px-6 py-4 text-[13px] leading-relaxed text-ink"
+            className="rh-shake border-b border-error/40 bg-error/10 px-6 py-4 text-[13px] leading-relaxed text-ink"
           >
             {paymentIssue.tone === "failed" ? (
               <p>
@@ -796,6 +1009,7 @@ export function CheckoutPanel() {
                     ? "Free"
                     : formatPaise(quote.pricing.shippingPaise)
               }
+              skeleton={!quote && !quoteError}
               tone={quote?.pricing.shippingPaise === 0 ? "ok" : undefined}
             />
             {quote && quote.pricing.codFeePaise > 0 && (
@@ -809,10 +1023,17 @@ export function CheckoutPanel() {
               <dt className="text-[10.5px] font-medium tracking-[0.16em] text-ink-3 uppercase">
                 {quote ? "Amount to pay" : "Total"}
               </dt>
-              <dd className="serif text-[1.5rem] tabular-nums text-ink">
-                {quote
-                  ? formatPaise(quote.pricing.grandTotalPaise)
-                  : formatPaise(itemsPaise)}
+              <dd
+                data-stale={quoting || undefined}
+                className="serif text-[1.5rem] tabular-nums text-ink"
+              >
+                <Odometer
+                  text={
+                    quote
+                      ? formatPaise(quote.pricing.grandTotalPaise)
+                      : formatPaise(itemsPaise)
+                  }
+                />
               </dd>
             </div>
 
@@ -851,7 +1072,10 @@ export function CheckoutPanel() {
         </section>
 
         {/* ── deliver to ─────────────────────────────────────────── */}
-        <section className="border-b border-line bg-surface px-6 py-5">
+        <section
+          data-section="address"
+          className="border-b border-line bg-surface px-6 py-5"
+        >
           <div className="flex items-center justify-between">
             <h3 className="text-[11px] font-medium tracking-[0.16em] text-ink uppercase">
               Deliver to
@@ -868,7 +1092,7 @@ export function CheckoutPanel() {
           </div>
 
           {!editingAddress && chosen ? (
-            <div className="mt-3">
+            <div key="card" className="rh-phase-in mt-3">
               <p className="text-[13px] leading-relaxed text-ink-2">
                 <span className="text-ink">{chosen.name}</span>
                 {chosen.label ? (
@@ -902,7 +1126,7 @@ export function CheckoutPanel() {
               )}
             </div>
           ) : (
-            <div className="mt-3.5 space-y-3">
+            <div key="edit" className="rh-phase-in mt-3.5 space-y-3">
               {addressMode === "saved" && saved.length > 0 && (
                 <>
                   {saved.map((a) => (
@@ -968,8 +1192,17 @@ export function CheckoutPanel() {
                       maxLength={6}
                       autoComplete="postal-code"
                       value={addr.pincode}
-                      error={addrErr.pincode}
+                      error={shownErr("pincode")}
                       onChange={onPincodeChange}
+                      trailing={
+                        pinStatus === "checking" ? (
+                          <Spinner className="size-4 text-ink-3" />
+                        ) : pinStatus === "ok" ? (
+                          <TickMark className="size-4 text-ok" />
+                        ) : pinStatus === "bad" ? (
+                          <Icon name="close" className="size-3.5 text-error" />
+                        ) : null
+                      }
                     />
                     {service && activePincode === service.pincode && (
                       <p
@@ -992,7 +1225,7 @@ export function CheckoutPanel() {
                       required
                       autoComplete="name"
                       value={addr.name}
-                      error={addrErr.name}
+                      error={shownErr("name")}
                       onChange={(v) => setAddr((a) => ({ ...a, name: v }))}
                     />
                     <Field
@@ -1001,7 +1234,7 @@ export function CheckoutPanel() {
                       inputMode="tel"
                       autoComplete="tel"
                       value={addr.phone}
-                      error={addrErr.phone}
+                      error={shownErr("phone")}
                       onChange={(v) => setAddr((a) => ({ ...a, phone: v }))}
                     />
                   </div>
@@ -1010,7 +1243,7 @@ export function CheckoutPanel() {
                     required
                     autoComplete="address-line1"
                     value={addr.line1}
-                    error={addrErr.line1}
+                    error={shownErr("line1")}
                     onChange={(v) => setAddr((a) => ({ ...a, line1: v }))}
                   />
                   <Field
@@ -1025,7 +1258,7 @@ export function CheckoutPanel() {
                       required
                       autoComplete="address-level2"
                       value={addr.city}
-                      error={addrErr.city}
+                      error={shownErr("city")}
                       onChange={(v) => setAddr((a) => ({ ...a, city: v }))}
                     />
                     <div>
@@ -1035,7 +1268,8 @@ export function CheckoutPanel() {
                         onChange={(e) =>
                           setAddr((a) => ({ ...a, state: e.target.value }))
                         }
-                        className={cn(fieldCls, addrErr.state && "border-error")}
+                        aria-invalid={shownErr("state") ? true : undefined}
+                        className={cn(fieldCls, shownErr("state") && "border-error")}
                       >
                         <option value="">Select…</option>
                         {GST_STATES.map((s) => (
@@ -1073,7 +1307,7 @@ export function CheckoutPanel() {
           )}
 
           {/* receipt — shown as text once we know it, editable on tap */}
-          <div className="mt-4 border-t border-line pt-3.5">
+          <div data-section="email" className="mt-4 border-t border-line pt-3.5">
             {emailEditing || !email ? (
               <Field
                 label="Email for the receipt"
@@ -1156,27 +1390,49 @@ export function CheckoutPanel() {
           <div>
             <p className={labelCls}>Discount code</p>
             {appliedCoupon ? (
-              <div className="mt-1.5 flex items-center justify-between border border-ok/40 bg-ok/5 px-3 py-2.5 text-[12.5px]">
-                <span className="text-ink">
-                  <span className="tracking-[0.08em]">{appliedCoupon}</span>{" "}
-                  applied
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAppliedCoupon(null);
-                    setCouponInput("");
-                  }}
-                  className="text-[10px] font-medium tracking-[0.12em] text-ink-3 uppercase hover:text-ink"
+              couponChecking ? (
+                <div
+                  key="checking"
+                  className="mt-1.5 flex items-center gap-2.5 border border-line-2 px-3 py-2.5 text-[12.5px] text-ink-2"
                 >
-                  Remove
-                </button>
-              </div>
+                  <Spinner className="size-3.5" />
+                  <span>
+                    Checking{" "}
+                    <span className="tracking-[0.08em] text-ink">{appliedCoupon}</span>…
+                  </span>
+                </div>
+              ) : (
+                <div
+                  key="applied"
+                  className="rh-wash mt-1.5 flex items-center justify-between border border-ok/40 bg-ok/5 px-3 py-2.5 text-[12.5px]"
+                >
+                  <span className="inline-flex items-center gap-2 text-ink">
+                    <TickMark className="size-3.5 text-ok" />
+                    <span>
+                      <span className="tracking-[0.08em]">{appliedCoupon}</span> applied
+                    </span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAppliedCoupon(null);
+                      setCouponInput("");
+                    }}
+                    className="text-[10px] font-medium tracking-[0.12em] text-ink-3 uppercase hover:text-ink"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )
             ) : (
-              <div className="mt-1.5 flex gap-2">
+              <div ref={couponRowRef} className="mt-1.5 flex gap-2">
                 <input
                   value={couponInput}
-                  onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                  aria-invalid={couponError ? true : undefined}
+                  onChange={(e) => {
+                    setCouponInput(e.target.value.toUpperCase());
+                    if (couponError) setCouponError(null);
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
@@ -1184,7 +1440,12 @@ export function CheckoutPanel() {
                     }
                   }}
                   placeholder="Enter a code"
-                  className="w-full border border-line-2 bg-transparent px-3 py-2.5 text-[13px] tracking-[0.06em] uppercase focus:border-ink focus:outline-none"
+                  className={cn(
+                    "w-full border bg-transparent px-3 py-2.5 text-[13px] tracking-[0.06em] uppercase transition-colors focus:outline-none",
+                    couponError
+                      ? "border-error focus:border-error"
+                      : "border-line-2 focus:border-ink",
+                  )}
                 />
                 <Button
                   variant="onDark"
@@ -1197,10 +1458,8 @@ export function CheckoutPanel() {
                 </Button>
               </div>
             )}
-            {quote?.coupon && quote.coupon.applied === false && (
-              <p className="mt-1.5 text-[11.5px] text-error">
-                {quote.coupon.reason}
-              </p>
+            {couponError && !appliedCoupon && (
+              <p className="mt-1.5 text-[11.5px] text-error">{couponError}</p>
             )}
           </div>
 
@@ -1245,9 +1504,13 @@ export function CheckoutPanel() {
                       value={m}
                       checked={active}
                       disabled={!allowed}
-                      onChange={() => setMethod(m)}
-                      className="mt-0.5 accent-[var(--color-ink)]"
+                      onChange={() => {
+                        haptic("soft");
+                        setMethod(m);
+                      }}
+                      className="sr-only"
                     />
+                    <span className="rh-radio" aria-hidden="true" />
                     <span className="min-w-0 flex-1 text-ink">
                       {m === "razorpay"
                         ? "UPI · Card · Netbanking · Wallet"
@@ -1330,24 +1593,45 @@ export function CheckoutPanel() {
       </div>
 
       <PanelFooter>
+        {missing && ready && !busy && (
+          <p
+            aria-live="polite"
+            className="rh-phase-in mb-2.5 text-center text-[11.5px] text-ink-3"
+          >
+            {missing === "address"
+              ? "Add your delivery address to continue"
+              : "Add an email for your receipt to continue"}
+          </p>
+        )}
         {/* One button for every attempt — after a failure it reads "Retry
             payment" (online) or "Place order" (COD) and follows whichever method
-            is selected, so the shopper can switch UPI app, card or COD freely. */}
+            is selected, so the shopper can switch UPI app, card or COD freely.
+            While it works it says what it is doing, in the same words as the
+            overlay over the panel. */}
         <Button
           size="lg"
           className="w-full"
-          disabled={placing || paying || !canPay}
+          disabled={!ready}
+          loading={busy}
+          loadingLabel={
+            <span className="tracking-[0.1em] whitespace-nowrap">{busyLabel}</span>
+          }
           onClick={onPay}
         >
           <span className="inline-flex items-center justify-center gap-2 tracking-[0.1em] whitespace-nowrap">
-            {!placing && !paying && (
-              <Icon
-                name={method === "cod" ? "banknote" : "lock"}
-                className="size-[15px]"
-              />
+            <Icon
+              name={method === "cod" ? "banknote" : "lock"}
+              className="size-[15px]"
+            />
+            {idleLabel}
+            {total != null && (
+              <>
+                {" · "}
+                <span key={total} className="rh-num-in">
+                  {formatPaise(total)}
+                </span>
+              </>
             )}
-            {footerLabel}
-            {total != null ? ` · ${formatPaise(total)}` : ""}
           </span>
         </Button>
         <div className="mt-3 flex flex-col items-center gap-1.5">
@@ -1370,10 +1654,13 @@ function Row({
   label,
   value,
   tone,
+  skeleton,
 }: {
   label: string;
   value: string;
   tone?: "ok";
+  /** the figure is not known yet: a quiet shimmer instead of a placeholder sentence */
+  skeleton?: boolean;
 }) {
   return (
     <div className="flex items-baseline justify-between">
@@ -1381,7 +1668,13 @@ function Row({
       <dd
         className={cn("tabular-nums", tone === "ok" ? "text-ok" : "text-ink")}
       >
-        {value}
+        {skeleton ? (
+          <span className="rh-shimmer" role="status" aria-label="Calculating" />
+        ) : /\d/.test(value) ? (
+          <Odometer text={value} />
+        ) : (
+          value
+        )}
       </dd>
     </div>
   );

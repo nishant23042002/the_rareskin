@@ -13,6 +13,9 @@ import { PdpBack } from "@/components/product/pdp-back";
 import { PdpSizeLine, PdpVariantsProvider } from "@/components/product/pdp-variants";
 import { PdpScent } from "@/components/product/pdp-scent";
 import { PdpStickyBar } from "@/components/product/pdp-sticky-bar";
+import { PdpAnalytics } from "@/components/product/pdp-analytics";
+import { ListImpression } from "@/components/analytics/list-impression";
+import { itemFromProduct } from "@/lib/analytics";
 import { Accordion } from "@/components/ui/accordion";
 import { Stars } from "@/components/ui/stars";
 import { PdpReviews } from "@/components/product/pdp-reviews";
@@ -221,6 +224,7 @@ export default async function FragrancePage({
       />
 
       <PdpVariantsProvider variants={f.variants} initialMl={initialMl}>
+      <PdpAnalytics name={f.name} slug={f.slug} />
       <Container className="max-w-[1280px]">
         <div className="flex items-center gap-3">
           <PdpBack />
@@ -394,6 +398,19 @@ export default async function FragrancePage({
 
       <Container className="max-w-[1280px]">
         <section className="py-[clamp(40px,6vw,72px)]">
+          <ListImpression
+            listName="Related fragrances"
+            items={related.map((r) =>
+              itemFromProduct({
+                sku: r.sku,
+                name: r.name,
+                slug: r.slug,
+                volumeMl: r.volumeMl,
+                price: r.price,
+                mrp: r.mrp,
+              }),
+            )}
+          />
           <h2 className="mb-5 text-[10.5px] font-normal tracking-[0.16em] text-ink-3 uppercase">
             You might also like
           </h2>
@@ -425,6 +442,7 @@ export default async function FragrancePage({
                       href={`/fragrances/${r.slug}`}
                       meta={`Extrait · ${r.volumeMl} ml`}
                       label="Add"
+                      list="Related fragrances"
                       variant="onDark"
                       size="sm"
                     />

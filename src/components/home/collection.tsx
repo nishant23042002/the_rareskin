@@ -9,6 +9,8 @@ import {
 import Link from "next/link";
 
 import { BagButton } from "@/components/cart/bag-button";
+import { ListImpression } from "@/components/analytics/list-impression";
+import { itemFromProduct } from "@/lib/analytics";
 import { Flacon } from "@/components/ui/flacon";
 import { RhIcon } from "@/components/ui/rh-icon";
 import { useDragX } from "@/hooks/use-drag-x";
@@ -225,7 +227,7 @@ function ProductTile({ f }: { f: Fragrance }) {
           {formatINR(f.price)}
           {f.mrp > f.price && <s>{formatINR(f.mrp)}</s>}
         </p>
-        <BagButton line={line} className="rh-btn rh-btn--ghost rh-btn--sm">
+        <BagButton line={line} list="The Three" className="rh-btn rh-btn--ghost rh-btn--sm">
           Add to bag <RhIcon name="arrow" />
         </BagButton>
       </div>
@@ -370,6 +372,19 @@ export function Collection({ fragrances }: { fragrances: Fragrance[] }) {
           <RhIcon name="chevR" />
         </button>
       </div>
+      <ListImpression
+        listName="The Three"
+        items={fragrances.map((f) =>
+          itemFromProduct({
+            sku: f.sku,
+            name: f.name,
+            slug: f.slug,
+            volumeMl: f.volumeMl,
+            price: f.price,
+            mrp: f.mrp,
+          }),
+        )}
+      />
     </section>
   );
 }

@@ -92,6 +92,7 @@ export function PdpStickyBar({
             href={v.isMain ? `/fragrances/${slug}` : `/fragrances/${slug}?size=${v.volumeMl}`}
             meta={`Extrait · ${v.volumeMl} ml`}
             label="Add to bag"
+            list="Product page"
             variant="solid"
             size="sm"
             className="shrink-0"

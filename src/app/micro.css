@@ -1,0 +1,805 @@
+/* ==========================================================================
+   THE RARESKIN: micro-interactions
+
+   motion.css is the page's ambient feel (hover, scroll, parallax). This file is
+   the other half: FEEDBACK for what someone just did, mostly in the order flow
+   (add to bag, bag, checkout, payment, confirmation). The rules:
+
+     1. Acknowledge at once (a press, a state change in < 100 ms); show progress
+        if it takes longer than ~300 ms; mark the finish with one distinct beat.
+     2. Only transform / opacity / stroke-dashoffset / background-size move. Nothing
+        changes layout, so CLS stays 0. A control that goes "loading" keeps its width.
+     3. Nothing here hides content: every animation has the visible state as its
+        resting state (`backwards` fills, `from` keyframes only).
+     4. Everything that MOVES is behind `prefers-reduced-motion: no-preference`.
+        Under `reduce` a state change is still visible (a colour, an opacity, a
+        static glyph) but nothing travels, spins or shakes.
+   ========================================================================== */
+
+/* ---- brand spinner: a hairline arc on a faint ring (ui/spinner.tsx) ---- */
+.rh-spinner {
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+  animation: rh-breathe 1.4s ease-in-out infinite;
+}
+.rh-spinner circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+.rh-spin__track {
+  opacity: 0.2;
+}
+.rh-spin__arc {
+  stroke-dasharray: 24 64;
+}
+@keyframes rh-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes rh-breathe {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* ---- a button that is busy (ui/button.tsx `loading`): the idle label slides up and out, the busy
+        label (a spinner + a sentence) slides up in. Both live in one grid cell, so the button keeps the
+        width of the longer one and nothing around it moves. A busy button is `disabled` (no double
+        submit) but is not dimmed: it is working, not unavailable. ---- */
+.rh-lb {
+  display: inline-grid;
+  place-items: center;
+  max-width: 100%;
+}
+.rh-lb > * {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7em;
+  min-width: 0;
+}
+.rh-lb__busy {
+  opacity: 0;
+  pointer-events: none;
+}
+.rh-lb[data-loading] .rh-lb__idle {
+  opacity: 0;
+}
+.rh-lb[data-loading] .rh-lb__busy {
+  opacity: 1;
+}
+button[data-busy]:disabled {
+  opacity: 1;
+  cursor: progress;
+}
+
+/* ---- a label that swaps for a confirmation ("Add to bag" -> a tick + "Added") ---- */
+.rh-swap {
+  display: inline-grid;
+  place-items: center;
+}
+.rh-swap > * {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  white-space: nowrap;
+}
+.rh-swap__b {
+  opacity: 0;
+}
+.rh-swap[data-state="done"] .rh-swap__a {
+  opacity: 0;
+}
+.rh-swap[data-state="done"] .rh-swap__b {
+  opacity: 1;
+}
+/* the tick draws itself (pathLength is normalised to 1 in the markup) */
+.rh-tick {
+  width: 1.1em;
+  height: 1.1em;
+  flex: none;
+}
+.rh-tick path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.rh-swap[data-state="done"] .rh-tick path,
+.rh-tick.is-on path {
+  stroke-dashoffset: 0;
+}
+
+/* ---- the field underline: a line that grows from the middle on focus (error = red) ---- */
+.rh-fld {
+  --fld-c: var(--color-ink);
+  background-image: linear-gradient(var(--fld-c), var(--fld-c));
+  background-repeat: no-repeat;
+  background-position: 50% 100%;
+  background-size: 0% 1px;
+}
+.rh-fld:focus {
+  background-size: 100% 1px;
+}
+.rh-fld[aria-invalid="true"] {
+  --fld-c: var(--color-error);
+  background-size: 100% 1px;
+}
+
+/* ---- a hand-drawn radio: the dot springs in (the native input stays, visually hidden, for the keyboard
+        and screen readers) ---- */
+.rh-radio {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  border: 1px solid var(--color-line-2);
+  border-radius: 50%;
+  background: transparent;
+}
+.rh-radio::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-ink);
+  transform: scale(0);
+}
+input:checked + .rh-radio {
+  border-color: var(--color-ink);
+}
+input:checked + .rh-radio::after {
+  transform: scale(1);
+}
+input:focus-visible + .rh-radio {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+}
+input:disabled + .rh-radio {
+  opacity: 0.5;
+}
+
+/* ---- a number that rolls to its new value (ui/odometer.tsx); the 0-9 column is generated content, so the
+        page text is just the number ---- */
+.rh-num {
+  display: inline-flex;
+  align-items: flex-start;
+  font-variant-numeric: tabular-nums;
+}
+.rh-num__c,
+.rh-num__d {
+  display: block;
+  height: 1lh;
+}
+.rh-num__d {
+  width: 1ch;
+  overflow: hidden;
+  text-align: center;
+}
+.rh-num__s {
+  display: block;
+  transform: translate3d(0, calc(var(--n, 0) * -1lh), 0);
+}
+.rh-num__s::before {
+  content: "0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9";
+  display: block;
+  white-space: pre;
+}
+/* a total that is being re-priced is dimmed until the new figure lands */
+[data-stale] {
+  opacity: 0.5;
+}
+
+/* ---- a value that changed: it rises into place, once (keyed by the value) ---- */
+@keyframes rh-num-in {
+  from {
+    opacity: 0;
+    transform: translateY(40%);
+  }
+}
+
+/* ---- skeleton: a quiet shimmer on a placeholder shape ---- */
+.rh-shimmer {
+  display: inline-block;
+  min-width: 3.5em;
+  height: 0.95em;
+  vertical-align: middle;
+  border-radius: 3px;
+  color: transparent;
+  background: linear-gradient(
+      100deg,
+      transparent 20%,
+      color-mix(in srgb, var(--color-surface) 70%, transparent) 50%,
+      transparent 80%
+    )
+    0 0 / 200% 100% no-repeat,
+    var(--color-line);
+}
+
+/* ---- the live hairline along the top of the checkout while something is happening ---- */
+.rh-live {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 3;
+  height: 2px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.rh-live::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 38%;
+  background: linear-gradient(90deg, transparent, var(--gilt), transparent);
+}
+
+/* ---- the drawer's journey line: bag -> checkout -> placed (a hairline under the header that fills) ---- */
+.rh-journey {
+  position: absolute;
+  inset: auto 0 -1px 0;
+  height: 2px;
+  transform-origin: 0 50%;
+  background: var(--tri, linear-gradient(90deg, #e0d7bf 0%, #c5872f 52%, #3d2712 100%));
+}
+
+/* ---- the "something went wrong here" shake, on the element that needs attention ---- */
+@keyframes rh-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  16% {
+    transform: translateX(-7px);
+  }
+  34% {
+    transform: translateX(6px);
+  }
+  52% {
+    transform: translateX(-4px);
+  }
+  70% {
+    transform: translateX(3px);
+  }
+  86% {
+    transform: translateX(-1px);
+  }
+}
+@keyframes rh-errflash {
+  from {
+    background-color: color-mix(in srgb, var(--color-error) 14%, transparent);
+  }
+}
+
+/* ---- a value that was just accepted: a soft gilt wash that fades ---- */
+@keyframes rh-wash {
+  from {
+    background-color: color-mix(in srgb, var(--gilt) 22%, transparent);
+  }
+}
+
+/* ---- a bag line that was just added while the bag is open ---- */
+.rh-fresh {
+  position: relative;
+}
+.rh-fresh::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--gilt) 16%, transparent);
+  animation: rh-fade-out 1.5s ease-out forwards;
+}
+@keyframes rh-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---- the bag icon, as the item that flew up lands in it ---- */
+@keyframes rh-catch {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.3) rotate(-6deg);
+  }
+  70% {
+    transform: scale(0.94);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ---- a free-delivery unlock: the icon rings once, the bar catches a glint ---- */
+@keyframes rh-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+@keyframes rh-glint {
+  from {
+    opacity: 1;
+    transform: translateX(-120%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(260%);
+  }
+}
+/* resting state: not there (reduced motion never plays the sweep, so it must not sit on the bar) */
+.rh-glint {
+  opacity: 0;
+}
+.rh-unlock {
+  position: relative;
+}
+.rh-unlock::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--gilt);
+  pointer-events: none;
+}
+
+/* ---- payment in progress: the overlay over the checkout (cart/payment-overlay.tsx) ---- */
+.rh-pay {
+  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+}
+@supports (backdrop-filter: blur(1px)) {
+  .rh-pay {
+    background: color-mix(in srgb, var(--color-surface) 86%, transparent);
+    -webkit-backdrop-filter: blur(7px);
+    backdrop-filter: blur(7px);
+  }
+}
+.rh-pay__ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1px solid var(--color-line-2);
+}
+.rh-pay__ring svg.rh-pay__arc {
+  position: absolute;
+  inset: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  color: var(--gilt);
+}
+.rh-pay__arc circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 22 78;
+}
+.rh-pay__step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-block: 9px;
+  color: var(--color-ink-3);
+}
+.rh-pay__step[data-state="active"] {
+  color: var(--color-ink);
+}
+.rh-pay__step[data-state="done"] {
+  color: var(--color-ink-2);
+}
+.rh-pay__dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--color-line-2);
+  background: var(--color-surface);
+  font-size: 10px;
+  line-height: 1;
+}
+.rh-pay__step[data-state="active"] .rh-pay__dot {
+  border-color: var(--gilt);
+  color: var(--gilt);
+}
+.rh-pay__step[data-state="done"] .rh-pay__dot {
+  border-color: var(--color-ok);
+  background: var(--color-ok);
+  color: var(--color-surface);
+}
+/* the connecting hairline between two dots; it fills when the step above is done */
+.rh-pay__step + .rh-pay__step::before {
+  content: "";
+  position: absolute;
+  left: 10.5px;
+  top: -9px;
+  width: 1px;
+  height: 18px;
+  background: var(--color-line-2);
+}
+.rh-pay__step[data-state="done"] + .rh-pay__step::before,
+.rh-pay__step[data-state="active"]::before {
+  background: var(--color-ok);
+}
+.rh-pay__step[data-state="active"]::before {
+  background: linear-gradient(var(--color-ok), var(--color-line-2));
+}
+
+/* ---- confirmation: the tick draws, rings ripple out, gilt dust lifts (cart-drawer.tsx Confirmation) ---- */
+.rh-ok {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+}
+.rh-ok__disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--color-line-2);
+}
+.rh-ok__svg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.rh-ok__svg circle {
+  stroke: var(--gilt);
+  stroke-dasharray: 1;
+}
+.rh-ok__ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--gilt);
+  opacity: 0;
+  pointer-events: none;
+}
+.rh-burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.rh-burst i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--sz, 4px);
+  height: var(--sz, 4px);
+  border-radius: 50%;
+  background: var(--c, var(--gilt));
+  opacity: 0;
+}
+@keyframes rh-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+@keyframes rh-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3);
+  }
+  14% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1);
+  }
+}
+@keyframes rh-ok-pop {
+  0% {
+    transform: scale(0.82);
+  }
+  55% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes rh-pulse-dot {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--gilt) 55%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--gilt) 0%, transparent);
+  }
+}
+/* the receipt: a paper slip with notched edges */
+.rh-slip {
+  position: relative;
+  border-inline: 1px solid var(--color-line);
+  background: var(--color-surface-2);
+}
+.rh-slip::before,
+.rh-slip::after {
+  content: "";
+  position: absolute;
+  inset-inline: -1px;
+  height: 8px;
+  background:
+    radial-gradient(circle at 6px 0, var(--color-surface) 4px, transparent 4.5px) 0 0 / 12px 8px repeat-x;
+}
+.rh-slip::before {
+  top: -1px;
+}
+.rh-slip::after {
+  bottom: -1px;
+  transform: scaleY(-1);
+}
+
+/* ---- the cart toast (cart/cart-toast.tsx): it eases out rather than vanishing; its foot is a countdown ---- */
+/* the sticky bag bar (cart-bar.tsx sets data-cart-bar on <html> while it is up) is ~72px tall: the toast clears it */
+html[data-cart-bar] .rh-toast-host {
+  bottom: calc(92px + env(safe-area-inset-bottom));
+}
+.rh-toast--out {
+  opacity: 0;
+  pointer-events: none;
+}
+@keyframes rh-toast-bar {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+@keyframes rh-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+}
+
+/* ==========================================================================
+   Motion (everything below moves, so it only runs with no-preference)
+   ========================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  .rh-spinner {
+    animation: rh-rotate 0.85s linear infinite;
+  }
+  .rh-lb > * {
+    transition:
+      transform 0.45s var(--expo),
+      opacity 0.28s ease;
+  }
+  .rh-lb__busy {
+    transform: translateY(70%);
+  }
+  .rh-lb[data-loading] .rh-lb__idle {
+    transform: translateY(-70%);
+  }
+  .rh-lb[data-loading] .rh-lb__busy {
+    transform: none;
+  }
+
+  .rh-swap > * {
+    transition:
+      transform 0.5s var(--expo),
+      opacity 0.3s ease;
+  }
+  .rh-swap__b {
+    transform: translateY(80%);
+  }
+  .rh-swap[data-state="done"] .rh-swap__a {
+    transform: translateY(-80%);
+  }
+  .rh-swap[data-state="done"] .rh-swap__b {
+    transform: none;
+  }
+  /* an animation (not a transition), so it plays both when the tick is mounted already "on" and when it flips on */
+  .rh-tick.is-on path {
+    animation: rh-draw 0.5s var(--expo) 0.12s backwards;
+  }
+  .rh-phase-in {
+    animation: rh-num-in 0.5s var(--expo) backwards;
+  }
+
+  .rh-fld {
+    transition:
+      background-size 0.55s var(--expo),
+      border-color 0.3s;
+  }
+  .rh-radio {
+    transition: border-color 0.25s;
+  }
+  .rh-radio::after {
+    transition: transform 0.45s var(--spring);
+  }
+
+  .rh-num__s {
+    transition: transform 0.75s var(--expo) calc(var(--k, 0) * 45ms);
+  }
+  [data-stale] {
+    transition: opacity 0.2s;
+  }
+  [data-live] {
+    transition: opacity 0.35s;
+  }
+  .rh-num-in {
+    animation: rh-num-in 0.45s var(--expo) backwards;
+  }
+
+  .rh-shimmer {
+    animation: rh-shimmer 1.3s linear infinite;
+  }
+  @keyframes rh-shimmer {
+    to {
+      background-position: -200% 0, 0 0;
+    }
+  }
+  .rh-live::before {
+    animation: rh-live 1.15s var(--ease) infinite;
+  }
+  @keyframes rh-live {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(265%);
+    }
+  }
+  .rh-journey {
+    transition: transform 0.9s var(--expo);
+  }
+
+  .rh-shake {
+    animation: rh-shake 0.5s var(--expo);
+  }
+  .rh-wash {
+    animation: rh-wash 1.4s ease-out;
+  }
+  .rh-pop-in {
+    animation: rh-pop 0.55s var(--expo);
+  }
+  .rh-catch svg {
+    animation: rh-catch 0.6s var(--spring);
+  }
+  .rh-unlock::before {
+    animation: rh-ring 0.9s var(--expo) 1;
+  }
+  .rh-glint {
+    animation: rh-glint 0.9s var(--expo) 0.1s 1 both;
+  }
+
+  .rh-toast--in {
+    animation: rh-toast-in 0.45s var(--expo) backwards;
+  }
+  .rh-toast--out {
+    transition:
+      opacity 0.25s ease,
+      transform 0.3s var(--expo);
+    transform: translateY(8px);
+  }
+  .rh-toast__bar {
+    animation: rh-toast-bar var(--ms, 2s) linear forwards;
+  }
+
+  .rh-pay {
+    animation: rh-fade-in 0.35s ease 0.28s backwards;
+  }
+  @keyframes rh-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  .rh-pay__arc {
+    animation: rh-rotate 1.1s linear infinite;
+  }
+  .rh-pay__step[data-state="active"] .rh-pay__dot {
+    animation: rh-pulse-dot 1.6s ease-out infinite;
+  }
+  .rh-pay__dot,
+  .rh-pay__step {
+    transition:
+      background-color 0.4s,
+      border-color 0.4s,
+      color 0.4s;
+  }
+
+  /* the one-time-code cells: a wrong code shakes the row; while a code is being checked a wave runs through the cells */
+  .rh-otp[data-invalid] {
+    animation: rh-shake 0.5s var(--expo);
+  }
+  .rh-otp[data-busy] input {
+    animation: rh-otp-wave 1s ease-in-out infinite;
+    animation-delay: calc(var(--k, 0) * 90ms);
+  }
+  @keyframes rh-otp-wave {
+    50% {
+      border-color: var(--gilt);
+      transform: translateY(-3px);
+    }
+  }
+  .rh-live-dot {
+    animation: rh-pulse-dot 1.8s ease-out infinite;
+  }
+  .rh-ok {
+    animation: rh-ok-pop 0.7s var(--spring) backwards;
+  }
+  .rh-ok__svg circle {
+    animation: rh-draw 0.9s var(--expo) 0.1s backwards;
+  }
+  .rh-ok__svg path {
+    stroke-dasharray: 1;
+    animation: rh-draw 0.6s var(--expo) 0.62s backwards;
+  }
+  .rh-ok__ripple {
+    animation: rh-ring 1.4s var(--expo) 0.55s 2;
+  }
+  .rh-burst i {
+    animation: rh-burst 1.05s var(--expo) var(--d, 0.6s) forwards;
+  }
+  .rh-cascade {
+    animation: rh-rise 0.6s var(--expo) calc(var(--i, 0) * 80ms + 0.35s) backwards;
+  }
+
+  /* a bag line the shopper just added while the bag is open does not wait for the open stagger */
+  .rh-cart.is-open .rh-in.rh-fresh {
+    animation-delay: 0s;
+  }
+}
+
+/* ---- reduced motion: the state is still shown, only the travelling is removed ---- */
+@media (prefers-reduced-motion: reduce) {
+  .rh-shake,
+  .rh-otp[data-invalid] {
+    animation: rh-errflash 1.2s ease-out;
+  }
+  .rh-wash {
+    animation: rh-wash 1.4s ease-out;
+  }
+  .rh-live::before {
+    width: 100%;
+    animation: rh-breathe 1.4s ease-in-out infinite;
+  }
+  .rh-pay__arc {
+    display: none;
+  }
+  .rh-ok__svg circle,
+  .rh-ok__svg path {
+    stroke-dasharray: none;
+  }
+  .rh-burst,
+  .rh-ok__ripple {
+    display: none;
+  }
+  .rh-unlock::before {
+    display: none;
+  }
+}

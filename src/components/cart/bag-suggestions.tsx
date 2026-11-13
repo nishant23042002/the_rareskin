@@ -10,7 +10,9 @@ import {
 
 import { Flacon } from "@/components/ui/flacon";
 import { Icon } from "@/components/ui/icon";
+import { ListImpression } from "@/components/analytics/list-impression";
 import { useCart } from "@/components/providers/cart-provider";
+import { itemFromSuggestion } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 import {
   DISCOVERY_SET_SLUG,
@@ -58,15 +60,18 @@ export function BagSuggestions({
 
   function add(s: BagSuggestion) {
     if (phase[s.sku]) return;
-    addItem({
-      sku: s.sku,
-      name: s.name,
-      price: s.price,
-      mrp: s.mrp,
-      fragrance: s.fragrance,
-      href: s.href,
-      meta: s.meta,
-    });
+    addItem(
+      {
+        sku: s.sku,
+        name: s.name,
+        price: s.price,
+        mrp: s.mrp,
+        fragrance: s.fragrance,
+        href: s.href,
+        meta: s.meta,
+      },
+      "Bag suggestions",
+    );
     setPhase((p) => ({ ...p, [s.sku]: "added" }));
     timers.current.push(
       window.setTimeout(
@@ -124,6 +129,12 @@ export function BagSuggestions({
           </Fold>
         ))}
       </ul>
+      <ListImpression
+        listName="Bag suggestions"
+        items={[...(featured ? [featured] : []), ...rest].map((s, i) =>
+          itemFromSuggestion(s, "Bag suggestions", i),
+        )}
+      />
     </section>
   );
 }

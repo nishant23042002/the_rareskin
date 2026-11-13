@@ -60,10 +60,16 @@ export function Hero({
           </h1>
           <p className="rh-hero__sub rh-serif">Scents that stay with you.</p>
           <div className="rh-hero__cta">
-            <a className="rh-btn rh-btn--solid" href="#collection">
+            <a
+              className="rh-btn rh-btn--solid"
+              href="#collection"
+              data-ga-promo="Hero · Shop the three"
+              data-ga-slot="hero"
+              data-ga-view
+            >
               Shop the three <RhIcon name="arrow" />
             </a>
-            <a className="rh-hero__alt" href="#quiz">
+            <a className="rh-hero__alt" href="#quiz" data-ga-promo="Hero · Find your scent" data-ga-slot="hero">
               <span>Find your scent</span>
             </a>
           </div>

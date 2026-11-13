@@ -113,6 +113,8 @@ function Message({
     className,
     "aria-hidden": !active,
     tabIndex: active ? 0 : -1,
+    "data-ga-promo": `Announcement · ${slot.lead}`,
+    "data-ga-slot": "announcement-bar",
   } as const;
 
   if (!slot.href) return <p {...common}>{inner}</p>;

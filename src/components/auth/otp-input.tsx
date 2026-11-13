@@ -82,7 +82,9 @@ export function OtpInput({
 
   return (
     <div
-      className="flex justify-center gap-2.5 sm:gap-3"
+      className="rh-otp flex justify-center gap-2.5 sm:gap-3"
+      data-invalid={invalid || undefined}
+      data-busy={disabled || undefined}
       role="group"
       aria-label={`${OTP_LENGTH}-digit verification code`}
     >
@@ -107,6 +109,7 @@ export function OtpInput({
             onKeyDown={(e) => onKeyDown(e, i)}
             onPaste={onPaste}
             onFocus={(e) => e.currentTarget.select()}
+            style={{ "--k": i } as React.CSSProperties}
             className={cn(
               "h-12 w-full min-w-0 max-w-[3.25rem] bg-transparent pb-1 text-center text-[22px] font-light tabular-nums outline-none transition-colors sm:text-[26px]",
               "border-b-2",

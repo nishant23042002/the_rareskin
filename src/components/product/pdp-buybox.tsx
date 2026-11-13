@@ -92,6 +92,7 @@ export function PdpBuyBox({
           href={href}
           meta={`Extrait · ${v.volumeMl} ml`}
           label={`Add to bag · ${formatINR(v.price)}`}
+          list="Product page"
           variant="solid"
           size="lg"
           className="mt-5 w-full"

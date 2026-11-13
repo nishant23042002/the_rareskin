@@ -11,6 +11,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { HoldingPage } from "@/components/layout/holding-page";
 import { GoogleTagManager } from "@/components/analytics/google-tag-manager";
+import { AnalyticsRoot } from "@/components/analytics/analytics-root";
 import { CartDrawer } from "@/components/cart/cart-drawer";
 import { CartToast } from "@/components/cart/cart-toast";
 import { CartBar } from "@/components/cart/cart-bar";
@@ -130,6 +131,8 @@ export default async function StoreLayout({
               codEnabled={settings.cod.enabled}
             />
             <CartToast />
+            {/* GA4: product / promotion / contact clicks and promotion impressions (src/components/analytics) */}
+            <AnalyticsRoot />
             <CartBar freeShippingAbove={freeShippingAbove} />
             <BackToTop />
             {/* founder preview: the colour themes (src/config/themes.ts, app/themes.css) — signed-in staff only */}

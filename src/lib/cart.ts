@@ -14,6 +14,11 @@ export interface CartLine {
   fragrance?: FragranceSlug;
   href?: string;
   meta?: string;
+  /**
+   * Where the shopper first put this in the bag from ("The Three", "Product page", "Bag suggestions"…).
+   * Analytics only (GA4 `item_list_name`); never shown, never sent to the server.
+   */
+  list?: string;
 }
 
 interface CartState {

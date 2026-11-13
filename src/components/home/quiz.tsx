@@ -7,6 +7,7 @@ import { pdpCover } from "@/lib/pdp-images";
 import { AddToBagButton } from "@/components/cart/add-to-bag-button";
 import { QUIZ, tallyWinner } from "@/lib/quiz";
 import { formatINR, type Fragrance, type FragranceSlug } from "@/lib/catalog";
+import { track } from "@/lib/analytics";
 
 const STEPS = QUIZ.length; // 3 questions; step === STEPS -> result
 
@@ -37,8 +38,14 @@ export function Quiz({ fragrances }: { fragrances: Fragrance[] }) {
   }, [step]);
 
   function pick(key: FragranceSlug) {
-    setAnswers((prev) => [...prev.slice(0, step), key]);
+    const next = [...answers.slice(0, step), key];
+    setAnswers(next);
     setStep((s) => Math.min(s + 1, STEPS));
+    // GA4: the last answer produces the result — which fragrance the quiz points to
+    if (next.length >= STEPS) {
+      const result = tallyWinner(next);
+      if (result) track("quiz_complete", { quiz_result: result });
+    }
   }
 
   function retake() {
@@ -167,6 +174,7 @@ export function Quiz({ fragrances }: { fragrances: Fragrance[] }) {
                         href={`/fragrances/${match.slug}`}
                         meta={`Extrait · ${match.volumeMl} ml`}
                         label={`Add to bag · ${formatINR(match.price)}`}
+                        list="Quiz result"
                         variant="solid"
                         size="sm"
                       />
