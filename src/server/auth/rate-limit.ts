@@ -38,6 +38,10 @@ const RULES = {
   "account:review:user": { limit: 20, window: "1 h" as Duration },
   // Customer image uploads (avatar + review photos) — scoped per user.
   "account:upload:user": { limit: 40, window: "1 h" as Duration },
+  // Public forms: each one writes a row / raises a staff notification, so a bot could flood
+  // the inbox. Generous for a real person (several enquiries, a shared network), tight for a script.
+  "contact:ip": { limit: 6, window: "15 m" as Duration },
+  "newsletter:ip": { limit: 10, window: "15 m" as Duration },
 } as const;
 
 export type RateRule = keyof typeof RULES;
@@ -133,4 +137,21 @@ export async function checkRate(
     );
   }
   return memoryLimit(rule, key);
+}
+
+/**
+ * `checkRate` for a public form that must keep working when the limiter's backend does
+ * not: if Redis is unreachable the request is let through (the cost of a missed limit is a
+ * little spam; the cost of failing closed is a contact form that is down).
+ */
+export async function checkRateOpen(
+  rule: RateRule,
+  key: string,
+): Promise<RateResult> {
+  try {
+    return await checkRate(rule, key);
+  } catch (err) {
+    console.error(`[rate-limit] ${rule} unavailable, allowing`, err);
+    return { success: true, remaining: 0, reset: Date.now() };
+  }
 }

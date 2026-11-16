@@ -46,7 +46,7 @@ export default async function OrdersPage() {
         {orders.length === 0 ? (
           <div className="border border-line bg-surface px-6 py-14 text-center">
             <p className="serif-italic text-[1.4rem] text-ink-2">No orders yet.</p>
-            <Button href="/#shop" variant="onDark" size="sm" className="mt-6">
+            <Button href="/#collection" variant="onDark" size="sm" className="mt-6">
               Shop the three
             </Button>
           </div>

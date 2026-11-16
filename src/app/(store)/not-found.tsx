@@ -25,7 +25,7 @@ export default function StoreNotFound() {
           <Button href="/" variant="solid" size="sm">
             Home
           </Button>
-          <Button href="/#shop" variant="onDark" size="sm">
+          <Button href="/#collection" variant="onDark" size="sm">
             The fragrances
           </Button>
         </div>

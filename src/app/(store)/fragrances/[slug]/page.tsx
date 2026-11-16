@@ -204,7 +204,7 @@ export default async function FragrancePage({
   };
 
   const breadcrumbJson = breadcrumbJsonLd([
-    { name: "Fragrances", path: "/#shop" },
+    { name: "Fragrances", path: "/#collection" },
     { name: f.name, path: `/fragrances/${slug}` },
   ]);
 

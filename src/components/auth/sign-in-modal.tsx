@@ -140,7 +140,11 @@ export function SignInModal({
         finish();
       }
     }, 700);
-    return () => window.clearTimeout(safety);
+    return () => {
+      window.clearTimeout(safety);
+      // a modal asked for again mid-close must not be shut by the old timeline when it completes
+      tl.kill();
+    };
   }, [open, reduced]);
 
   // animate out on native ESC instead of a hard close
@@ -153,6 +157,26 @@ export function SignInModal({
     };
     dlg.addEventListener("cancel", onCancel);
     return () => dlg.removeEventListener("cancel", onCancel);
+  }, [onClose]);
+
+  // The route curtain closes every open dialog once it is opaque. If it shut this one while the app still says
+  // "open", the Sign in button would do nothing (asking for an already-open modal changes no state) and the lock
+  // would stay on: tell the app, which then closes properly.
+  const openRef = useRef(open);
+  useEffect(() => {
+    openRef.current = open;
+  });
+  useEffect(() => {
+    const dlg = dialogRef.current;
+    if (!dlg) return;
+    const onClosed = () => {
+      if (!dlg.open && openRef.current) {
+        unlockScroll("signin");
+        onClose();
+      }
+    };
+    dlg.addEventListener("close", onClosed);
+    return () => dlg.removeEventListener("close", onClosed);
   }, [onClose]);
 
   function handleAuthenticated() {

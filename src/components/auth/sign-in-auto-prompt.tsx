@@ -61,6 +61,12 @@ export function SignInAutoPrompt() {
       if (firedRef.current || status !== "guest") return cleanup();
       if (Date.now() - landedAt < ARM_DELAY_MS) return;
       if (document.hidden) return;
+      // a page transition is running (the curtain, a picture flight): a modal opened now would be shut under it
+      if (document.querySelector(".rh-curtain[data-open]") || document.documentElement.hasAttribute("data-flight")) {
+        window.clearTimeout(retry);
+        retry = window.setTimeout(fire, 1500);
+        return;
+      }
       if (signIn.open) {
         firedRef.current = true; // reached sign-in another way
         return cleanup();

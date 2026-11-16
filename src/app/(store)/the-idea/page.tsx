@@ -152,7 +152,7 @@ export default async function OurStoryPage() {
           </p>
 
           <Link
-            href="/#shop"
+            href="/#collection"
             className="nav-underline mt-[clamp(28px,5vw,48px)] inline-flex items-center gap-2 text-[11px] tracking-[0.14em] text-ink uppercase"
           >
             See the three extraits <span aria-hidden>&rarr;</span>

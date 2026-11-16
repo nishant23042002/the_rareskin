@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 
 import { lockScroll, unlockScroll } from "@/lib/scroll-lock";
 
@@ -20,14 +20,28 @@ export const SLIDE_MS = 660;
  *
  * The page is never left locked, and a throttled rAF (hidden tab / pane) can
  * never leave an open dialog parked off-screen: a timer sets the state anyway.
+ *
+ * Someone else may close the dialog (the route curtain closes every open dialog
+ * once it is opaque; the menu closes itself for a picture flight). The lock is
+ * released in that case too: on the dialog's own `close` event, and whenever
+ * `open` turns false with the dialog already shut. `onExternalClose` tells the
+ * owner so its `open` state does not stay true over a closed dialog (a dead
+ * first tap on the button that opens it).
  */
 export function useSlideDialog(
   dialogRef: RefObject<HTMLDialogElement | null>,
   open: boolean,
   lockKey: string,
   reduced: boolean,
+  onExternalClose?: () => void,
 ): boolean {
   const [shown, setShown] = useState(false);
+  const openRef = useRef(open);
+  const externalRef = useRef(onExternalClose);
+  useEffect(() => {
+    openRef.current = open;
+    externalRef.current = onExternalClose;
+  });
 
   useEffect(() => {
     const dlg = dialogRef.current;
@@ -54,9 +68,23 @@ export function useSlideDialog(
         },
         reduced ? 0 : SLIDE_MS,
       );
+    } else {
+      // already shut by someone else (the curtain, a flight): nothing to slide, but the lock is ours to give back
+      unlockScroll(lockKey);
+      fallbackTimer = window.setTimeout(() => setShown(false), 0);
     }
 
+    // the dialog was closed from outside while we still thought it open
+    const onClosed = () => {
+      if (dlg.open) return; // a modal -> non-modal flip (the payment window), not a close
+      unlockScroll(lockKey);
+      setShown(false);
+      if (openRef.current) externalRef.current?.();
+    };
+    dlg.addEventListener("close", onClosed);
+
     return () => {
+      dlg.removeEventListener("close", onClosed);
       cancelAnimationFrame(r1);
       cancelAnimationFrame(r2);
       window.clearTimeout(fallbackTimer);

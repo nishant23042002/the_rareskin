@@ -66,7 +66,9 @@ export function SiteMenu({
   const lenis = useLenis();
   const { status, openSignIn } = useAuth();
   const { count, openCart } = useCart();
-  const shown = useSlideDialog(dialogRef, open, "menu", reduced);
+  // `onClose` is also the answer to someone else shutting the drawer (the route curtain, a picture flight): the
+  // hook gives the scroll lock back and tells us, so `open` never stays true over a closed dialog
+  const shown = useSlideDialog(dialogRef, open, "menu", reduced, onClose);
   const flight = useFlight();
   const canFly = useCanFly();
   // a picture in the drawer opens its page with the flight; the drawer slides shut while the page loads

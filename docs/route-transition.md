@@ -144,3 +144,12 @@ The landing is `data-flight-frame="<slug>"`: the 50 ml gallery frame (`product/p
 - No View Transitions API, or reduced motion: nothing here runs; the links fall back to the curtain (`useCanFly()` drives `data-no-transition`).
 - Adding a source: give the link `data-no-transition={useCanFly() ? "" : undefined}` and an `onClick` that calls `useFlight().open(slug, href, element, { id, after, ghost, fill })`
   for a plain click (`isPlainClick(e)`), then `e.preventDefault()` when it returns true. Name the element on the homepage `data-flight-src="<id>"` if the picture should fly back to it.
+
+
+## Guarantees (2026-11-16)
+
+Neither transition may ever leave the page locked or the tap swallowed. The curtain's lift runs in `try/finally`, a run is torn
+down after `MAX_RUN_MS` whatever its state, an orphaned curtain is swept (`sweep()`), and a flight that the browser never starts
+(no rendered frame) is skipped after 1.2s, which runs its update and so the navigation; a flight still going after 9s is released.
+The flight waits at most 2.8s for the other page (the screen is frozen meanwhile). Full write-up, the incident that prompted it and
+the rules for new code: `docs/page-freeze-guards.md`.

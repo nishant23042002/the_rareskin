@@ -86,6 +86,31 @@ function failureMessage(e: unknown): string {
   return text || DEFAULT_FAILURE;
 }
 
+/**
+ * Razorpay's window locks the page behind it with inline styles on <html> / <body> and is meant to give them back
+ * when it closes. On a phone, when the window goes away abnormally (back from a UPI app, a bank page that
+ * redirects, the tab frozen and restored), it can leave them: the page is then unscrollable and nothing is
+ * tappable-through. So the page's own values are written down before the window opens and put back once it is
+ * gone: a no-op when Razorpay did its job, the cure when it did not.
+ */
+const LOCKED_PROPS = ["overflow", "overflow-x", "overflow-y", "position", "top", "left", "right", "width", "height", "touch-action", "padding-right"] as const;
+
+function snapshotPageStyles(): () => void {
+  const targets = [document.documentElement, document.body];
+  const saved = targets.map((el) => LOCKED_PROPS.map((p) => [p, el.style.getPropertyValue(p), el.style.getPropertyPriority(p)] as const));
+  const at = window.scrollY;
+  return () => {
+    targets.forEach((el, i) => {
+      for (const [prop, value, priority] of saved[i]) {
+        if (value) el.style.setProperty(prop, value, priority);
+        else el.style.removeProperty(prop);
+      }
+    });
+    // a body-fix lock moves the page to the top while it holds; once it is gone the reader is where they were
+    if (Math.abs(window.scrollY - at) > 1) window.scrollTo(0, at);
+  };
+}
+
 /** Open the Razorpay modal and resolve with what happened. */
 export async function openRazorpayCheckout(
   input: OpenCheckoutInput,
@@ -96,6 +121,7 @@ export async function openRazorpayCheckout(
 
   return new Promise<CheckoutOutcome>((resolve) => {
     let settled = false;
+    const restorePage = snapshotPageStyles();
     // A failed attempt does NOT close Razorpay's window — it swaps to a "try
     // another method" screen. We hold this and only settle the promise when the
     // window is actually dismissed, so the caller doesn't restore the drawer
@@ -104,6 +130,8 @@ export async function openRazorpayCheckout(
     const done = (o: CheckoutOutcome) => {
       if (settled) return;
       settled = true;
+      // after Razorpay has finished tearing its window down (it restores the page itself on the way out)
+      window.setTimeout(restorePage, 350);
       resolve(o);
     };
 

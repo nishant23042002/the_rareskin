@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { contactMessageInput } from "@/lib/validation/contact";
 import { dbConnect } from "@/server/db";
 import { ContactMessage } from "@/server/models";
-import { getAuth, requestContext } from "@/server/auth";
+import { checkRateOpen, getAuth, requestContext } from "@/server/auth";
 import { notifyContactMessage } from "@/server/notifications";
 
 /**
@@ -26,6 +26,14 @@ export async function POST(request: Request) {
   }
 
   const [auth, ctx] = await Promise.all([getAuth(), requestContext()]);
+
+  const rl = await checkRateOpen("contact:ip", ctx.ip ?? "unknown");
+  if (!rl.success) {
+    return NextResponse.json(
+      { error: "You have sent several messages in a short time. Please try again in a little while." },
+      { status: 429 },
+    );
+  }
 
   try {
     await dbConnect();

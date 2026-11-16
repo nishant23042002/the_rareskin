@@ -103,7 +103,7 @@ export default async function AccountPage() {
                 No orders yet.
               </p>
               <Link
-                href="/#shop"
+                href="/#collection"
                 className="nav-underline mt-3 inline-block text-[11px] font-medium tracking-[0.14em] text-ink uppercase"
               >
                 Shop the three →

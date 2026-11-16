@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { checkRateOpen, requestContext } from "@/server/auth";
 import { notifyNewsletterSubscribed } from "@/server/notifications";
 
 /**
@@ -24,6 +25,15 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: "Enter a valid email address." },
       { status: 400 },
+    );
+  }
+
+  const ctx = await requestContext();
+  const rl = await checkRateOpen("newsletter:ip", ctx.ip ?? "unknown");
+  if (!rl.success) {
+    return NextResponse.json(
+      { error: "Too many attempts. Please try again in a little while." },
+      { status: 429 },
     );
   }
 

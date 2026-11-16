@@ -19,6 +19,7 @@ import { CampaignNote } from "@/components/layout/campaign-note";
 import { BackToTop } from "@/components/layout/back-to-top";
 import { StaffThemeSwitcher } from "@/components/auth/staff-tools";
 import { MotionLayer } from "@/components/providers/motion-layer";
+import { PageHealth } from "@/components/providers/page-health";
 import { CARD_SLUGS, DEFAULT_CARD_CONCEPT, type CardSlug } from "@/config/homepage-assets";
 import { DISCOVERY_SET_SLUG } from "@/lib/catalog";
 import { getVariant, homeImageSrc, resolveCardAsset } from "@/lib/home-images";
@@ -139,6 +140,8 @@ export default async function StoreLayout({
             <StaffThemeSwitcher />
             {/* scroll reveals, card tilt, button pull: motion.css + this controller (nothing under reduced motion) */}
             <MotionLayer />
+            {/* the net under every scroll lock / curtain / flight: a page that is locked with nothing to justify it is unlocked */}
+            <PageHealth />
             <CampaignNote
               campaign={settings.campaign}
               products={bagSuggestions

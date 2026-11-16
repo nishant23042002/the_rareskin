@@ -83,8 +83,19 @@ const frame = () => new Promise<void>((res) => setTimeout(res, 16));
 async function frames(n: number) {
   for (let i = 0; i < n; i++) await frame();
 }
+/**
+ * How long a flight may wait for the other page. While it waits the screen holds the old picture and the page takes no
+ * input (a view transition owns the screen), so this is how long a slow network can freeze a phone: a page that is not
+ * there by then arrives on its own afterwards, as an ordinary navigation, instead of keeping the shopper waiting.
+ */
+const ARRIVE_MS = 2800;
+/** a flight that has not ended after this is torn down whatever state it is in */
+const MAX_FLIGHT_MS = 9000;
+/** the browser has not even started the update (no frame to capture: a hidden tab, a stalled compositor): skip the transition, the update then runs at once */
+const START_MS = 1200;
+
 /** resolves true when `cond()` holds, false after `ms` (a flight must never strand the page) */
-async function until(cond: () => boolean, ms = 4500): Promise<boolean> {
+async function until(cond: () => boolean, ms = ARRIVE_MS): Promise<boolean> {
   const t0 = performance.now();
   while (!cond()) {
     if (performance.now() - t0 > ms) return false;
@@ -138,6 +149,8 @@ export function PdpFlightProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     lenisRef.current = lenis;
   });
+  /** the flight in the air, if any: one at a time (a second tap meanwhile is an ordinary link click) */
+  const flying = useRef<{ at: number } | null>(null);
 
   const scrollTo = useCallback((y: number) => {
     const l = lenisRef.current;
@@ -145,17 +158,12 @@ export function PdpFlightProvider({ children }: { children: ReactNode }) {
     else window.scrollTo(0, y);
   }, []);
 
-  const finish = useCallback((vt: ViewTransition) => {
-    const done = () => {
-      unmark();
-      delete document.documentElement.dataset.flight;
-    };
-    vt.finished.then(done, done);
-  }, []);
-
   const open = useCallback(
     (slug: string, href: string, tile: HTMLElement, opts?: FlightOpts) => {
       if (!supported()) return false;
+      // one flight at a time: a second source tapped while one runs just navigates (the link's own behaviour)
+      const busy = flying.current;
+      if (busy && Date.now() - busy.at < MAX_FLIGHT_MS) return false;
       const ghost = opts?.ghost ? makeGhost(tile, opts.ghost, opts.fill) : null;
       if (opts?.ghost && !ghost) return false; // nothing of the picture is on screen to fly
       const from = ghost ?? tile;
@@ -165,30 +173,66 @@ export function PdpFlightProvider({ children }: { children: ReactNode }) {
       } catch {
         /* the reverse flight then lands at the top of the page: fine */
       }
+
+      const me = { at: Date.now() };
+      flying.current = me;
+      let started = false;
+      let timers: number[] = [];
+      /** the flight is over (or never was): the marks, the flag and the ghost go, and the next one may fly */
+      const release = () => {
+        timers.forEach((t) => window.clearTimeout(t));
+        timers = [];
+        ghost?.remove();
+        unmark();
+        delete document.documentElement.dataset.flight;
+        if (flying.current === me) flying.current = null;
+      };
+
       document.documentElement.dataset.flight = "in";
       mark(from, slug);
-      const vt = document.startViewTransition(async () => {
-        ghost?.remove();
-        const closing = Promise.resolve(opts?.after?.()).catch(() => undefined);
-        router.push(href);
-        const there = await until(() => window.location.pathname === path && !!document.querySelector(`[data-flight-frame="${slug}"]`));
-        if (!there) {
+      let vt: ViewTransition;
+      try {
+        vt = document.startViewTransition(async () => {
+          started = true;
+          ghost?.remove();
+          const closing = Promise.resolve(opts?.after?.()).catch(() => undefined);
+          router.push(href);
+          const there = await until(() => window.location.pathname === path && !!document.querySelector(`[data-flight-frame="${slug}"]`));
+          if (!there) {
+            await closing;
+            return;
+          }
+          scrollTo(0);
+          const target = document.querySelector<HTMLElement>(`[data-flight-frame="${slug}"]`);
+          mark(target, slug);
+          // the first picture decoded, so the landing is not a pop
+          const img = target?.querySelector("img");
+          if (img && !img.complete) await Promise.race([img.decode().catch(() => undefined), new Promise((r) => setTimeout(r, 700))]);
           await closing;
-          return;
-        }
-        scrollTo(0);
-        const target = document.querySelector<HTMLElement>(`[data-flight-frame="${slug}"]`);
-        mark(target, slug);
-        // the first picture decoded, so the landing is not a pop
-        const img = target?.querySelector("img");
-        if (img && !img.complete) await Promise.race([img.decode().catch(() => undefined), new Promise((r) => setTimeout(r, 700))]);
-        await closing;
-        await frames(2);
-      });
-      finish(vt);
+          await frames(2);
+        });
+      } catch {
+        // the browser refused to start one: nothing was captured, the link navigates as a plain one
+        release();
+        return false;
+      }
+      vt.finished.then(release, release);
+      vt.ready.catch(() => undefined); // a skipped transition rejects `ready`; that is the plan, not an error
+
+      // The guarantees. A view transition needs a rendered frame to begin: if none comes, the update (which holds the
+      // navigation) never runs, the tap seems dead and the flag stays up. Skipping runs the update at once.
+      timers.push(
+        window.setTimeout(() => {
+          if (!started) vt.skipTransition();
+        }, START_MS),
+        window.setTimeout(() => {
+          vt.skipTransition();
+          release();
+        }, MAX_FLIGHT_MS),
+      );
       return true;
     },
-    [router, scrollTo, finish],
+    [router, scrollTo],
   );
 
   // closing: browser back from a product page to the homepage. A view transition cannot do this one: by the time the browser captures the "old"
@@ -267,9 +311,9 @@ export function PdpFlightProvider({ children }: { children: ReactNode }) {
         tile.animate([{ opacity: 0 }, { opacity: 0, offset: 0.55 }, { opacity: 1 }], { duration: 640, easing: "ease", fill: "both" });
         await move.finished.catch(() => undefined);
         clean(tile);
-      })();
-      // never strand the page
-      window.setTimeout(() => clean(findTile()), 6000);
+      })().catch(() => clean(findTile())); // a throw anywhere in the flight must still take the wash down
+      // never strand the page: the wash is opaque, so a flight that stalls would look like a frozen blank screen
+      window.setTimeout(() => clean(findTile()), ARRIVE_MS + 1700);
     };
     const nav = (window as unknown as { navigation?: EventTarget }).navigation;
     const onNavigate = (e: Event) => {

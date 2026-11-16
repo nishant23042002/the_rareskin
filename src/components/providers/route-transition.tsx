@@ -61,6 +61,8 @@ interface RouteTransitionValue {
    * closes (viewport px); it defaults to the last pointer position, or the centre.
    */
   navigate: (href: string, from?: Point) => void;
+  /** take down a curtain (and its scroll lock) that has nothing left to wait for; a no-op while a transition is running */
+  sweep: () => void;
 }
 
 const RouteTransitionContext = createContext<RouteTransitionValue | null>(null);
@@ -70,6 +72,7 @@ const FALLBACK: RouteTransitionValue = {
   navigate: (href) => {
     window.location.assign(href);
   },
+  sweep: () => {},
 };
 
 export function useRouteTransition(): RouteTransitionValue {
@@ -90,6 +93,12 @@ type Timing = typeof FULL | typeof SOFT;
 
 /** never keep the curtain up longer than this if the route does not commit */
 const NAV_TIMEOUT_MS = 8000;
+/**
+ * The last word: whatever state the phase machine is in, a run that is still going after this long is torn down
+ * (the ceiling above + the longest reveal, with room to spare). A curtain that cannot lift swallows every tap and
+ * locks the scroll, i.e. a dead page, so this is not a tuning knob but a guarantee.
+ */
+const MAX_RUN_MS = NAV_TIMEOUT_MS + 5000;
 /** the most the reveal waits for the above-the-fold pictures of the new page */
 const IMAGE_WAIT_MS = 700;
 /** a link slower than this gets the "working" glint along the rule */
@@ -304,7 +313,7 @@ function createCurtain(root: HTMLElement, deps: Deps) {
     if (run === r) run = null;
   };
 
-  const reveal = async (r: Run) => {
+  const lift = async (r: Run) => {
     const { t } = r;
     // behind the curtain: scroll to the top (the announcement bar and header re-expand
     // out of sight), let the new page paint, wait for its pictures
@@ -323,15 +332,15 @@ function createCurtain(root: HTMLElement, deps: Deps) {
     root.classList.remove("is-waiting", "is-closed");
     root.classList.add("is-leaving"); // the page is live as soon as it starts to lift
 
-    let lift: Animation;
+    let lifted: Animation;
     if (r.reduced) {
-      lift = play(r, root, [{ opacity: 1 }, { opacity: 0 }], {
+      lifted = play(r, root, [{ opacity: 1 }, { opacity: 0 }], {
         duration: t.reveal,
         easing: "ease-in-out",
       });
     } else {
       const opts = { duration: t.reveal, delay: t.lift, easing: EASE_REVEAL };
-      lift = play(r, top, [{ transform: HOME }, { transform: UP }], opts);
+      lifted = play(r, top, [{ transform: HOME }, { transform: UP }], opts);
       play(r, bottom, [{ transform: HOME }, { transform: DOWN }], opts);
       play(r, dim, [{ opacity: 0.5 }, { opacity: 0 }], {
         duration: t.reveal,
@@ -359,8 +368,18 @@ function createCurtain(root: HTMLElement, deps: Deps) {
         { duration: 420, delay: t.lift, easing: "ease-out" },
       );
     }
-    await ends(lift, t.reveal + t.lift);
-    finish(r);
+    await ends(lifted, t.reveal + t.lift);
+  };
+
+  /** the lift, and whatever happens in it (a throw included) the page is handed back */
+  const reveal = async (r: Run) => {
+    try {
+      await lift(r);
+    } catch {
+      /* a lift that fails must still hand the page back */
+    } finally {
+      finish(r);
+    }
   };
 
   const advance = (r: Run) => {
@@ -411,8 +430,7 @@ function createCurtain(root: HTMLElement, deps: Deps) {
     check();
   };
 
-  const start = (href: string, from: Point) => {
-    if (run) return;
+  const begin = (href: string, from: Point) => {
     const url = new URL(href, window.location.href);
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const t: Timing = reduced ? SOFT : FULL;
@@ -519,11 +537,45 @@ function createCurtain(root: HTMLElement, deps: Deps) {
       },
       NAV_TIMEOUT_MS,
     );
+    // the guarantee behind every wait above: past this, the curtain comes down whatever state it is in
+    later(r, () => finish(r), MAX_RUN_MS);
+  };
+
+  const start = (href: string, from: Point) => {
+    if (run) return;
+    try {
+      begin(href, from);
+    } catch {
+      // the curtain could not be raised: never leave it half up, and never swallow the tap, navigate plainly
+      if (run) finish(run);
+      window.location.assign(href);
+    }
+  };
+
+  /**
+   * The curtain is up (or the page locked for it) with no run behind it: nothing will ever lift it.
+   * Not reachable by the phase machine as written; this is for the day something else breaks it.
+   */
+  const sweep = () => {
+    if (run) return;
+    const stale = root.hasAttribute("data-open") || document.body.classList.contains("route-locked");
+    if (!stale) return;
+    root.classList.remove("is-leaving", "is-waiting", "is-closed", "is-reduced");
+    delete root.dataset.open;
+    topLayer(false);
+    try {
+      root.getAnimations({ subtree: true }).forEach((a) => a.cancel());
+    } catch {
+      /* no getAnimations: the animations end on their own */
+    }
+    document.body.classList.remove("route-locked");
+    if (!document.querySelector("dialog[open]")) deps.lenis()?.start();
   };
 
   return {
     start,
     check,
+    sweep,
     /**
      * Back / forward before the route committed: nothing is coming (the router drops
      * the pending push), so lift the curtain now rather than at the ceiling. The
@@ -629,6 +681,14 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
     // restored from the back/forward cache with the curtain still up
     const onPageShow = (e: PageTransitionEvent) => {
       if (e.persisted) curtain.abort();
+      curtain.sweep();
+    };
+    // coming back to the tab (an app switch, the payment app, a locked screen): whatever the curtain was
+    // waiting on may have been frozen with the page, so look again
+    const onVisible = () => {
+      if (document.visibilityState !== "visible") return;
+      curtain.check();
+      curtain.sweep();
     };
 
     const onPopState = () => curtain.interrupt();
@@ -637,6 +697,7 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
     document.addEventListener("click", onClick, true);
     window.addEventListener("pageshow", onPageShow);
     window.addEventListener("popstate", onPopState);
+    document.addEventListener("visibilitychange", onVisible);
 
     apiRef.current = (href, from) => {
       let url: URL;
@@ -664,6 +725,7 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
       document.removeEventListener("click", onClick, true);
       window.removeEventListener("pageshow", onPageShow);
       window.removeEventListener("popstate", onPopState);
+      document.removeEventListener("visibilitychange", onVisible);
       apiRef.current = null;
       curtainRef.current = null;
       curtain.abort();
@@ -674,7 +736,8 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
     if (apiRef.current) apiRef.current(href, from);
     else routerRef.current.push(href);
   }, []);
-  const value = useMemo(() => ({ navigate }), [navigate]);
+  const sweep = useCallback(() => curtainRef.current?.sweep(), []);
+  const value = useMemo(() => ({ navigate, sweep }), [navigate, sweep]);
 
   return (
     <RouteTransitionContext.Provider value={value}>

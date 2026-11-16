@@ -20,7 +20,7 @@ export default function NotFound() {
           <Button href="/" variant="solid" size="sm">
             Home
           </Button>
-          <Button href="/#shop" variant="onDark" size="sm">
+          <Button href="/#collection" variant="onDark" size="sm">
             The fragrances
           </Button>
         </div>
