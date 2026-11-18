@@ -66,6 +66,17 @@ export {
 } from "./coupon-actions";
 export type { CouponActionResult } from "./coupon-actions";
 
+export { listCertificates, getCertificateForAdmin } from "./certificates";
+export type { AdminCertificateRow } from "./certificates";
+
+export {
+  createCertificate,
+  updateCertificateDraft,
+  issueCertificate,
+  revokeCertificate,
+} from "./certificate-actions";
+export type { CertificateActionResult } from "./certificate-actions";
+
 export {
   getSettingsForEdit,
   updateSiteSettings,

@@ -5,6 +5,7 @@
  */
 export * from "./primitives";
 export * from "./auth";
+export * from "./certificate";
 export * from "./commerce";
 export * from "./contact";
 export * from "./media";

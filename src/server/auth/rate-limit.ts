@@ -42,6 +42,9 @@ const RULES = {
   // the inbox. Generous for a real person (several enquiries, a shared network), tight for a script.
   "contact:ip": { limit: 6, window: "15 m" as Duration },
   "newsletter:ip": { limit: 10, window: "15 m" as Duration },
+  // Public certificate verification (/verify and /api/certificates/<no>) — one lookup per call, so this
+  // only has to stop someone walking the number space (TRS-INT-2026-001, -002, …) with a script.
+  "certificate:verify:ip": { limit: 40, window: "10 m" as Duration },
 } as const;
 
 export type RateRule = keyof typeof RULES;

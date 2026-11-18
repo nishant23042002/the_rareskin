@@ -58,6 +58,10 @@ next-env.d.ts
 # design exploration — local visual reference only (see design-explorations/README.md)
 /design-explorations/
 
+# official document kit — certificate/letter templates, register and plans. Holds the company's GSTIN, address
+# and draft certificates, and this repo is public, so it stays on this computer only (back it up separately).
+/docs/official-document-kit/
+
 # editor / OS cruft
 .idea/
 .vscode/
