@@ -138,6 +138,24 @@ export default async function CertificatePage({
             </p>
           </Card>
 
+          {cert.status !== "revoked" && cert.type !== "HR" && (
+            <Card title="Certificate PDF">
+              <a
+                href={`/api/admin/certificates/${encodeURIComponent(cert.certNo)}/pdf`}
+                download={`${cert.certNo}.pdf`}
+                className="flex w-full items-center justify-center gap-1.5 rounded-[3px] bg-cta px-3 py-2 text-[11px] tracking-[0.1em] text-w0 uppercase hover:bg-cta-hover"
+              >
+                <Icon name="download" className="size-3.5" />
+                Download PDF
+              </a>
+              <p className="mt-3 text-[11.5px] leading-relaxed text-ink-3">
+                {cert.status === "draft"
+                  ? "A4 landscape, drawn from this record with its QR code. The date line is left blank: print it, then the founder writes the date, signs and stamps it."
+                  : "The final copy, with the issue date printed. Print it for ink and the stamp, or e-sign the PDF, then email it from the company address."}
+              </p>
+            </Card>
+          )}
+
           <CertificateActions certNo={cert.certNo} status={cert.status} />
         </div>
       </div>

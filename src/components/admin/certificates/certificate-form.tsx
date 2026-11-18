@@ -200,14 +200,14 @@ export function CertificateForm({
 
       <FormSection
         title="Work & issuer"
-        description="Shown to anyone who verifies the certificate. Keep it factual: every line must be true and explainable in an interview."
+        description="Printed on the certificate right after the dates, and shown to anyone who verifies it. Write a complete sentence and keep it factual: every line must be true and explainable in an interview."
       >
         <Field label="Work summary" hint={`${s.summary.length}/320`}>
           <TextArea
             value={s.summary}
             onChange={(e) => set("summary", e.target.value.slice(0, 320))}
             rows={3}
-            placeholder="One line on what the person built or owned."
+            placeholder="e.g. The internship covered the build of …"
           />
         </Field>
         <Field

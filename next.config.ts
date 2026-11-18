@@ -63,6 +63,11 @@ const nextConfig: NextConfig = {
       "./public/brand/rareskin-wordmark.png",
       "./public/images/pdp/*/item-thumb.jpg",
     ],
+    // the certificate PDF: brand faces + the cream wordmark (src/server/certificates/)
+    "/api/admin/certificates/[certNo]/pdf": [
+      "./public/fonts/**",
+      "./public/brand/rareskin-wordmark-cream.png",
+    ],
     // the product share card re-renders daily on the server (see its file)
     "/fragrances/[slug]/opengraph-image*": [
       "./public/brand/rareskin-wordmark.png",
