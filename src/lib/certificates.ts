@@ -25,6 +25,13 @@ export const CERT_ISSUER_TITLE =
 export const CERT_ORGANISATION =
   "THE RARESKIN, operated by Velocity Ventures (Proprietorship)";
 export const CERT_CONTACT_EMAIL = "admin@velocityventuresgroup.in";
+/**
+ * The registered address, worded exactly as on the founder's letter and our letterhead (the
+ * storefront's contact line in Studio → Settings words it differently, and marketing may edit
+ * that one — an official document must not follow it).
+ */
+export const CERT_REGISTERED_ADDRESS =
+  "Shop No. 4, Jija Mata Bachat Bhavan, Roha ST Road, Near ST Stand, Roha, Raigad, Maharashtra – 402109";
 
 export const CERT_TYPE_LABEL: Record<CertificateType, string> = {
   INT: "Certificate of Internship",
@@ -97,10 +104,21 @@ export function periodLabel(startMonth: string, endMonth: string): string {
     : `${monthLabel(startMonth)} – ${monthLabel(endMonth)}`;
 }
 
-/** A date stored at UTC midnight → `20 November 2026` (no timezone drift). */
+/** 1 → `1st`, 2 → `2nd`, 3 → `3rd`, 4 → `4th`, 11 → `11th`, 22 → `22nd`, 31 → `31st` */
+export function ordinal(n: number): string {
+  const teen = n % 100 >= 11 && n % 100 <= 13;
+  const suffix = teen ? "th" : (["th", "st", "nd", "rd"][n % 10] ?? "th");
+  return `${n}${suffix}`;
+}
+
+/**
+ * A date stored at UTC midnight → `2nd November 2026` (no timezone drift). Day first, an
+ * ordinal day and the month spelled out: the formal form on Indian certificates and letters,
+ * and it can never be misread as month/day. The suffix is set inline, not raised.
+ */
 export function dateLabel(value: Date | string | null | undefined): string {
   if (!value) return "—";
   const d = typeof value === "string" ? new Date(value) : value;
   if (Number.isNaN(d.getTime())) return "—";
-  return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+  return `${ordinal(d.getUTCDate())} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 }

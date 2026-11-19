@@ -15,6 +15,7 @@ import {
   CERT_CONTACT_EMAIL,
   CERT_ISSUER_TITLE,
   CERT_ORGANISATION,
+  CERT_REGISTERED_ADDRESS,
   dateLabel,
   monthLabel,
 } from "@/lib/certificates";
@@ -147,14 +148,18 @@ export function CertificateDocument({ data }: { data: CertificatePdfData }) {
   const w = wording(data);
   const { size, d: qrD } = qrPath(data.verifyUrl);
   const titles = CERT_ISSUER_TITLE.split(" · ");
-  const footer = [
-    "Velocity Ventures (Proprietorship)",
-    data.gstin ? `GSTIN ${data.gstin}` : null,
-    CERT_CONTACT_EMAIL,
-    "www.therareskin.com",
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  // Two lines: who issues it and how to reach it, then where (the registered address).
+  const footerLines = [
+    [
+      "Velocity Ventures (Proprietorship)",
+      data.gstin ? `GSTIN ${data.gstin}` : null,
+      CERT_CONTACT_EMAIL,
+      "www.therareskin.com",
+    ]
+      .filter(Boolean)
+      .join(" · "),
+    `Registered address: ${CERT_REGISTERED_ADDRESS}`,
+  ];
 
   return (
     <Document
@@ -372,7 +377,8 @@ export function CertificateDocument({ data }: { data: CertificatePdfData }) {
                       </Text>
                     )}
                   </View>
-                  <View style={{ width: p(168), height: 0.75, backgroundColor: INK }} />
+                  {/* long enough for "23rd September 2026" typed OR written by hand */}
+                  <View style={{ width: p(200), height: 0.75, backgroundColor: INK }} />
                   <Text
                     style={{
                       marginTop: p(8),
@@ -386,34 +392,10 @@ export function CertificateDocument({ data }: { data: CertificatePdfData }) {
                   </Text>
                 </View>
 
-                {/* seal */}
-                <View style={{ marginTop: p(6) }}>
-                  <View
-                    style={{
-                      width: p(104),
-                      height: p(104),
-                      borderRadius: p(52),
-                      borderWidth: 0.75,
-                      borderColor: GOLD,
-                      borderStyle: "dashed",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: p(12),
-                        lineHeight: 1.4,
-                        letterSpacing: ls(12, 0.16),
-                        textTransform: "uppercase",
-                        textAlign: "center",
-                        color: MUTED,
-                      }}
-                    >
-                      {"Company\nseal"}
-                    </Text>
-                  </View>
-                </View>
+                {/* The company stamp is applied in ink (or as a stamp image on an e-signed
+                    copy) in the clear space between the date and the signature. Nothing is
+                    printed here: a "Company seal" label on a finished certificate is a
+                    template placeholder, not part of the document. */}
 
                 {/* signature */}
                 <View style={{ width: p(220) }}>
@@ -439,18 +421,19 @@ export function CertificateDocument({ data }: { data: CertificatePdfData }) {
                 </View>
               </View>
 
-              <Text
+              <View
                 style={{
                   paddingTop: p(10),
                   borderTopWidth: 0.75,
                   borderTopColor: "#DDD6C6",
-                  fontSize: p(12),
-                  lineHeight: 1.5,
-                  color: MUTED,
                 }}
               >
-                {footer}
-              </Text>
+                {footerLines.map((line) => (
+                  <Text key={line} style={{ fontSize: p(12), lineHeight: 1.5, color: MUTED }}>
+                    {line}
+                  </Text>
+                ))}
+              </View>
             </View>
           </View>
         </View>

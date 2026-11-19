@@ -15,6 +15,7 @@ import { renderCertificatePdf } from "@/server/certificates/render";
  *   /api/dev/certificate?case=valid      → with the issue date typeset
  *   /api/dev/certificate?case=long       → a very long name and role
  *   /api/dev/certificate?case=test       → the TEST certificate
+ *   /api/dev/certificate?date=2026-09-23 → with that issue date (any case)
  */
 export const dynamic = "force-dynamic";
 
@@ -62,6 +63,10 @@ export async function GET(request: Request) {
               signedBy: "Test Signatory",
             }
           : {};
+
+  // ?date=2026-09-23 types the issue date set (to check the widest ones fit the date line)
+  const on = new URL(request.url).searchParams.get("date");
+  if (on && /^\d{4}-\d{2}-\d{2}$/.test(on)) over.issuedOn = new Date(`${on}T00:00:00Z`);
 
   const data = { ...SAMPLE, ...over, logo: brandFile("rareskin-wordmark-cream.png") };
   data.verifyUrl = certVerifyUrl(data.certNo);
