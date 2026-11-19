@@ -7,6 +7,7 @@ import { qrPath, qrSvg } from "@/server/certificates/qr";
 import { PageHeader, Card } from "@/components/admin/ui";
 import { CertificateForm } from "@/components/admin/certificates/certificate-form";
 import { CertificateActions } from "@/components/admin/certificates/certificate-actions";
+import { CertificatePreview } from "@/components/admin/certificates/certificate-preview";
 import { CertificateStatusBadge } from "@/components/admin/certificates/certificate-status";
 import { Icon } from "@/components/ui/icon";
 import {
@@ -64,6 +65,8 @@ export default async function CertificatePage({
 
       <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
         <div className="grid content-start gap-4">
+          <CertificatePreview cert={cert} />
+
           <Card title="Record">
             <dl>
               <Item label="Holder">{cert.holderName}</Item>

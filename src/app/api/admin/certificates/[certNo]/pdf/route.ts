@@ -16,11 +16,15 @@ import {
  * shows). `admin`+. Drafts download too (that is the copy the founder signs; the date line
  * is blank); a valid certificate's copy also prints the issue date. A revoked certificate
  * has no PDF. Every download is audit-logged.
+ *
+ * `?inline=1` serves the same bytes for display (`Content-Disposition: inline`) — the preview
+ * frame on the Studio certificate page. A preview is just looking at the record, so it is not
+ * audit-logged; a download is.
  */
 export const dynamic = "force-dynamic";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   ctxArg: { params: Promise<{ certNo: string }> },
 ) {
   const ctx = await requireAdminRole("admin");
@@ -40,21 +44,25 @@ export async function GET(
     return NextResponse.json({ ok: false, error: "render-failed" }, { status: 500 });
   }
 
-  const req = await requestContext();
-  await recordAudit({
-    actorId: new Types.ObjectId(ctx.user.id),
-    actorRole: ctx.user.role,
-    action: "certificate.download",
-    targetType: "Certificate",
-    targetId: certNo,
-    ip: req.ip,
-    userAgent: req.userAgent,
-  });
+  const inline = new URL(request.url).searchParams.get("inline") === "1";
+
+  if (!inline) {
+    const req = await requestContext();
+    await recordAudit({
+      actorId: new Types.ObjectId(ctx.user.id),
+      actorRole: ctx.user.role,
+      action: "certificate.download",
+      targetType: "Certificate",
+      targetId: certNo,
+      ip: req.ip,
+      userAgent: req.userAgent,
+    });
+  }
 
   return new Response(pdf, {
     headers: {
       "content-type": "application/pdf",
-      "content-disposition": `attachment; filename="${certNo}.pdf"`,
+      "content-disposition": `${inline ? "inline" : "attachment"}; filename="${certNo}.pdf"`,
       "content-length": String(pdf.byteLength),
       "cache-control": "private, no-store",
     },
