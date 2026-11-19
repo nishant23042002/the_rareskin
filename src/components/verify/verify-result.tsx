@@ -70,53 +70,6 @@ export function Ornament({
   );
 }
 
-/** a rosette of rotated ellipses — guilloche line work, faint, behind the wording */
-function Rosette() {
-  const n = 30;
-  return (
-    <svg className="cv-rosette" viewBox="-100 -100 200 200" aria-hidden="true">
-      {Array.from({ length: n }, (_, i) => (
-        <ellipse key={i} rx="94" ry="36" transform={`rotate(${(i * 180) / n})`} />
-      ))}
-      <circle r="97" />
-      <circle r="60" />
-      <circle r="26" />
-    </svg>
-  );
-}
-
-/** the digital seal: a scalloped medal with the record's wording round the rim and a check at its centre */
-function Seal() {
-  const pts = Array.from({ length: 72 }, (_, i) => {
-    const a = (i * Math.PI) / 36;
-    const r = i % 2 === 0 ? 58 : 54.2;
-    return `${(60 + r * Math.cos(a)).toFixed(2)},${(60 + r * Math.sin(a)).toFixed(2)}`;
-  }).join(" ");
-  const r = 34.5;
-  return (
-    <svg className="cv-seal" viewBox="0 0 120 120" role="img" aria-label="Seal: verified record">
-      <defs>
-        <linearGradient id="cv-seal-fill" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#E6D3AE" />
-          <stop offset="0.5" stopColor="#C9AC7E" />
-          <stop offset="1" stopColor="#A88B5C" />
-        </linearGradient>
-        <path id="cv-seal-ring" d={`M60,60 m-${r},0 a${r},${r} 0 1,1 ${2 * r},0 a${r},${r} 0 1,1 -${2 * r},0`} />
-      </defs>
-      <polygon points={pts} fill="url(#cv-seal-fill)" stroke="#7A5C2E" strokeWidth="0.8" strokeLinejoin="round" />
-      <circle cx="60" cy="60" r="47.5" fill="none" stroke="#7A5C2E" strokeWidth="0.8" />
-      <circle cx="60" cy="60" r="44.5" fill="none" stroke="#7A5C2E" strokeWidth="0.4" opacity="0.7" />
-      <circle cx="60" cy="60" r="27.5" fill="#F2F1ED" stroke="#7A5C2E" strokeWidth="0.8" />
-      <text fill="#3B2C14" fontSize="7.2" fontWeight="500" fontFamily="var(--font-jost), system-ui, sans-serif">
-        <textPath href="#cv-seal-ring" textLength={(2 * Math.PI * r - 2).toFixed(1)} lengthAdjust="spacing">
-          THE RARESKIN · VERIFIED RECORD ·
-        </textPath>
-      </text>
-      <path d="M48.5 60.5l8 8 15-17" fill="none" stroke="#3F6A4C" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 function Verdict({
   isTest,
   checkedOn,
@@ -186,9 +139,8 @@ export function ValidCard({
             <div className="cv-side__how">
               <Ornament lead onDark />
               <p className="mt-4">
-                This certificate is held in THE RARESKIN&rsquo;s register. Scan the code, or enter the
-                number at{" "}
-                <a href={VERIFY_HOME}>{VERIFY_HOME_LABEL}</a>, to see the details on record.
+                This certificate can be verified online. Scan the code, or enter the certificate number at{" "}
+                <a href={VERIFY_HOME}>{VERIFY_HOME_LABEL}</a> to see the details on record.
               </p>
             </div>
 
@@ -221,7 +173,6 @@ export function ValidCard({
               <i className="cv-dia cv-dia--bl" />
               <i className="cv-dia cv-dia--br" />
             </div>
-            <Rosette />
             {c.isTest && (
               <div className="cv-watermark" aria-hidden="true">
                 <span>TEST ONLY</span>
@@ -255,8 +206,8 @@ export function ValidCard({
                     <p className="cv-cap">Date of issue</p>
                   </div>
 
-                  <div className="cv-seal-cell">{!c.isTest && <Seal />}</div>
-
+                  {/* the company stamp is applied in ink on the paper copy, in the clear space between
+                      the date and the signature — nothing is drawn here */}
                   <div className="cv-signer">
                     <div className="cv-sig-space" />
                     <div className="cv-rule" />

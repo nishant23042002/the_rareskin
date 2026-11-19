@@ -3,7 +3,7 @@
 
    The result is drawn as the certificate itself: the same layout, palette, type and
    wording as the downloadable PDF and the printable templates (dark panel with the QR
-   and the number, ivory panel with a gold double rule and corner diamonds). The
+   and the number, ivory panel with a gold rule and corner diamonds). The
    palette is FIXED — it is the locked certificate design, not the storefront theme —
    so a theme preview can never recolour an official document.
 
@@ -14,7 +14,6 @@
 
 .cv {
   --cv-ivory: #f2f1ed;
-  --cv-paper: #f6f5f0;
   --cv-ink: #1a1714;
   --cv-muted: #5e5850;
   --cv-gold: #a88b5c;
@@ -321,23 +320,6 @@
   isolation: isolate;
   margin-top: 30px;
 }
-/* two sheets under it, a hair off-square — it is a document, not a card */
-.cv-sheet::before,
-.cv-sheet::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--cv-paper);
-  border: 1px solid rgba(16, 14, 12, 0.09);
-}
-.cv-sheet::before {
-  transform: translate(6px, 9px) rotate(0.45deg);
-}
-.cv-sheet::after {
-  transform: translate(-5px, 15px) rotate(-0.4deg);
-  opacity: 0.7;
-}
 .cv-paper {
   position: relative;
   display: grid;
@@ -361,7 +343,7 @@
   flex-direction: column;
   gap: 22px;
   padding: 26px 22px 24px;
-  background: radial-gradient(120% 55% at 0% 0%, rgba(197, 168, 128, 0.15), transparent 62%), var(--cv-onyx);
+  background: var(--cv-onyx);
   color: var(--cv-on-dark);
 }
 .cv-side__sub {
@@ -448,7 +430,7 @@
   }
 }
 
-/* right panel: the wording, inside a gold double rule */
+/* right panel: the wording, inside a gold rule with a diamond at each corner */
 .cv-main {
   position: relative;
   display: flex;
@@ -462,12 +444,6 @@
   border: 1px solid var(--cv-gold);
   pointer-events: none;
 }
-.cv-frame::before {
-  content: "";
-  position: absolute;
-  inset: 4px;
-  border: 0.5px solid color-mix(in srgb, var(--cv-gold) 55%, transparent);
-}
 .cv-dia {
   position: absolute;
   width: 9px;
@@ -480,24 +456,6 @@
 .cv-dia--tr { top: -5.5px; right: -5.5px; }
 .cv-dia--bl { bottom: -5.5px; left: -5.5px; }
 .cv-dia--br { bottom: -5.5px; right: -5.5px; }
-
-/* a guilloche rosette, faint, behind the wording — the kind of line work banknotes use */
-.cv-rosette {
-  position: absolute;
-  left: 50%;
-  bottom: -34%;
-  width: 76%;
-  max-width: 600px;
-  transform: translateX(-50%);
-  pointer-events: none;
-  opacity: 0.15;
-}
-.cv-rosette ellipse,
-.cv-rosette circle {
-  fill: none;
-  stroke: var(--cv-gold);
-  stroke-width: 0.45;
-}
 
 .cv-watermark {
   position: absolute;
@@ -588,47 +546,43 @@
   line-height: 1.65;
 }
 
-/* date · seal · signature */
+/* date on the left, signatory on the right; the clear space between is where the ink stamp goes on paper */
 .cv-end {
   display: grid;
   gap: 14px;
 }
+/* Both columns start at the top and open with a block of the same fixed height, so the date's rule
+   and the signature's rule sit on ONE line however tall the text under each turns out (the signer's
+   name and two titles make that column taller; aligning to the bottom pushed the date's rule down). */
 .cv-sign {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-areas: "seal" "date" "sig";
   gap: 20px;
-  align-items: end;
+  align-items: start;
 }
-.cv-date { grid-area: date; min-width: 0; }
-.cv-seal-cell { grid-area: seal; display: grid; justify-items: start; }
-.cv-signer { grid-area: sig; min-width: 0; }
+.cv-date,
+.cv-signer {
+  min-width: 0;
+}
 @container cvp (min-width: 520px) {
   .cv-sign {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-areas: "seal seal" "date sig";
-    gap: 22px 18px;
+    gap: 18px;
   }
-  .cv-seal-cell { justify-items: center; }
   .cv-signer { text-align: right; }
   .cv-signer .cv-rule { margin-left: auto; }
-}
-@container cvp (min-width: 960px) {
-  .cv-sign {
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    grid-template-areas: "date seal sig";
-  }
 }
 .cv-date__v {
   display: flex;
   align-items: flex-end;
-  min-height: 40px;
+  height: 44px;
   padding-bottom: 3px;
   font-weight: 500;
   font-size: clamp(15px, 1.7cqw, 17px);
+  white-space: nowrap;
 }
 .cv-sig-space {
-  min-height: 40px;
+  height: 44px;
 }
 .cv-rule {
   max-width: 200px;
@@ -670,15 +624,6 @@
 }
 .cv-fine a:hover {
   text-decoration: underline;
-}
-
-/* the digital seal — what stands in the middle where the ink stamp goes on paper */
-.cv-seal {
-  display: block;
-  width: clamp(76px, 10cqw, 112px);
-  height: auto;
-  transform: rotate(-8deg);
-  filter: drop-shadow(0 2px 2px rgba(70, 48, 12, 0.3));
 }
 
 /* ---------- below the certificate ---------- */
@@ -973,10 +918,6 @@
   .cv-print-only {
     display: block !important;
   }
-  .cv-sheet::before,
-  .cv-sheet::after {
-    display: none;
-  }
   .cv-paper {
     box-shadow: none;
   }
@@ -989,9 +930,6 @@
 @media (prefers-reduced-motion: no-preference) {
   .cv-sheet {
     animation: cv-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.05s backwards;
-  }
-  .cv-seal {
-    animation: cv-stamp 0.6s cubic-bezier(0.2, 0.85, 0.3, 1.15) 0.55s backwards;
   }
   .cv-verdict__mark path {
     stroke-dasharray: 24;
@@ -1006,9 +944,6 @@
 }
 @keyframes cv-rise {
   from { opacity: 0; transform: translateY(14px); }
-}
-@keyframes cv-stamp {
-  from { opacity: 0; transform: scale(1.7) rotate(-26deg); }
 }
 @keyframes cv-stamp-flat {
   from { opacity: 0; scale: 1.5; }
