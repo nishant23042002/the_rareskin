@@ -6,6 +6,7 @@ import {
   View,
   Text,
   Image,
+  Link,
   Svg,
   Path,
   StyleSheet,
@@ -16,6 +17,8 @@ import {
   CERT_ISSUER_TITLE,
   CERT_ORGANISATION,
   CERT_REGISTERED_ADDRESS,
+  CERT_VERIFY_ORIGIN,
+  CERT_VERIFY_PATH,
   dateLabel,
   monthLabel,
 } from "@/lib/certificates";
@@ -148,18 +151,12 @@ export function CertificateDocument({ data }: { data: CertificatePdfData }) {
   const w = wording(data);
   const { size, d: qrD } = qrPath(data.verifyUrl);
   const titles = CERT_ISSUER_TITLE.split(" · ");
-  // Two lines: who issues it and how to reach it, then where (the registered address).
-  const footerLines = [
-    [
-      "Velocity Ventures (Proprietorship)",
-      data.gstin ? `GSTIN ${data.gstin}` : null,
-      CERT_CONTACT_EMAIL,
-      "www.therareskin.com",
-    ]
-      .filter(Boolean)
-      .join(" · "),
-    `Registered address: ${CERT_REGISTERED_ADDRESS}`,
-  ];
+  // Every address on the paper is a REAL link annotation with an absolute https:// target. Text
+  // that merely looks like an address ("therareskin.com/verify") is guessed at by PDF viewers,
+  // which resolve a scheme-less guess against the file's own folder
+  // (file:///C:/Users/.../Downloads/therareskin.com/verify) — a dead link.
+  const verifyHome = `${CERT_VERIFY_ORIGIN}${CERT_VERIFY_PATH}`;
+  const linkStyle = { textDecoration: "none" } as const;
 
   return (
     <Document
@@ -213,16 +210,22 @@ export function CertificateDocument({ data }: { data: CertificatePdfData }) {
             <Ornament color={BRASS} line={56} lead />
             <Text style={{ marginTop: p(16), fontSize: p(14), lineHeight: 1.65, color: ON_DARK_MUTED }}>
               This certificate can be verified online. Scan the code, or enter the certificate number at{" "}
-              <Text style={{ color: IVORY }}>therareskin.com/verify</Text> to see the details on record.
+              <Link src={verifyHome} style={{ ...linkStyle, color: IVORY }}>
+                www.therareskin.com/verify
+              </Link>{" "}
+              to see the details on record.
             </Text>
           </View>
 
           <View>
-            <View style={{ width: p(152), height: p(152), padding: p(16), backgroundColor: IVORY }}>
-              <Svg viewBox={`0 0 ${size} ${size}`} width={p(120)} height={p(120)}>
-                <Path d={qrD} fill={INK} />
-              </Svg>
-            </View>
+            {/* the QR is a link too: opening the PDF on a screen, a click lands on this record */}
+            <Link src={data.verifyUrl} style={linkStyle}>
+              <View style={{ width: p(152), height: p(152), padding: p(16), backgroundColor: IVORY }}>
+                <Svg viewBox={`0 0 ${size} ${size}`} width={p(120)} height={p(120)}>
+                  <Path d={qrD} fill={INK} />
+                </Svg>
+              </View>
+            </Link>
             <Text
               style={{
                 marginTop: p(18),
@@ -237,7 +240,11 @@ export function CertificateDocument({ data }: { data: CertificatePdfData }) {
             <Text style={{ marginTop: p(2), fontSize: p(19), letterSpacing: ls(19, 0.05), color: IVORY }}>
               {data.certNo}
             </Text>
-            <Text style={{ marginTop: p(4), fontSize: p(13), color: ON_DARK_MUTED }}>therareskin.com/verify</Text>
+            <Text style={{ marginTop: p(4), fontSize: p(13), color: ON_DARK_MUTED }}>
+              <Link src={verifyHome} style={{ ...linkStyle, color: ON_DARK_MUTED }}>
+                www.therareskin.com/verify
+              </Link>
+            </Text>
           </View>
         </View>
 
@@ -428,11 +435,21 @@ export function CertificateDocument({ data }: { data: CertificatePdfData }) {
                   borderTopColor: "#DDD6C6",
                 }}
               >
-                {footerLines.map((line) => (
-                  <Text key={line} style={{ fontSize: p(12), lineHeight: 1.5, color: MUTED }}>
-                    {line}
-                  </Text>
-                ))}
+                <Text style={{ fontSize: p(12), lineHeight: 1.5, color: MUTED }}>
+                  Velocity Ventures (Proprietorship)
+                  {data.gstin ? ` · GSTIN ${data.gstin}` : ""}
+                  {" · "}
+                  <Link src={`mailto:${CERT_CONTACT_EMAIL}`} style={{ ...linkStyle, color: MUTED }}>
+                    {CERT_CONTACT_EMAIL}
+                  </Link>
+                  {" · "}
+                  <Link src={CERT_VERIFY_ORIGIN} style={{ ...linkStyle, color: MUTED }}>
+                    www.therareskin.com
+                  </Link>
+                </Text>
+                <Text style={{ fontSize: p(12), lineHeight: 1.5, color: MUTED }}>
+                  Registered address: {CERT_REGISTERED_ADDRESS}
+                </Text>
               </View>
             </View>
           </View>
