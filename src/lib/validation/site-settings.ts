@@ -68,10 +68,15 @@ const codSettings = z.object({
 });
 
 const gstSettings = z.object({
+  // 2-digit state · 10-char PAN · entity no. (1-9, then A-Z) · "Z" · check char
+  // (a digit OR a letter — the old pattern demanded a digit and rejected every
+  // GSTIN whose check character is a letter).
   gstin: z
     .string()
+    .trim()
+    .toUpperCase()
     .regex(
-      /^\d{2}[A-Z]{5}\d{4}[A-Z]\d[A-Z]\d$/,
+      /^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/,
       "Enter a valid 15-character GSTIN",
     )
     .optional(),
