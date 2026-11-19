@@ -7,8 +7,10 @@ import {
   CERT_ORGANISATION,
   ENGAGEMENT_LABEL,
   CERT_TYPE_LABEL,
+  certificateWording,
   dateLabel,
   periodLabel,
+  type CertificateWording,
 } from "@/lib/certificates";
 
 /**
@@ -36,6 +38,8 @@ export interface PublicCertificate {
   issuedBy: string;
   issuerTitle: string;
   organisation: string;
+  /** the sentences as printed on the paper (same function the PDF uses) */
+  wording: CertificateWording;
 }
 
 export type VerifyResult =
@@ -71,6 +75,7 @@ export async function verifyCertificate(certNo: string): Promise<VerifyResult> {
       issuedBy: doc.signedBy,
       issuerTitle: CERT_ISSUER_TITLE,
       organisation: CERT_ORGANISATION,
+      wording: certificateWording(doc),
     },
   };
 }

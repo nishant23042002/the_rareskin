@@ -104,6 +104,50 @@ export function periodLabel(startMonth: string, endMonth: string): string {
     : `${monthLabel(startMonth)} – ${monthLabel(endMonth)}`;
 }
 
+export interface CertificateWording {
+  isTest: boolean;
+  title: string;
+  intro: string;
+  lead: string;
+  body: string;
+}
+
+/**
+ * The sentences printed on a certificate, built from its record. ONE function for both the PDF
+ * (`server/certificates/document.tsx`) and the certificate shown on `/verify`, so the paper and
+ * the page can never word the same record differently.
+ */
+export function certificateWording(c: {
+  type: CertificateType;
+  engagement: CertificateEngagement;
+  startMonth: string;
+  endMonth: string;
+  summary: string;
+}): CertificateWording {
+  const isTest = c.type === "TEST";
+  const title = isTest
+    ? "Test Certificate"
+    : c.type === "EXP"
+      ? "Certificate of Experience"
+      : "Certificate of Internship";
+  const intro = isTest ? "This test certificate is issued to" : "This is to certify that";
+  const lead = isTest
+    ? "only to check the verification flow, as"
+    : c.engagement === "internship"
+      ? "has successfully completed an internship as"
+      : c.engagement === "freelance"
+        ? "has successfully completed a freelance engagement as"
+        : "has worked full-time as";
+  const when =
+    c.startMonth === c.endMonth
+      ? `in ${monthLabel(c.startMonth)}`
+      : `from ${monthLabel(c.startMonth)} to ${monthLabel(c.endMonth)}`;
+  const body = isTest
+    ? `This document certifies nothing and must never be given to anyone as a real certificate.${c.summary ? ` ${c.summary}` : ""}`
+    : `with THE RARESKIN, operated by Velocity Ventures, ${when}.${c.summary ? ` ${c.summary}` : ""}`;
+  return { isTest, title, intro, lead, body };
+}
+
 /** 1 → `1st`, 2 → `2nd`, 3 → `3rd`, 4 → `4th`, 11 → `11th`, 22 → `22nd`, 31 → `31st` */
 export function ordinal(n: number): string {
   const teen = n % 100 >= 11 && n % 100 <= 13;

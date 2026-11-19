@@ -2,10 +2,13 @@ import { pageMeta } from "@/lib/seo";
 import { dateLabel, normaliseCertNo } from "@/lib/certificates";
 import { checkRateOpen, requestContext } from "@/server/auth";
 import { verifyCertificate, type VerifyResult } from "@/server/data/certificates";
+import { Icon } from "@/components/ui/icon";
+import { FindTheNumber } from "@/components/verify/find-the-number";
 import { VerifyForm } from "@/components/verify/verify-form";
 import {
   InvalidFormatCard,
   NotFoundCard,
+  Ornament,
   RateLimitedCard,
   RevokedCard,
   UnavailableCard,
@@ -19,6 +22,10 @@ import {
  * Dynamic (it reads `searchParams`) and never cached, so a revocation shows on
  * the next scan. `noindex`: nobody should find a person's certificate by
  * searching, only by holding the paper.
+ *
+ * Two shapes: with no number it is a landing page (form, how it works); with one
+ * the answer comes FIRST — the person scanning a QR on a phone wants the verdict,
+ * not the introduction — and the form moves below it for the next check.
  */
 export const dynamic = "force-dynamic";
 
@@ -64,30 +71,31 @@ export default async function VerifyPage({
   const sp = await searchParams;
   const rawId = Array.isArray(sp.id) ? sp.id[0] : sp.id;
   const verdict = await check(rawId);
+  const answered = verdict.kind !== "none";
 
   return (
     <>
-      <p className="eyebrow">THE RARESKIN</p>
-      <h1 className="serif-italic mt-3 text-[2.2rem] leading-[1.08] text-ink sm:text-[3rem]">
-        Verify a certificate
-      </h1>
-      <p className="mt-4 max-w-[56ch] text-[15px] leading-relaxed text-ink-2">
-        Every certificate and official letter issued by THE RARESKIN carries a number and a QR code.
-        Scan the code, or type the number below, to confirm that it is genuine and see the details on
-        record.
-      </p>
+      <header className="cv-hero" data-compact={answered || undefined}>
+        <p className="cv-eyebrow">THE RARESKIN · Register of certificates</p>
+        <h1 className="cv-h1">{answered ? "Verification result" : "Verify a certificate"}</h1>
+        <Ornament both line={72} />
+        {!answered && (
+          <p className="cv-lede">
+            Every certificate and official letter issued by THE RARESKIN carries a number and a QR
+            code. Scan the code, or type the number below, to confirm that it is genuine and see the
+            details on record.
+          </p>
+        )}
+      </header>
 
-      <VerifyForm defaultValue={verdict.kind === "none" ? "" : (rawId ?? "")} />
+      {!answered && <VerifyForm />}
 
       <div aria-live="polite">
         {verdict.kind === "invalid" && <InvalidFormatCard typed={verdict.typed} />}
         {verdict.kind === "limited" && <RateLimitedCard />}
         {verdict.kind === "unavailable" && <UnavailableCard />}
         {verdict.kind === "result" && verdict.result.state === "valid" && (
-          <ValidCard
-            certificate={verdict.result.certificate}
-            checkedOn={dateLabel(new Date())}
-          />
+          <ValidCard certificate={verdict.result.certificate} checkedOn={dateLabel(new Date())} />
         )}
         {verdict.kind === "result" && verdict.result.state === "revoked" && (
           <RevokedCard certNo={verdict.certNo} revokedOn={verdict.result.revokedOn} />
@@ -97,24 +105,74 @@ export default async function VerifyPage({
         )}
       </div>
 
-      {verdict.kind === "none" && (
-        <section className="mt-12 border-t border-line pt-8">
-          <h2 className="eyebrow">How verification works</h2>
-          <ol className="mt-4 grid gap-4 text-[14px] leading-relaxed text-ink-2 sm:grid-cols-3">
-            <li>
-              <span className="block text-ink">1. Find the number</span>
-              Printed on the certificate beside the QR code, in the form TRS-INT-2026-001.
-            </li>
-            <li>
-              <span className="block text-ink">2. Scan or type it</span>
-              The QR code opens this page with the number filled in.
-            </li>
-            <li>
-              <span className="block text-ink">3. Compare the details</span>
-              The name, role and period shown here must match the paper exactly.
-            </li>
-          </ol>
+      {answered && (
+        <section className="cv-again cv-noprint" aria-labelledby="again">
+          <h2 id="again" className="cv-eyebrow">
+            Check another certificate
+          </h2>
+          <VerifyForm defaultValue={rawId ?? ""} />
         </section>
+      )}
+
+      {!answered && (
+        <>
+          <section className="cv-how" aria-labelledby="how">
+            <div>
+              <h2 id="how" className="cv-eyebrow">
+                How verification works
+              </h2>
+              <ol className="cv-steps">
+                <li>
+                  <span className="cv-num" aria-hidden="true">1</span>
+                  <div>
+                    <strong>Find the number</strong>
+                    Printed on the certificate beside the QR code, in the form{" "}
+                    <span className="whitespace-nowrap">TRS-INT-2026-001</span>.
+                  </div>
+                </li>
+                <li>
+                  <span className="cv-num" aria-hidden="true">2</span>
+                  <div>
+                    <strong>Scan or type it</strong>
+                    The QR code opens this page with the number filled in.
+                  </div>
+                </li>
+                <li>
+                  <span className="cv-num" aria-hidden="true">3</span>
+                  <div>
+                    <strong>Compare the details</strong>
+                    The name, role and period shown here must match the paper exactly.
+                  </div>
+                </li>
+              </ol>
+            </div>
+            <FindTheNumber />
+          </section>
+
+          <section className="cv-trust" aria-label="About this register">
+            <div>
+              <span className="cv-ico"><Icon name="shield" className="size-[18px]" /></span>
+              <p>
+                <strong>Only what is printed</strong>
+                This page shows the same details as the certificate itself, and nothing more about the person.
+              </p>
+            </div>
+            <div>
+              <span className="cv-ico"><Icon name="clock" className="size-[18px]" /></span>
+              <p>
+                <strong>Checked live</strong>
+                Each check reads the register as it is now, so a withdrawn certificate stops verifying at once.
+              </p>
+            </div>
+            <div>
+              <span className="cv-ico"><Icon name="lock" className="size-[18px]" /></span>
+              <p>
+                <strong>No sign-in needed</strong>
+                Anyone holding a certificate can check it. Nothing is asked of you and no account is needed.
+              </p>
+            </div>
+          </section>
+        </>
       )}
     </>
   );

@@ -19,8 +19,8 @@ import {
   CERT_REGISTERED_ADDRESS,
   CERT_VERIFY_ORIGIN,
   CERT_VERIFY_PATH,
+  certificateWording,
   dateLabel,
-  monthLabel,
 } from "@/lib/certificates";
 import type {
   CertificateEngagement,
@@ -76,31 +76,6 @@ const s = StyleSheet.create({
   page: { backgroundColor: IVORY, color: INK, fontFamily: "Jost" },
 });
 
-function wording(d: CertificatePdfData) {
-  const isTest = d.type === "TEST";
-  const title = isTest
-    ? "Test Certificate"
-    : d.type === "EXP"
-      ? "Certificate of Experience"
-      : "Certificate of Internship";
-  const intro = isTest ? "This test certificate is issued to" : "This is to certify that";
-  const lead = isTest
-    ? "only to check the verification flow, as"
-    : d.engagement === "internship"
-      ? "has successfully completed an internship as"
-      : d.engagement === "freelance"
-        ? "has successfully completed a freelance engagement as"
-        : "has worked full-time as";
-  const when =
-    d.startMonth === d.endMonth
-      ? `in ${monthLabel(d.startMonth)}`
-      : `from ${monthLabel(d.startMonth)} to ${monthLabel(d.endMonth)}`;
-  const body = isTest
-    ? `This document certifies nothing and must never be given to anyone as a real certificate.${d.summary ? ` ${d.summary}` : ""}`
-    : `with THE RARESKIN, operated by Velocity Ventures, ${when}.${d.summary ? ` ${d.summary}` : ""}`;
-  return { isTest, title, intro, lead, body };
-}
-
 /** Long names / roles step down so they never push the page past one sheet. */
 function nameSize(n: string): number {
   return n.length <= 20 ? 66 : n.length <= 26 ? 54 : n.length <= 34 ? 44 : 36;
@@ -148,7 +123,7 @@ function Ornament({ color, line, lead }: { color: string; line: number; lead?: b
 }
 
 export function CertificateDocument({ data }: { data: CertificatePdfData }) {
-  const w = wording(data);
+  const w = certificateWording(data);
   const { size, d: qrD } = qrPath(data.verifyUrl);
   const titles = CERT_ISSUER_TITLE.split(" · ");
   // Every address on the paper is a REAL link annotation with an absolute https:// target. Text

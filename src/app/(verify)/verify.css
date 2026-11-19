@@ -1,0 +1,1018 @@
+/* ==========================================================================
+   /verify — certificate verification.
+
+   The result is drawn as the certificate itself: the same layout, palette, type and
+   wording as the downloadable PDF and the printable templates (dark panel with the QR
+   and the number, ivory panel with a gold double rule and corner diamonds). The
+   palette is FIXED — it is the locked certificate design, not the storefront theme —
+   so a theme preview can never recolour an official document.
+
+   Scoped under `.cv` (set on the verify layout's wrapper, which also carries the
+   Cormorant Garamond variable). Everything that moves sits behind
+   `prefers-reduced-motion: no-preference`; at rest the page is complete.
+   ========================================================================== */
+
+.cv {
+  --cv-ivory: #f2f1ed;
+  --cv-paper: #f6f5f0;
+  --cv-ink: #1a1714;
+  --cv-muted: #5e5850;
+  --cv-gold: #a88b5c;
+  --cv-gold-d: #7a5c2e;
+  --cv-brass: #c5a880;
+  --cv-onyx: #100e0c;
+  --cv-on-dark: #b8b1a4;
+  --cv-hair: #ddd6c6;
+  --cv-red: #b23a2b;
+  --cv-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --cv-sans: var(--font-jost), system-ui, sans-serif;
+  font-family: var(--cv-sans);
+}
+
+/* ---------- ornaments ---------- */
+.cv-orn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--cv-gold);
+}
+.cv-orn b {
+  display: block;
+  width: var(--cv-orn-line, 64px);
+  height: 1px;
+  background: currentColor;
+}
+.cv-orn i {
+  display: block;
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border: 1px solid currentColor;
+  transform: rotate(45deg);
+}
+.cv-orn--on-dark {
+  color: var(--cv-brass);
+}
+
+/* ---------- chrome ---------- */
+.cv-head {
+  position: relative;
+  border-bottom: 1px solid var(--color-line);
+}
+.cv-head::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cv-gold) 22%, var(--cv-gold) 78%, transparent);
+  opacity: 0.6;
+}
+.cv-foot {
+  background: var(--onyx, #100e0c);
+  color: var(--cv-on-dark);
+}
+.cv-foot a {
+  color: var(--cv-ivory);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cv-foot a:hover {
+  text-decoration: none;
+}
+
+/* ---------- headings ---------- */
+.cv-eyebrow {
+  font: 500 11px/1.5 var(--cv-sans);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--cv-gold-d);
+}
+.cv-hero {
+  text-align: center;
+}
+.cv-h1 {
+  margin-top: 14px;
+  font-family: var(--cv-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(2.5rem, 7vw, 4rem);
+  line-height: 1.02;
+  color: var(--cv-ink);
+}
+.cv-hero[data-compact] .cv-h1 {
+  font-size: clamp(2.1rem, 5vw, 2.9rem);
+}
+.cv-hero .cv-orn {
+  margin-top: 20px;
+}
+.cv-lede {
+  margin: 20px auto 0;
+  max-width: 56ch;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--color-ink-2);
+}
+
+/* ---------- the enquiry form ---------- */
+.cv-form {
+  position: relative;
+  max-width: 620px;
+  margin: 34px auto 0;
+  padding: 26px 24px 22px;
+  text-align: left;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line-2);
+  box-shadow: 0 1px 2px rgba(16, 14, 12, 0.05), 0 16px 32px -20px rgba(16, 14, 12, 0.3);
+}
+.cv-form::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid color-mix(in srgb, var(--cv-gold) 42%, transparent);
+  pointer-events: none;
+}
+.cv-label {
+  display: block;
+  font: 500 11px/1.4 var(--cv-sans);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cv-gold-d);
+}
+.cv-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+@media (min-width: 560px) {
+  .cv-field {
+    flex-direction: row;
+  }
+}
+.cv-input {
+  flex: 1;
+  width: 100%;
+  min-height: 54px;
+  padding: 0 16px;
+  border: 1px solid var(--color-line-2);
+  background: #fdfcf9;
+  font: 500 16px/1 var(--cv-sans);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cv-ink);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.cv-input::placeholder {
+  color: var(--color-ink-3);
+  text-transform: none;
+  letter-spacing: 0.03em;
+  font-weight: 400;
+}
+.cv-input:focus {
+  border-color: var(--cv-ink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cv-gold) 28%, transparent);
+}
+.cv-btn {
+  flex: none;
+  min-height: 54px;
+  padding: 0 30px;
+  border: 1px solid var(--cv-onyx);
+  background: var(--cv-onyx);
+  font: 500 11px/1 var(--cv-sans);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cv-ivory);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.cv-btn:hover {
+  background: #2a2623;
+}
+.cv-btn:focus-visible,
+.cv-ghost:focus-visible {
+  outline: 2px solid var(--cv-gold);
+  outline-offset: 3px;
+}
+.cv-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid var(--color-line-2);
+  background: transparent;
+  font: 500 11px/1 var(--cv-sans);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cv-ink);
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.cv-ghost:hover {
+  border-color: var(--cv-ink);
+  background: var(--color-surface);
+}
+.cv-hint {
+  margin-top: 12px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--color-ink-3);
+}
+.cv-again {
+  margin-top: 56px;
+  padding-top: 34px;
+  border-top: 1px solid var(--color-line);
+  text-align: center;
+}
+.cv-again .cv-form {
+  margin-top: 18px;
+}
+
+/* ---------- verdict banner ---------- */
+.cv-verdict {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  align-items: center;
+  padding: 18px 20px;
+  border: 1px solid color-mix(in srgb, var(--color-ok) 40%, var(--color-line));
+  background: color-mix(in srgb, var(--color-ok) 7%, var(--color-surface));
+}
+.cv-verdict[data-tone="test"] {
+  border-color: color-mix(in srgb, var(--color-warn) 48%, var(--color-line));
+  background: color-mix(in srgb, var(--color-warn) 9%, var(--color-surface));
+}
+.cv-verdict__mark {
+  grid-row: 1 / span 2;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--color-ok);
+  color: #fff;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-ok) 18%, transparent);
+}
+.cv-verdict[data-tone="test"] .cv-verdict__mark {
+  background: var(--color-warn);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-warn) 18%, transparent);
+}
+.cv-verdict__mark svg {
+  width: 24px;
+  height: 24px;
+}
+.cv-verdict__kicker {
+  font: 500 10.5px/1.4 var(--cv-sans);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-ok);
+}
+.cv-verdict[data-tone="test"] .cv-verdict__kicker {
+  color: var(--color-warn);
+}
+.cv-verdict h2 {
+  margin-top: 2px;
+  font-family: var(--cv-serif);
+  font-weight: 500;
+  font-size: clamp(1.55rem, 3.6vw, 2rem);
+  line-height: 1.1;
+  color: var(--cv-ink);
+}
+.cv-verdict p {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--color-ink-2);
+}
+.cv-verdict__when {
+  grid-column: 1 / -1;
+  padding-top: 10px;
+  border-top: 1px solid color-mix(in srgb, var(--color-ok) 22%, transparent);
+  font-size: 12px;
+  color: var(--color-ink-3);
+}
+.cv-verdict__when strong {
+  display: block;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--cv-ink);
+}
+.cv-verdict__mark { grid-column: 1; }
+.cv-verdict__text { grid-column: 2; min-width: 0; }
+@media (min-width: 720px) {
+  .cv-verdict {
+    grid-template-columns: auto 1fr auto;
+    padding: 20px 26px;
+  }
+  .cv-verdict__when {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    padding: 0 0 0 26px;
+    border-top: 0;
+    border-left: 1px solid color-mix(in srgb, var(--color-ok) 24%, transparent);
+    text-align: right;
+  }
+}
+
+/* ---------- the certificate ---------- */
+.cv-sheet {
+  position: relative;
+  isolation: isolate;
+  margin-top: 30px;
+}
+/* two sheets under it, a hair off-square — it is a document, not a card */
+.cv-sheet::before,
+.cv-sheet::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--cv-paper);
+  border: 1px solid rgba(16, 14, 12, 0.09);
+}
+.cv-sheet::before {
+  transform: translate(6px, 9px) rotate(0.45deg);
+}
+.cv-sheet::after {
+  transform: translate(-5px, 15px) rotate(-0.4deg);
+  opacity: 0.7;
+}
+.cv-paper {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  container: cvp / inline-size;
+  background: var(--cv-ivory);
+  color: var(--cv-ink);
+  box-shadow: 0 1px 2px rgba(16, 14, 12, 0.12), 0 26px 46px -22px rgba(16, 14, 12, 0.45);
+}
+@media (min-width: 820px) {
+  .cv-paper {
+    grid-template-columns: 272px minmax(0, 1fr);
+    aspect-ratio: 1123 / 794; /* A4 landscape, like the PDF; taller only if the wording needs it */
+  }
+}
+
+/* left panel: brand, QR, number */
+.cv-side {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 26px 22px 24px;
+  background: radial-gradient(120% 55% at 0% 0%, rgba(197, 168, 128, 0.15), transparent 62%), var(--cv-onyx);
+  color: var(--cv-on-dark);
+}
+.cv-side__sub {
+  margin-top: 12px;
+  font-size: 10.5px;
+  line-height: 1.6;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cv-brass);
+}
+.cv-side__how {
+  display: none;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--cv-on-dark);
+}
+.cv-side__how a {
+  color: var(--cv-ivory);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cv-ref {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.cv-qr {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 112px;
+  aspect-ratio: 1;
+  background: var(--cv-ivory);
+}
+/* 79% of the card: the PDF's quiet zone (a percentage padding would follow the PARENT's width, not the card's) */
+.cv-qr svg {
+  display: block;
+  width: 79%;
+  height: 79%;
+}
+.cv-ref__cap {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cv-brass);
+}
+.cv-ref__no {
+  margin-top: 3px;
+  font-size: 17px;
+  letter-spacing: 0.05em;
+  color: var(--cv-ivory);
+  overflow-wrap: anywhere;
+}
+.cv-ref__url {
+  display: inline-block;
+  margin-top: 5px;
+  font-size: 12.5px;
+  color: var(--cv-on-dark);
+  text-decoration: none;
+}
+.cv-ref__url:hover {
+  color: var(--cv-ivory);
+}
+@media (min-width: 820px) {
+  .cv-side {
+    justify-content: space-between;
+    gap: 0;
+    padding: 46px 34px 42px;
+  }
+  .cv-side__how {
+    display: block;
+  }
+  .cv-ref {
+    display: block;
+  }
+  .cv-qr {
+    width: 150px;
+  }
+  .cv-ref__cap {
+    margin-top: 18px;
+  }
+  .cv-ref__no {
+    font-size: 19px;
+  }
+}
+
+/* right panel: the wording, inside a gold double rule */
+.cv-main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  overflow: hidden;
+}
+.cv-frame {
+  position: absolute;
+  inset: 14px;
+  border: 1px solid var(--cv-gold);
+  pointer-events: none;
+}
+.cv-frame::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 0.5px solid color-mix(in srgb, var(--cv-gold) 55%, transparent);
+}
+.cv-dia {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background: var(--cv-ivory);
+  border: 1px solid var(--cv-gold);
+  transform: rotate(45deg);
+}
+.cv-dia--tl { top: -5.5px; left: -5.5px; }
+.cv-dia--tr { top: -5.5px; right: -5.5px; }
+.cv-dia--bl { bottom: -5.5px; left: -5.5px; }
+.cv-dia--br { bottom: -5.5px; right: -5.5px; }
+
+/* a guilloche rosette, faint, behind the wording — the kind of line work banknotes use */
+.cv-rosette {
+  position: absolute;
+  left: 50%;
+  bottom: -34%;
+  width: 76%;
+  max-width: 600px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  opacity: 0.15;
+}
+.cv-rosette ellipse,
+.cv-rosette circle {
+  fill: none;
+  stroke: var(--cv-gold);
+  stroke-width: 0.45;
+}
+
+.cv-watermark {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.cv-watermark span {
+  transform: rotate(-14deg);
+  font: 500 clamp(52px, 13cqw, 104px) / 1 var(--cv-sans);
+  letter-spacing: 0.12em;
+  color: var(--cv-red);
+  opacity: 0.1;
+  white-space: nowrap;
+}
+
+.cv-body {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 30px;
+  padding: clamp(28px, 4.6cqw, 46px) clamp(22px, 5cqw, 52px) clamp(18px, 2.6cqw, 26px);
+}
+.cv-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cv-pill {
+  padding: 5px 12px;
+  border: 1px solid var(--cv-red);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cv-red);
+}
+.cv-title {
+  margin-top: 16px;
+  font-family: var(--cv-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(32px, 5cqw, 54px);
+  line-height: 1;
+}
+.cv-intro {
+  margin-top: clamp(16px, 2.4cqw, 26px);
+  font-family: var(--cv-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(17px, 2cqw, 21px);
+  line-height: 1.2;
+  color: var(--cv-muted);
+}
+.cv-name {
+  margin-top: 4px;
+  font-family: var(--cv-serif);
+  font-weight: 500;
+  font-size: var(--cv-name, 56px);
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+.cv-body .cv-orn--name {
+  margin-top: 12px;
+  --cv-orn-line: 112px;
+}
+.cv-lead {
+  margin-top: 16px;
+  font-size: clamp(15px, 1.5cqw, 16px);
+  line-height: 1.6;
+}
+.cv-role {
+  margin-top: 2px;
+  font-family: var(--cv-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: var(--cv-role, 30px);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.cv-text {
+  margin-top: 10px;
+  max-width: 640px;
+  font-size: clamp(15px, 1.5cqw, 16px);
+  line-height: 1.65;
+}
+
+/* date · seal · signature */
+.cv-end {
+  display: grid;
+  gap: 14px;
+}
+.cv-sign {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "seal" "date" "sig";
+  gap: 20px;
+  align-items: end;
+}
+.cv-date { grid-area: date; min-width: 0; }
+.cv-seal-cell { grid-area: seal; display: grid; justify-items: start; }
+.cv-signer { grid-area: sig; min-width: 0; }
+@container cvp (min-width: 520px) {
+  .cv-sign {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "seal seal" "date sig";
+    gap: 22px 18px;
+  }
+  .cv-seal-cell { justify-items: center; }
+  .cv-signer { text-align: right; }
+  .cv-signer .cv-rule { margin-left: auto; }
+}
+@container cvp (min-width: 960px) {
+  .cv-sign {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas: "date seal sig";
+  }
+}
+.cv-date__v {
+  display: flex;
+  align-items: flex-end;
+  min-height: 40px;
+  padding-bottom: 3px;
+  font-weight: 500;
+  font-size: clamp(15px, 1.7cqw, 17px);
+}
+.cv-sig-space {
+  min-height: 40px;
+}
+.cv-rule {
+  max-width: 200px;
+  height: 1px;
+  background: var(--cv-ink);
+}
+.cv-signer .cv-rule {
+  max-width: 220px;
+}
+.cv-cap {
+  margin-top: 8px;
+  font-size: 11.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cv-gold-d);
+}
+.cv-signer__name {
+  margin-top: 8px;
+  font-family: var(--cv-serif);
+  font-weight: 600;
+  font-size: 21px;
+  line-height: 1.15;
+}
+.cv-signer__title {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--cv-gold-d);
+}
+.cv-fine {
+  padding-top: 10px;
+  border-top: 1px solid var(--cv-hair);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--cv-muted);
+}
+.cv-fine a {
+  color: inherit;
+  text-decoration: none;
+}
+.cv-fine a:hover {
+  text-decoration: underline;
+}
+
+/* the digital seal — what stands in the middle where the ink stamp goes on paper */
+.cv-seal {
+  display: block;
+  width: clamp(76px, 10cqw, 112px);
+  height: auto;
+  transform: rotate(-8deg);
+  filter: drop-shadow(0 2px 2px rgba(70, 48, 12, 0.3));
+}
+
+/* ---------- below the certificate ---------- */
+.cv-notes {
+  display: grid;
+  gap: 32px;
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid var(--color-line);
+}
+@media (min-width: 760px) {
+  .cv-notes {
+    grid-template-columns: 1.1fr 1fr;
+    gap: 60px;
+  }
+}
+.cv-notes p {
+  margin-top: 10px;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--color-ink-2);
+}
+.cv-notes a {
+  color: var(--cv-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cv-notes a:hover {
+  text-decoration: none;
+}
+.cv-checks {
+  display: grid;
+  gap: 9px;
+  margin-top: 14px;
+}
+.cv-checks li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14.5px;
+  color: var(--cv-ink);
+}
+.cv-checks li::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--cv-gold);
+  transform: rotate(45deg);
+}
+.cv-entry {
+  margin-top: 12px;
+}
+.cv-entry > div {
+  display: grid;
+  grid-template-columns: 124px minmax(0, 1fr);
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid var(--color-line);
+}
+.cv-entry > div:first-child {
+  border-top: 0;
+}
+.cv-entry dt {
+  font: 500 10.5px/1.7 var(--cv-sans);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+.cv-entry dd {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--cv-ink);
+}
+.cv-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--color-ok);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ok) 20%, transparent);
+}
+.cv-actions {
+  margin-top: 18px;
+}
+
+/* ---------- notices (not found, revoked, and the like) ---------- */
+.cv-notice {
+  --tone: var(--color-warn);
+  position: relative;
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  margin-top: 30px;
+  padding: 26px 22px;
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--tone) 42%, var(--color-line));
+  box-shadow: 0 16px 32px -24px rgba(16, 14, 12, 0.3);
+}
+.cv-notice[data-tone="error"] {
+  --tone: var(--color-error);
+}
+.cv-notice::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid color-mix(in srgb, var(--tone) 22%, transparent);
+  pointer-events: none;
+}
+.cv-notice__mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1.5px solid var(--tone);
+  color: var(--tone);
+}
+.cv-notice h2 {
+  font-family: var(--cv-serif);
+  font-weight: 500;
+  font-size: clamp(1.5rem, 3.4vw, 1.95rem);
+  line-height: 1.1;
+  color: var(--tone);
+}
+.cv-notice__body {
+  margin-top: 10px;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--color-ink-2);
+}
+.cv-notice__body a {
+  color: var(--cv-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cv-notice__body a:hover {
+  text-decoration: none;
+}
+.cv-stamp {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 7px 14px 6px;
+  border: 2px solid var(--tone);
+  border-radius: 3px;
+  font: 600 14px/1 var(--cv-sans);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--tone);
+  opacity: 0.85;
+  transform: rotate(-5deg);
+  box-shadow: inset 0 0 0 2px var(--color-surface), inset 0 0 0 3px var(--tone);
+}
+@media (min-width: 720px) {
+  .cv-notice {
+    padding: 30px 190px 30px 28px;
+  }
+  .cv-stamp {
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    margin-top: 0;
+    transform: translateY(-50%) rotate(-9deg);
+    font-size: 17px;
+    padding: 9px 16px 8px;
+  }
+}
+
+/* ---------- landing: how it works ---------- */
+.cv-how {
+  display: grid;
+  gap: 40px;
+  margin-top: 60px;
+  padding-top: 44px;
+  border-top: 1px solid var(--color-line);
+}
+@media (min-width: 820px) {
+  .cv-how {
+    grid-template-columns: 1fr 1.05fr;
+    gap: 64px;
+    align-items: center;
+  }
+}
+.cv-steps {
+  display: grid;
+  gap: 24px;
+  margin-top: 22px;
+}
+.cv-steps li {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 16px;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--color-ink-2);
+}
+.cv-steps strong {
+  display: block;
+  font-family: var(--cv-serif);
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 1.25;
+  color: var(--cv-ink);
+}
+.cv-num {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  font: italic 500 18px/1 var(--cv-serif);
+  color: var(--cv-gold-d);
+}
+.cv-num::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid var(--cv-gold);
+  transform: rotate(45deg);
+}
+.cv-map {
+  margin: 0;
+}
+.cv-map svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 18px 20px rgba(16, 14, 12, 0.2));
+}
+.cv-map figcaption {
+  margin-top: 16px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--color-ink-3);
+}
+.cv-trust {
+  display: grid;
+  gap: 22px;
+  margin-top: 56px;
+}
+@media (min-width: 720px) {
+  .cv-trust {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+}
+.cv-trust > div {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--color-ink-2);
+}
+.cv-trust strong {
+  display: block;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--cv-ink);
+}
+.cv-trust .cv-ico {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--cv-gold);
+  color: var(--cv-gold-d);
+}
+
+/* ---------- print: the verification, as a record to keep ---------- */
+.cv-print-only {
+  display: none;
+}
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 10mm;
+  }
+  .cv,
+  .cv * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .cv-noprint {
+    display: none !important;
+  }
+  .cv-print-only {
+    display: block !important;
+  }
+  .cv-sheet::before,
+  .cv-sheet::after {
+    display: none;
+  }
+  .cv-paper {
+    box-shadow: none;
+  }
+  .cv-sheet {
+    margin-top: 16px;
+  }
+}
+
+/* ---------- motion (only if the person has not asked for less) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .cv-sheet {
+    animation: cv-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.05s backwards;
+  }
+  .cv-seal {
+    animation: cv-stamp 0.6s cubic-bezier(0.2, 0.85, 0.3, 1.15) 0.55s backwards;
+  }
+  .cv-verdict__mark path {
+    stroke-dasharray: 24;
+    animation: cv-draw 0.45s ease-out 0.2s backwards;
+  }
+  .cv-notice {
+    animation: cv-rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+  }
+  .cv-stamp {
+    animation: cv-stamp-flat 0.5s cubic-bezier(0.2, 0.85, 0.3, 1.15) 0.3s backwards;
+  }
+}
+@keyframes cv-rise {
+  from { opacity: 0; transform: translateY(14px); }
+}
+@keyframes cv-stamp {
+  from { opacity: 0; transform: scale(1.7) rotate(-26deg); }
+}
+@keyframes cv-stamp-flat {
+  from { opacity: 0; scale: 1.5; }
+}
+@keyframes cv-draw {
+  from { stroke-dashoffset: 24; }
+}
